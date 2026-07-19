@@ -19,13 +19,9 @@ const revealSelectors = [
   ".nr-payment-info-item",
 ].join(", ");
 
-const WELCOME_STORAGE_KEY = "nour-welcome-shown";
-const WELCOME_DURATION = 2500;
-
 export default function SiteEnhancements() {
   const [progress, setProgress] = useState(0);
   const [showTop, setShowTop] = useState(false);
-  const [showWelcome, setShowWelcome] = useState(true);
 
   useEffect(() => {
     const updateScroll = () => {
@@ -50,26 +46,6 @@ export default function SiteEnhancements() {
 
     return () => {
       window.removeEventListener("scroll", updateScroll);
-    };
-  }, []);
-
-  useEffect(() => {
-    const alreadyShown = sessionStorage.getItem(
-      WELCOME_STORAGE_KEY,
-    );
-
-    if (alreadyShown) {
-      setShowWelcome(false);
-      return;
-    }
-
-    const timer = window.setTimeout(() => {
-      setShowWelcome(false);
-      sessionStorage.setItem(WELCOME_STORAGE_KEY, "true");
-    }, WELCOME_DURATION);
-
-    return () => {
-      window.clearTimeout(timer);
     };
   }, []);
 
@@ -116,53 +92,15 @@ export default function SiteEnhancements() {
     };
   }, []);
 
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
   return (
     <>
-      <AnimatePresence>
-        {showWelcome && (
-          <motion.div
-            className="nour-welcome-screen"
-            role="status"
-            aria-live="polite"
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <motion.div
-              className="nour-welcome-content"
-              initial={{
-                opacity: 0,
-                scale: 0.9,
-                y: 20,
-              }}
-              animate={{
-                opacity: 1,
-                scale: 1,
-                y: 0,
-              }}
-              transition={{
-                duration: 0.6,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-            >
-              <img
-                className="nour-welcome-logo"
-                src="/images/site/v-logo.png"
-                alt="Nour"
-              />
-
-              <div className="nour-welcome-title">
-                مرحبًا بك في نور
-              </div>
-
-              <div className="nour-welcome-text">
-                رفيقك لرحلة عمرة أكثر سهولة وطمأنينة
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <div
         className="modern-scroll-progress"
         style={{ width: `${progress}%` }}
@@ -200,12 +138,7 @@ export default function SiteEnhancements() {
             className="modern-back-top"
             type="button"
             aria-label="العودة إلى أعلى الصفحة"
-            onClick={() => {
-              window.scrollTo({
-                top: 0,
-                behavior: "smooth",
-              });
-            }}
+            onClick={scrollToTop}
             initial={{
               opacity: 0,
               scale: 0.8,
