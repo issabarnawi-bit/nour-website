@@ -667,3 +667,33 @@ html[dir="rtl"] .nr-installment-card::after {
     transition: none;
   }
 }
+
+/* Safe interaction polish */
+
+.nr-controls button,
+.nr-actions a,
+.nr-store-badge,
+.nr-journey-step,
+.nr-payment-card {
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
+}
+
+.nr-controls button:hover,
+.nr-actions a:hover,
+.nr-store-badge:hover {
+  transform: translateY(-3px);
+}
+
+.nr-journey-step:hover,
+.nr-payment-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 45px rgba(8, 76, 161, 0.14);
+}
+
+.nr-controls button:active,
+.nr-actions a:active {
+  transform: scale(0.97);
+}
