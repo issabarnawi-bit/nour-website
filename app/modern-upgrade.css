@@ -627,3 +627,43 @@ html[dir="rtl"] .nr-installment-card::after {
     animation: none !important;
   }
 }
+/* =========================================
+   Reveal sections while scrolling
+========================================= */
+
+.nr-reveal {
+  opacity: 0;
+  transform: translateY(42px);
+  transition:
+    opacity 0.75s ease,
+    transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--nr-reveal-delay, 0ms);
+}
+
+.nr-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* حركة جانبية خفيفة لأقسام الصور */
+
+.nr-about.nr-reveal,
+.nr-showcase.nr-reveal {
+  transform: translateY(35px) scale(0.985);
+}
+
+.nr-about.nr-reveal.is-visible,
+.nr-showcase.nr-reveal.is-visible {
+  transform: translateY(0) scale(1);
+}
+
+/* منع إخفاء العناصر عند تعطيل JavaScript أو تقليل الحركة */
+
+@media (prefers-reduced-motion: reduce) {
+  .nr-reveal,
+  .nr-reveal.is-visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

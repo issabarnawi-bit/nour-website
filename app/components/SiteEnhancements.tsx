@@ -3,23 +3,80 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
+const revealSelectors = [
+  ".nr-goals",
+  ".nr-about",
+  ".nr-features",
+  ".nr-journey",
+  ".nr-showcase",
+  ".nr-payments",
+  ".nr-cta",
+  ".nr-footer",
+  ".nr-goals article",
+  ".nr-feature-grid article",
+  ".nr-journey-step",
+  ".nr-payment-card",
+  ".nr-payment-info-item",
+].join(", ");
+
 export default function SiteEnhancements() {
   const [progress, setProgress] = useState(0);
   const [showTop, setShowTop] = useState(false);
 
   useEffect(() => {
-    const update = () => {
+    const updateScroll = () => {
       const top = window.scrollY;
-      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const max =
+        document.documentElement.scrollHeight - window.innerHeight;
 
       setProgress(max > 0 ? Math.min((top / max) * 100, 100) : 0);
       setShowTop(top > 550);
     };
 
-    update();
-    window.addEventListener("scroll", update, { passive: true });
+    updateScroll();
 
-    return () => window.removeEventListener("scroll", update);
+    window.addEventListener("scroll", updateScroll, {
+      passive: true,
+    });
+
+    return () => {
+      window.removeEventListener("scroll", updateScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    const elements =
+      document.querySelectorAll<HTMLElement>(revealSelectors);
+
+    if (!elements.length) return;
+
+    elements.forEach((element, index) => {
+      element.classList.add("nr-reveal");
+
+      const delay = Math.min((index % 6) * 70, 350);
+      element.style.setProperty("--nr-reveal-delay", `${delay}ms`);
+    });
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+
+          const element = entry.target as HTMLElement;
+          element.classList.add("is-visible");
+
+          observer.unobserve(element);
+        });
+      },
+      {
+        threshold: 0.12,
+        rootMargin: "0px 0px -55px 0px",
+      },
+    );
+
+    elements.forEach((element) => observer.observe(element));
+
+    return () => observer.disconnect();
   }, []);
 
   return (
@@ -35,10 +92,11 @@ export default function SiteEnhancements() {
         href="https://wa.me/966567488377"
         target="_blank"
         rel="noreferrer"
-        aria-label="WhatsApp"
+        aria-label="التواصل عبر واتساب"
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         whileHover={{ y: -4, scale: 1.05 }}
+        whileTap={{ scale: 0.92 }}
       >
         <span>◉</span>
       </motion.a>
@@ -48,12 +106,30 @@ export default function SiteEnhancements() {
           <motion.button
             className="modern-back-top"
             type="button"
-            aria-label="Back to top"
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            initial={{ opacity: 0, scale: 0.8, y: 12 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.8, y: 12 }}
+            aria-label="العودة إلى أعلى الصفحة"
+            onClick={() =>
+              window.scrollTo({
+                top: 0,
+                behavior: "smooth",
+              })
+            }
+            initial={{
+              opacity: 0,
+              scale: 0.8,
+              y: 12,
+            }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+              y: 0,
+            }}
+            exit={{
+              opacity: 0,
+              scale: 0.8,
+              y: 12,
+            }}
             whileHover={{ y: -4 }}
+            whileTap={{ scale: 0.92 }}
           >
             ↑
           </motion.button>
