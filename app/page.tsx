@@ -21,9 +21,9 @@ const copy = {
   "تواصل معنا",
 ],
     heroEyebrow: "تطبيق نور للعمرة",
-    heroTitle: "افتح الأبواب لرحلة عمرة أكثر سهولة وطمأنينة",
+    heroTitle: "رحلتك إلى العمرة تبدأ من نور",
     heroText:
-      "منصة رقمية تساعد المعتمر على اكتشاف البرامج، المقارنة بين الباقات، والحجز المباشر ضمن تجربة واضحة وآمنة.",
+  "اكتشف برامج عمرة متنوعة، قارن بين الباقات والخدمات، وأكمل حجزك بسهولة ضمن تجربة رقمية واضحة وآمنة.",
     discover: "اكتشف نور",
     contact: "تواصل معنا",
     goalsTitle: "أهداف نور",
@@ -34,10 +34,10 @@ const copy = {
       ["وضوح وثقة", "في الخدمات والأسعار"],
     ],
     aboutLabel: "عن نور",
-    aboutTitle: "تطبيق عمرة عربي وعالمي",
+    aboutTitle: "منصة ذكية لرحلة عمرة أكثر راحة",
     aboutText:
-      "نور منصة رقمية صُممت لتسهيل رحلة المعتمر، وتوفير باقات مرنة وخدمات موثوقة تساعده على أداء العمرة براحة ووضوح من خلال هاتفه.",
-    featuresLabel: "ماذا نقدم",
+  "نور منصة رقمية متكاملة تجمع برامج العمرة، السكن، النقل والخدمات المساندة في تجربة واحدة واضحة، لتمنح المعتمر رحلة أكثر سهولة وثقة من لحظة الاختيار وحتى إتمام الرحلة.",
+      featuresLabel: "ماذا نقدم",
     featuresTitle: "أفضل المزايا في تطبيق واحد",
     features: [
       ["باقات عمرة متنوعة", "خيارات تناسب الاحتياجات والميزانيات المختلفة."],
@@ -91,9 +91,9 @@ journeySteps: [
   "Contact",
 ],
     heroEyebrow: "Nour Umrah App",
-    heroTitle: "Unlock the doors to a smoother, more rewarding Umrah journey",
-    heroText:
-      "A digital platform that helps pilgrims discover programs, compare packages, and book directly through a clear and secure experience.",
+    heroTitle: "Your Umrah journey begins with Nour",
+   heroText:
+  "Discover diverse Umrah programs, compare packages and services, and complete your booking through a clear and secure digital experience.",
     discover: "Discover Nour",
     contact: "Contact Us",
     goalsTitle: "Nour Goals",
@@ -104,9 +104,9 @@ journeySteps: [
       ["Clarity and trust", "in services and prices"],
     ],
     aboutLabel: "About Nour",
-    aboutTitle: "An Arab and international Umrah app",
+    aboutTitle: "A smarter platform for a more comfortable Umrah journey",
     aboutText:
-      "Nour is a digital platform designed to simplify the pilgrim journey and provide flexible packages and trusted services from the palm of the hand.",
+  "Nour brings Umrah programs, accommodation, transport, and supporting services together in one clear digital experience, helping pilgrims plan and complete their journey with greater ease and confidence.",
     featuresLabel: "What We Offer",
     featuresTitle: "The best features in one app",
     features: [
