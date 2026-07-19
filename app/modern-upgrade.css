@@ -1,0 +1,629 @@
+/* Modern visual upgrade for the existing Nour redesign */
+
+:root {
+  --modern-blue: #1375e8;
+  --modern-blue-dark: #064ba9;
+  --modern-gold: #ffc515;
+  --modern-cyan: #58d8ff;
+  --modern-shadow: 0 24px 70px rgba(9, 63, 133, 0.13);
+}
+
+/* Scroll progress */
+
+.modern-scroll-progress {
+  position: fixed;
+  top: 0;
+  inset-inline-start: 0;
+  z-index: 9999;
+  height: 3px;
+  background: linear-gradient(90deg, var(--modern-gold), var(--modern-cyan));
+  box-shadow: 0 0 15px rgba(255, 197, 21, 0.45);
+  transition: width 0.08s linear;
+}
+
+/* Header */
+
+.nr-header {
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease,
+    backdrop-filter 0.3s ease;
+}
+
+.nr-header {
+  background: color-mix(in srgb, var(--nr-bg) 84%, transparent);
+  box-shadow: 0 10px 45px rgba(4, 48, 105, 0.06);
+  backdrop-filter: blur(18px);
+}
+
+.nr-nav nav a {
+  position: relative;
+}
+
+.nr-nav nav a::after {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  bottom: -9px;
+  width: 0;
+  height: 2px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, var(--modern-gold), var(--modern-blue));
+  transition: width 0.25s ease;
+}
+
+.nr-nav nav a:hover::after {
+  width: 100%;
+}
+
+/* Hero */
+
+.nr-hero {
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 14% 18%, rgba(88, 216, 255, 0.3), transparent 24%),
+    radial-gradient(circle at 84% 20%, rgba(255, 197, 21, 0.22), transparent 21%),
+    linear-gradient(135deg, #0a5ac9 0%, #1676e8 58%, #52b9ff 100%);
+}
+
+.nr-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.2;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.11) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.11) 1px, transparent 1px);
+  background-size: 54px 54px;
+  mask-image: linear-gradient(to left, black, transparent 78%);
+}
+
+.nr-hero h1 {
+  text-wrap: balance;
+  letter-spacing: -0.8px;
+}
+
+.nr-actions a {
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    background-color 0.22s ease;
+}
+
+.nr-actions a:hover {
+  transform: translateY(-4px);
+}
+
+.nr-primary {
+  box-shadow: 0 17px 38px rgba(255, 197, 21, 0.28);
+}
+
+.nr-phones::before {
+  content: "";
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  top: 40px;
+  inset-inline-end: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.26), transparent 67%);
+  filter: blur(5px);
+}
+
+.nr-phone-front,
+.nr-phone-back {
+  transition:
+    transform 0.45s ease,
+    filter 0.45s ease;
+}
+
+
+/* Animated section cards */
+
+.nr-goals article,
+.nr-feature-grid article {
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 0.28s ease,
+    box-shadow 0.28s ease,
+    border-color 0.28s ease;
+}
+
+.nr-goals article::before,
+.nr-feature-grid article::before {
+  content: "";
+  position: absolute;
+  width: 130px;
+  height: 130px;
+  top: -75px;
+  inset-inline-end: -65px;
+  border-radius: 50%;
+  background: rgba(255, 197, 21, 0.13);
+  transition: transform 0.4s ease;
+}
+
+.nr-goals article:hover,
+.nr-feature-grid article:hover {
+  transform: translateY(-9px);
+}
+
+.nr-goals article:hover {
+  border-color: rgba(19, 117, 232, 0.28);
+  box-shadow: var(--modern-shadow);
+}
+
+.nr-feature-grid article:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.nr-goals article:hover::before,
+.nr-feature-grid article:hover::before {
+  transform: scale(1.35);
+}
+
+/* About visual */
+
+.nr-visual-blob {
+  animation: modernBlob 9s ease-in-out infinite alternate;
+}
+
+@keyframes modernBlob {
+  from {
+    border-radius: 42% 58% 60% 40% / 45% 43% 57% 55%;
+    transform: rotate(0deg) scale(1);
+  }
+
+  to {
+    border-radius: 58% 42% 39% 61% / 56% 62% 38% 44%;
+    transform: rotate(8deg) scale(1.04);
+  }
+}
+
+.nr-about-visual img {
+  filter: drop-shadow(0 32px 48px rgba(17, 67, 126, 0.2));
+  transition: transform 0.45s ease;
+}
+
+.nr-about-visual:hover img {
+  transform: translateY(-12px) rotate(1deg);
+}
+
+/* Showcase */
+
+.nr-showcase-devices img {
+  filter: drop-shadow(0 28px 48px rgba(17, 67, 126, 0.18));
+  transition: transform 0.45s ease;
+}
+
+.nr-showcase-devices:hover img:first-child {
+  transform: translateY(-9px) rotate(-1deg);
+}
+
+.nr-showcase-devices:hover img:last-child {
+  transform: translateY(-15px) rotate(1deg);
+}
+
+/* CTA */
+
+.nr-cta-card {
+  position: relative;
+  isolation: isolate;
+  box-shadow: 0 30px 75px rgba(8, 76, 161, 0.2);
+}
+
+.nr-cta-card::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 360px;
+  height: 360px;
+  top: -190px;
+  inset-inline-start: -100px;
+  border: 65px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+}
+
+.nr-store-buttons button {
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.nr-store-buttons button:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(5, 44, 98, 0.18);
+}
+
+/* Footer */
+
+.nr-footer {
+  position: relative;
+  overflow: hidden;
+}
+
+.nr-footer::before {
+  content: "";
+  position: absolute;
+  width: 270px;
+  height: 270px;
+  left: -120px;
+  bottom: -170px;
+  border-radius: 50%;
+  background: rgba(19, 117, 232, 0.15);
+}
+
+/* Floating controls */
+
+.modern-whatsapp,
+.modern-back-top {
+  position: fixed;
+  z-index: 150;
+  width: 49px;
+  height: 49px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  color: white;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+.modern-whatsapp {
+  right: 22px;
+  bottom: 22px;
+  background: #1fbd5b;
+  font-size: 23px;
+}
+
+.modern-back-top {
+  left: 22px;
+  bottom: 22px;
+  background: linear-gradient(135deg, var(--modern-blue), var(--modern-blue-dark));
+  font: inherit;
+  font-size: 20px;
+}
+
+/* Dark mode refinements */
+
+html[data-theme="dark"] .nr-header {
+  background: rgba(6, 17, 30, 0.88);
+}
+
+html[data-theme="dark"] .nr-goals article {
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+}
+
+/* Mobile */
+
+@media (max-width: 920px) {
+  .nr-hero-grid {
+    padding-top: 105px;
+  }
+
+  .nr-phones::before {
+    width: 400px;
+    height: 400px;
+  }
+}
+
+@media (max-width: 580px) {
+  .nr-hero {
+    min-height: auto;
+  }
+
+  .nr-hero-grid {
+    padding-top: 95px;
+    padding-bottom: 72px;
+  }
+
+  .nr-hero h1 {
+    font-size: 42px;
+  }
+
+  .nr-goals article,
+  .nr-feature-grid article {
+    min-height: auto;
+  }
+
+  .modern-whatsapp,
+  .modern-back-top {
+    width: 44px;
+    height: 44px;
+    bottom: 15px;
+  }
+
+  .modern-whatsapp {
+    right: 15px;
+  }
+
+  .modern-back-top {
+    left: 15px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nr-visual-blob {
+    animation: none;
+  }
+}
+/* حركة هواتف الواجهة الرئيسية */
+
+.nr-phones {
+  perspective: 1200px;
+  transform-style: preserve-3d;
+}
+
+.nr-phone-back {
+  transform-origin: center;
+  animation: nourPhoneBackFloat 7s ease-in-out infinite;
+  will-change: transform;
+}
+
+.nr-phone-front {
+  transform-origin: center;
+  animation: nourPhoneFrontFloat 5.5s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* الهاتف الخلفي الكبير */
+
+@keyframes nourPhoneBackFloat {
+  0% {
+    transform:
+      translate3d(0, 0, 0)
+      rotate(-1deg)
+      scale(1);
+  }
+
+  35% {
+    transform:
+      translate3d(-8px, -16px, 0)
+      rotate(0.8deg)
+      scale(1.012);
+  }
+
+  70% {
+    transform:
+      translate3d(7px, -7px, 0)
+      rotate(-0.5deg)
+      scale(1.005);
+  }
+
+  100% {
+    transform:
+      translate3d(0, 0, 0)
+      rotate(-1deg)
+      scale(1);
+  }
+}
+
+/* الهاتف الأمامي الصغير */
+
+@keyframes nourPhoneFrontFloat {
+  0% {
+    transform:
+      translate3d(0, 0, 25px)
+      rotate(0deg)
+      scale(1);
+  }
+
+  40% {
+    transform:
+      translate3d(8px, -20px, 38px)
+      rotate(1deg)
+      scale(1.018);
+  }
+
+  75% {
+    transform:
+      translate3d(-5px, -9px, 30px)
+      rotate(-0.6deg)
+      scale(1.008);
+  }
+
+  100% {
+    transform:
+      translate3d(0, 0, 25px)
+      rotate(0deg)
+      scale(1);
+  }
+}
+
+/* توهج متحرك خلف الهواتف */
+
+.nr-phones::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 430px;
+  height: 430px;
+  top: 80px;
+  inset-inline-end: 25px;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.28) 0%,
+      rgba(82, 207, 255, 0.15) 38%,
+      transparent 70%
+    );
+  filter: blur(10px);
+  animation: nourPhoneGlow 6s ease-in-out infinite;
+}
+
+@keyframes nourPhoneGlow {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: scale(0.95);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+/* حركة إضافية عند مرور الماوس */
+
+.nr-phones:hover .nr-phone-back {
+  animation-play-state: paused;
+  transform:
+    translate3d(-12px, -10px, 0)
+    rotate(-2deg)
+    scale(1.015);
+}
+
+.nr-phones:hover .nr-phone-front {
+  animation-play-state: paused;
+  transform:
+    translate3d(12px, -20px, 50px)
+    rotate(1.5deg)
+    scale(1.025);
+}
+
+/* انتقال ناعم عند التفاعل */
+
+.nr-phone-back,
+.nr-phone-front {
+  transition:
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.4s ease;
+}
+
+/* تحسين الحركة على الجوال */
+
+@media (max-width: 580px) {
+  .nr-phone-back {
+    animation-duration: 8s;
+  }
+
+  .nr-phone-front {
+    animation-duration: 6.5s;
+  }
+
+  .nr-phones::after {
+    width: 300px;
+    height: 300px;
+    top: 55px;
+    inset-inline-end: 0;
+  }
+}
+
+/* احترام إعداد تقليل الحركة */
+
+@media (prefers-reduced-motion: reduce) {
+  .nr-phone-back,
+  .nr-phone-front,
+  .nr-phones::after {
+    animation: none !important;
+  }
+}
+
+/* حركة بطاقات وسائل الدفع */
+
+.nr-payment-card {
+  animation: nrPaymentFloat 5.5s ease-in-out infinite;
+  will-change: transform;
+}
+
+.nr-payment-card:nth-child(2) {
+  animation-delay: 0.4s;
+}
+
+.nr-payment-card:nth-child(3) {
+  animation-delay: 0.8s;
+}
+
+.nr-payment-card:nth-child(4) {
+  animation-delay: 1.2s;
+}
+
+.nr-payment-card:nth-child(5) {
+  animation-delay: 1.6s;
+}
+
+.nr-payment-card:nth-child(6) {
+  animation-delay: 2s;
+}
+
+@keyframes nrPaymentFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* تأثير إضافي عند المرور */
+
+.nr-payment-card:hover {
+  animation-play-state: paused;
+  transform: translateY(-12px) scale(1.025);
+}
+
+/* حركة الشعارات */
+
+.nr-payment-logo img {
+  transition:
+    transform 0.3s ease,
+    filter 0.3s ease;
+}
+
+.nr-payment-card:hover .nr-payment-logo img {
+  transform: scale(1.08);
+  filter: drop-shadow(0 8px 16px rgba(23, 111, 232, 0.18));
+}
+
+/* تابي وتمارا بشكل مميز */
+
+.nr-installment-card {
+  position: relative;
+}
+
+.nr-installment-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      120deg,
+      transparent 25%,
+      rgba(255, 255, 255, 0.32) 45%,
+      transparent 65%
+    );
+  transform: translateX(-120%);
+  animation: nrPaymentShine 4.5s ease-in-out infinite;
+}
+
+@keyframes nrPaymentShine {
+  0%,
+  65% {
+    transform: translateX(-120%);
+  }
+
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+html[dir="rtl"] .nr-installment-card::after {
+  animation-direction: reverse;
+}
+
+/* تقليل الحركة عند الحاجة */
+
+@media (prefers-reduced-motion: reduce) {
+  .nr-payment-card,
+  .nr-installment-card::after {
+    animation: none !important;
+  }
+}
