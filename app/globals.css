@@ -1550,3 +1550,24 @@ img {
   height: 52px;
   object-fit: contain;
 }
+/* تمييز رابط القسم الحالي */
+
+.nr-desktop-nav a.is-active {
+  color: var(--nr-blue);
+}
+
+.nr-desktop-nav a.is-active::after {
+  width: 100%;
+}
+
+.nr-mobile-menu a.is-active {
+  color: var(--nr-blue);
+  background: var(--nr-soft);
+}
+
+/* المتاجر غير متاحة حاليًا */
+
+.nr-store-badge.is-disabled {
+  cursor: default;
+  pointer-events: none;
+}

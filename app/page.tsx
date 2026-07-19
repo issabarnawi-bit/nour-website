@@ -7,6 +7,9 @@ import SiteEnhancements from "./components/SiteEnhancements";
 
 type Language = "ar" | "en";
 type Theme = "light" | "dark";
+type SectionId = "home" | "about" | "features" | "journey" | "payments" | "contact";
+
+const sectionIds: SectionId[] = ["home", "about", "features", "journey", "payments", "contact"];
 
 const copy = {
   ar: {nav: [
@@ -18,7 +21,7 @@ const copy = {
   "تواصل معنا",
 ],
     heroEyebrow: "تطبيق نور للعمرة",
-    heroTitle: "افتح الا بواب لرحلة عمرة أكثر سهولة وطمأنينة",
+    heroTitle: "افتح الأبواب لرحلة عمرة أكثر سهولة وطمأنينة",
     heroText:
       "منصة رقمية تساعد المعتمر على اكتشاف البرامج، المقارنة بين الباقات، والحجز المباشر ضمن تجربة واضحة وآمنة.",
     discover: "اكتشف نور",
@@ -202,6 +205,7 @@ export default function Home() {
   const [theme, setTheme] = useState<Theme>("light");
   const t = copy[language];
   const [menuOpen, setMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<SectionId>("home");
 
   useEffect(() => {
     const savedLanguage = localStorage.getItem("nour-language");
@@ -218,6 +222,40 @@ export default function Home() {
     localStorage.setItem("nour-theme", theme);
   }, [language, theme]);
 
+  useEffect(() => {
+    const sections = sectionIds
+      .map((id) => document.getElementById(id))
+      .filter((section): section is HTMLElement => Boolean(section));
+
+    if (!sections.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const current = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
+          ?.target.id as SectionId | undefined;
+
+        if (current) setActiveSection(current);
+      },
+      {
+        rootMargin: "-25% 0px -60% 0px",
+        threshold: [0.05, 0.2, 0.45, 0.7],
+      },
+    );
+
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+  }, []);
+
+  const navItems = sectionIds.map((id, index) => ({
+    id,
+    label: t.nav[index],
+  }));
+
+  const getNavClassName = (id: SectionId) =>
+    activeSection === id ? "is-active" : undefined;
+
   return (
     <main className="nour-redesign">
       <SiteEnhancements />
@@ -233,13 +271,20 @@ export default function Home() {
       />
     </a>
 
-    <nav className="nr-desktop-nav">
-      <a href="#home">{t.nav[0]}</a>
-      <a href="#about">{t.nav[1]}</a>
-      <a href="#features">{t.nav[2]}</a>
-      <a href="#journey">{t.nav[3]}</a>
-      <a href="#payments">{t.nav[4]}</a>
-      <a href="#contact">{t.nav[5]}</a>
+    <nav
+      className="nr-desktop-nav"
+      aria-label={language === "ar" ? "التنقل الرئيسي" : "Main navigation"}
+    >
+      {navItems.map((item) => (
+        <a
+          key={item.id}
+          href={`#${item.id}`}
+          className={getNavClassName(item.id)}
+          aria-current={activeSection === item.id ? "page" : undefined}
+        >
+          {item.label}
+        </a>
+      ))}
     </nav>
 
     <div className="nr-controls">
@@ -282,33 +327,22 @@ export default function Home() {
   {menuOpen && (
     <motion.nav
       className="nr-mobile-menu"
+      aria-label={language === "ar" ? "قائمة الجوال" : "Mobile navigation"}
       initial={{ opacity: 0, y: -15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25 }}
     >
-      <a href="#home" onClick={() => setMenuOpen(false)}>
-        {t.nav[0]}
-      </a>
-
-      <a href="#about" onClick={() => setMenuOpen(false)}>
-        {t.nav[1]}
-      </a>
-
-      <a href="#features" onClick={() => setMenuOpen(false)}>
-        {t.nav[2]}
-      </a>
-
-      <a href="#journey" onClick={() => setMenuOpen(false)}>
-        {t.nav[3]}
-      </a>
-
-      <a href="#payments" onClick={() => setMenuOpen(false)}>
-        {t.nav[4]}
-      </a>
-
-      <a href="#contact" onClick={() => setMenuOpen(false)}>
-        {t.nav[5]}
-      </a>
+      {navItems.map((item) => (
+        <a
+          key={item.id}
+          href={`#${item.id}`}
+          className={getNavClassName(item.id)}
+          aria-current={activeSection === item.id ? "page" : undefined}
+          onClick={() => setMenuOpen(false)}
+        >
+          {item.label}
+        </a>
+      ))}
     </motion.nav>
   )}
 </header>
@@ -637,26 +671,17 @@ export default function Home() {
             <h2>{t.ctaTitle}</h2>
             <p>{t.ctaText}</p>
             <div className="nr-store-buttons">
-  <a href="#" className="nr-store-badge" aria-label="App Store">
-    <img
-      src="/stores/app-store-badge.jpg"
-      alt="App Store"
-    />
-  </a>
+  <span className="nr-store-badge is-disabled" aria-label={language === "ar" ? "App Store — قريبًا" : "App Store — coming soon"}>
+    <Image src="/stores/app-store-badge.jpg" alt="App Store" width={180} height={52} />
+  </span>
 
-  <a href="#" className="nr-store-badge" aria-label="Google Play">
-    <img
-      src="/stores/google-play-badge.jpg"
-      alt="Google Play"
-    />
-  </a>
+  <span className="nr-store-badge is-disabled" aria-label={language === "ar" ? "Google Play — قريبًا" : "Google Play — coming soon"}>
+    <Image src="/stores/google-play-badge.jpg" alt="Google Play" width={176} height={52} />
+  </span>
 
-  <a href="#" className="nr-store-badge" aria-label="AppGallery">
-    <img
-      src="/stores/appgallery-badge.jpg"
-      alt="AppGallery"
-    />
-  </a>
+  <span className="nr-store-badge is-disabled" aria-label={language === "ar" ? "AppGallery — قريبًا" : "AppGallery — coming soon"}>
+    <Image src="/stores/appgallery-badge.jpg" alt="AppGallery" width={180} height={52} />
+  </span>
 </div>
           </div>
           <Image src="/images/site/front-view.png" alt="Nour app" width={300} height={540} />
@@ -703,4 +728,3 @@ export default function Home() {
     </main>
   );
 }
-
