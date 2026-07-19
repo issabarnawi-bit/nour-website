@@ -19,18 +19,27 @@ const revealSelectors = [
   ".nr-payment-info-item",
 ].join(", ");
 
+const WELCOME_STORAGE_KEY = "nour-welcome-shown";
+const WELCOME_DURATION = 2500;
+
 export default function SiteEnhancements() {
   const [progress, setProgress] = useState(0);
   const [showTop, setShowTop] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(true);
 
   useEffect(() => {
     const updateScroll = () => {
-      const top = window.scrollY;
-      const max =
+      const scrollTop = window.scrollY;
+      const scrollableHeight =
         document.documentElement.scrollHeight - window.innerHeight;
 
-      setProgress(max > 0 ? Math.min((top / max) * 100, 100) : 0);
-      setShowTop(top > 550);
+      const nextProgress =
+        scrollableHeight > 0
+          ? Math.min((scrollTop / scrollableHeight) * 100, 100)
+          : 0;
+
+      setProgress(nextProgress);
+      setShowTop(scrollTop > 550);
     };
 
     updateScroll();
@@ -45,6 +54,26 @@ export default function SiteEnhancements() {
   }, []);
 
   useEffect(() => {
+    const alreadyShown = sessionStorage.getItem(
+      WELCOME_STORAGE_KEY,
+    );
+
+    if (alreadyShown) {
+      setShowWelcome(false);
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setShowWelcome(false);
+      sessionStorage.setItem(WELCOME_STORAGE_KEY, "true");
+    }, WELCOME_DURATION);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, []);
+
+  useEffect(() => {
     const elements =
       document.querySelectorAll<HTMLElement>(revealSelectors);
 
@@ -54,7 +83,11 @@ export default function SiteEnhancements() {
       element.classList.add("nr-reveal");
 
       const delay = Math.min((index % 6) * 70, 350);
-      element.style.setProperty("--nr-reveal-delay", `${delay}ms`);
+
+      element.style.setProperty(
+        "--nr-reveal-delay",
+        `${delay}ms`,
+      );
     });
 
     const observer = new IntersectionObserver(
@@ -63,8 +96,8 @@ export default function SiteEnhancements() {
           if (!entry.isIntersecting) return;
 
           const element = entry.target as HTMLElement;
-          element.classList.add("is-visible");
 
+          element.classList.add("is-visible");
           observer.unobserve(element);
         });
       },
@@ -74,13 +107,62 @@ export default function SiteEnhancements() {
       },
     );
 
-    elements.forEach((element) => observer.observe(element));
+    elements.forEach((element) => {
+      observer.observe(element);
+    });
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+    };
   }, []);
 
   return (
     <>
+      <AnimatePresence>
+        {showWelcome && (
+          <motion.div
+            className="nour-welcome-screen"
+            role="status"
+            aria-live="polite"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <motion.div
+              className="nour-welcome-content"
+              initial={{
+                opacity: 0,
+                scale: 0.9,
+                y: 20,
+              }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                y: 0,
+              }}
+              transition={{
+                duration: 0.6,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+            >
+              <img
+                className="nour-welcome-logo"
+                src="/images/site/v-logo.png"
+                alt="Nour"
+              />
+
+              <div className="nour-welcome-title">
+                مرحبًا بك في نور
+              </div>
+
+              <div className="nour-welcome-text">
+                رفيقك لرحلة عمرة أكثر سهولة وطمأنينة
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div
         className="modern-scroll-progress"
         style={{ width: `${progress}%` }}
@@ -93,10 +175,21 @@ export default function SiteEnhancements() {
         target="_blank"
         rel="noreferrer"
         aria-label="التواصل عبر واتساب"
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        whileHover={{ y: -4, scale: 1.05 }}
-        whileTap={{ scale: 0.92 }}
+        initial={{
+          opacity: 0,
+          scale: 0.8,
+        }}
+        animate={{
+          opacity: 1,
+          scale: 1,
+        }}
+        whileHover={{
+          y: -4,
+          scale: 1.05,
+        }}
+        whileTap={{
+          scale: 0.92,
+        }}
       >
         <span>◉</span>
       </motion.a>
@@ -107,12 +200,12 @@ export default function SiteEnhancements() {
             className="modern-back-top"
             type="button"
             aria-label="العودة إلى أعلى الصفحة"
-            onClick={() =>
+            onClick={() => {
               window.scrollTo({
                 top: 0,
                 behavior: "smooth",
-              })
-            }
+              });
+            }}
             initial={{
               opacity: 0,
               scale: 0.8,
@@ -128,8 +221,12 @@ export default function SiteEnhancements() {
               scale: 0.8,
               y: 12,
             }}
-            whileHover={{ y: -4 }}
-            whileTap={{ scale: 0.92 }}
+            whileHover={{
+              y: -4,
+            }}
+            whileTap={{
+              scale: 0.92,
+            }}
           >
             ↑
           </motion.button>

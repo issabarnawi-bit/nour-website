@@ -24,16 +24,13 @@
 /* Header */
 
 .nr-header {
+  background: color-mix(in srgb, var(--nr-bg) 84%, transparent);
+  box-shadow: 0 10px 45px rgba(4, 48, 105, 0.06);
+  backdrop-filter: blur(18px);
   transition:
     background-color 0.3s ease,
     box-shadow 0.3s ease,
     backdrop-filter 0.3s ease;
-}
-
-.nr-header {
-  background: color-mix(in srgb, var(--nr-bg) 84%, transparent);
-  box-shadow: 0 10px 45px rgba(4, 48, 105, 0.06);
-  backdrop-filter: blur(18px);
 }
 
 .nr-nav nav a {
@@ -54,6 +51,19 @@
 
 .nr-nav nav a:hover::after {
   width: 100%;
+}
+
+.nr-desktop-nav a.is-active {
+  color: var(--nr-blue);
+}
+
+.nr-desktop-nav a.is-active::after {
+  width: 100%;
+}
+
+.nr-mobile-menu a.is-active {
+  color: var(--nr-blue);
+  background: var(--nr-soft);
 }
 
 /* Hero */
@@ -117,7 +127,6 @@
     transform 0.45s ease,
     filter 0.45s ease;
 }
-
 
 /* Animated section cards */
 
@@ -223,17 +232,6 @@
   inset-inline-start: -100px;
   border: 65px solid rgba(255, 255, 255, 0.08);
   border-radius: 50%;
-}
-
-.nr-store-buttons button {
-  transition:
-    transform 0.22s ease,
-    box-shadow 0.22s ease;
-}
-
-.nr-store-buttons button:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 14px 30px rgba(5, 44, 98, 0.18);
 }
 
 /* Footer */
@@ -696,4 +694,114 @@ html[dir="rtl"] .nr-installment-card::after {
 .nr-controls button:active,
 .nr-actions a:active {
   transform: scale(0.97);
+}
+
+/* شاشة الترحيب */
+
+.nour-welcome-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: 24px;
+  color: #ffffff;
+  background:
+    radial-gradient(
+      circle at 20% 18%,
+      rgba(48, 225, 210, 0.3),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 82% 78%,
+      rgba(255, 197, 21, 0.28),
+      transparent 25%
+    ),
+    linear-gradient(
+      135deg,
+      #0756bd 0%,
+      #1478e9 55%,
+      #49b7ff 100%
+    );
+}
+
+.nour-welcome-content {
+  width: min(460px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 26px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 30px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.13);
+  box-shadow: 0 30px 80px rgba(0, 35, 85, 0.28);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.nour-welcome-logo {
+  width: 110px;
+  height: 110px;
+  display: block;
+  padding: 12px;
+  border-radius: 24px;
+  object-fit: contain;
+  background: #ffffff;
+}
+
+@media (max-width: 580px) {
+  .nour-welcome-content {
+    padding: 32px 20px;
+    border-radius: 24px;
+  }
+
+  .nour-welcome-logo {
+    width: 92px;
+    height: 92px;
+  }
+}
+
+/* إصلاح ظهور نصوص شاشة الترحيب */
+
+.nour-welcome-title {
+  position: relative;
+  z-index: 5;
+  display: block !important;
+  margin: 24px 0 8px;
+  color: #ffffff !important;
+  font-size: clamp(30px, 5vw, 46px) !important;
+  font-weight: 900;
+  line-height: 1.3;
+  text-align: center;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+}
+
+.nour-welcome-text {
+  position: relative;
+  z-index: 5;
+  display: block !important;
+  max-width: 360px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.94) !important;
+  font-size: 17px !important;
+  font-weight: 600;
+  line-height: 1.8;
+  text-align: center;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+}
+
+@media (max-width: 580px) {
+  .nour-welcome-title {
+    font-size: 32px !important;
+  }
+
+  .nour-welcome-text {
+    font-size: 15px !important;
+  }
 }
