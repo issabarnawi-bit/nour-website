@@ -210,27 +210,33 @@ const privacySections = [
 export default function PrivacyPage() {
   return (
     <main className="legal-page">
+      <div className="legal-page-glow legal-page-glow-one" aria-hidden="true" />
+      <div className="legal-page-glow legal-page-glow-two" aria-hidden="true" />
       <header className="legal-header">
-        <div className="container legal-navigation">
+        <div className="container legal-navigation" aria-label="التنقل القانوني">
           <Link href="/" className="legal-brand">
-            <Image
-              src="/images/nour-logo.jpg"
-              alt="شعار نور"
-              width={76}
-              height={76}
-              priority
-            />
+       <Image
+  src="/images/site/v-logo.png"
+  alt="شعار نور"
+  width={92}
+              height={92}
+  priority
+/>
+            <span className="legal-brand-copy">
+              
+              <small>رفيق رحلتك إلى العمرة</small>
+            </span>
           </Link>
 
           <Link href="/" className="back-home">
-            العودة إلى الرئيسية
+            العودة إلى الرئيسية ←
           </Link>
         </div>
       </header>
 
       <section className="legal-hero">
-        <div className="container">
-          <span className="section-label">الوثائق القانونية</span>
+        <div className="container legal-hero-inner">
+          <span className="section-label"><span aria-hidden="true">✦</span> الوثائق القانونية</span>
           <h1>سياسة الخصوصية</h1>
           <p>
             توضح هذه السياسة كيفية جمع بيانات المستخدمين واستخدامها وحمايتها
@@ -259,7 +265,7 @@ export default function PrivacyPage() {
             </nav>
           </aside>
 
-          <article className="legal-document">
+          <article className="legal-document" aria-label="سياسة الخصوصية">
             <div className="legal-notice">
               يرجى قراءة هذه السياسة بعناية قبل إنشاء حساب أو استخدام خدمات
               منصة نور.
@@ -291,6 +297,7 @@ export default function PrivacyPage() {
       </section>
 
       <footer className="legal-footer">
+        <div className="legal-footer-orb" aria-hidden="true" />
         <div className="container">
           <span>© 2026 نور. جميع الحقوق محفوظة.</span>
 
