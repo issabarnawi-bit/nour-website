@@ -2219,3 +2219,103 @@ html[dir="ltr"] .nr-showcase li {
     font-size: 35px;
   }
 }
+/* =========================================================
+   FINAL MOBILE CHECKLIST + STORE BADGES FIX
+========================================================= */
+
+/* إصلاح قائمة مزايا التطبيق في العربي والإنجليزي */
+.nr-showcase ul {
+  width: 100%;
+  padding: 0;
+  list-style: none;
+}
+
+.nr-showcase li,
+html[dir="ltr"] .nr-showcase li,
+html[dir="rtl"] .nr-showcase li {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  min-height: 50px;
+  padding: 10px 14px !important;
+  text-align: start;
+}
+
+.nr-showcase li::before {
+  position: static !important;
+  inset: auto !important;
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+}
+
+/* توحيد أحجام أزرار المتاجر على الجوال */
+@media (max-width: 580px) {
+  .nr-cta-card > div {
+    width: 100%;
+    min-width: 0;
+    text-align: center;
+  }
+
+  .nr-store-buttons {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center !important;
+    gap: 12px;
+  }
+
+  .nr-store-badge,
+  .nr-store-badge-custom {
+    width: min(100%, 255px) !important;
+    min-width: 0 !important;
+    height: 58px;
+    justify-content: center;
+    margin-inline: auto;
+  }
+
+  .nr-store-badge img {
+    width: 100% !important;
+    height: 58px !important;
+    max-width: 255px;
+    object-fit: contain;
+  }
+
+  .nr-store-badge-custom {
+    padding: 7px 15px;
+  }
+
+  .nr-store-badge-copy strong {
+    font-size: 19px;
+  }
+
+  .nr-store-badge-copy small {
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 420px) {
+  .nr-showcase-copy li {
+    gap: 10px;
+    padding: 10px 12px !important;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .nr-showcase li::before {
+    flex-basis: 28px;
+    width: 28px;
+    height: 28px;
+  }
+
+  .nr-store-badge,
+  .nr-store-badge-custom {
+    width: min(100%, 235px) !important;
+  }
+
+  .nr-store-badge img {
+    max-width: 235px;
+  }
+}
