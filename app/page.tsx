@@ -200,6 +200,115 @@ const paymentMethods = [
     type: "installment",
   },
 ];
+
+function FeatureIcon({ index }: { index: number }) {
+  const icons = [
+    <svg
+      key="packages"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z" />
+      <path d="M5 15l.8 2.2L8 18l-2.2.8L5 21l-.8-2.2L2 18l2.2-.8L5 15z" />
+      <path d="M19 13l.7 1.8 1.8.7-1.8.7L19 18l-.7-1.8-1.8-.7 1.8-.7L19 13z" />
+    </svg>,
+    <svg
+      key="interface"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="4" y="3" width="16" height="18" rx="3" />
+      <path d="M8 8h8M8 12h5M8 16h7" />
+    </svg>,
+    <svg
+      key="booking"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" />
+      <path d="M8 2v4M16 2v4M3 9h18" />
+      <path d="m8 15 2.2 2.2L16 12" />
+    </svg>,
+    <svg
+      key="partners"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="m8.5 12.5 3 3a2 2 0 0 0 2.8 0l4.2-4.2a2 2 0 0 0 0-2.8l-2-2a2 2 0 0 0-2.8 0L12 8.2" />
+      <path d="m15.5 11.5-3-3a2 2 0 0 0-2.8 0l-4.2 4.2a2 2 0 0 0 0 2.8l2 2a2 2 0 0 0 2.8 0l1.7-1.7" />
+    </svg>,
+    <span key="support" className="nr-feature-icon-text" aria-hidden="true">
+      24
+    </span>,
+    <svg
+      key="security"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="m12 3 7 3v5c0 4.7-2.8 8.2-7 10-4.2-1.8-7-5.3-7-10V6l7-3z" />
+      <path d="m9 12 2 2 4-4" />
+    </svg>,
+  ];
+
+  return (
+    <div className="nr-feature-icon" aria-hidden="true">
+      {icons[index] ?? icons[0]}
+    </div>
+  );
+}
+
+function AppStoreBadge({ language }: { language: Language }) {
+  return (
+    <span
+      className="nr-store-badge nr-store-badge-custom is-disabled"
+      aria-label={
+        language === "ar"
+          ? "متوفر قريبًا على App Store"
+          : "Coming soon on the App Store"
+      }
+    >
+      <svg
+        className="nr-store-apple-icon"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        aria-hidden="true"
+      >
+        <path d="M16.7 12.1c0-2.8 2.3-4.2 2.4-4.3a5.1 5.1 0 0 0-4-2.2c-1.7-.2-3.3 1-4.2 1-.9 0-2.2-1-3.7-1-1.9 0-3.7 1.1-4.7 2.8-2 3.4-.5 8.5 1.4 11.2.9 1.3 2 2.8 3.5 2.7 1.4-.1 1.9-.9 3.6-.9 1.7 0 2.2.9 3.7.9 1.5 0 2.5-1.3 3.4-2.7 1.1-1.5 1.5-3 1.5-3.1-.1 0-2.9-1.1-2.9-4.4zM14 3.8c.8-1 1.3-2.3 1.2-3.6-1.2.1-2.6.8-3.4 1.8-.7.8-1.4 2.2-1.2 3.5 1.3.1 2.6-.7 3.4-1.7z" />
+      </svg>
+
+      <span className="nr-store-badge-copy">
+        <small>{language === "ar" ? "قريبًا على" : "Coming soon on"}</small>
+        <strong>App Store</strong>
+      </span>
+    </span>
+  );
+}
+
 export default function Home() {
   const [language, setLanguage] = useState<Language>("ar");
   const [theme, setTheme] = useState<Theme>("light");
@@ -451,7 +560,7 @@ export default function Home() {
                 viewport={{ once: true, amount: 0.2 }}
                 variants={fadeUp}
               >
-                <div className="nr-feature-icon">{["✦","⌁","✓","◇","24","⌂"][i]}</div>
+                <FeatureIcon index={i} />
                 <h3>{title}</h3>
                 <p>{text}</p>
               </motion.article>
@@ -671,9 +780,7 @@ export default function Home() {
             <h2>{t.ctaTitle}</h2>
             <p>{t.ctaText}</p>
             <div className="nr-store-buttons">
-  <span className="nr-store-badge is-disabled" aria-label={language === "ar" ? "App Store — قريبًا" : "App Store — coming soon"}>
-    <Image src="/stores/app-store-badge.jpg" alt="App Store" width={180} height={52} />
-  </span>
+  <AppStoreBadge language={language} />
 
   <span className="nr-store-badge is-disabled" aria-label={language === "ar" ? "Google Play — قريبًا" : "Google Play — coming soon"}>
     <Image src="/stores/google-play-badge.jpg" alt="Google Play" width={176} height={52} />

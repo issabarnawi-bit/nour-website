@@ -1563,3 +1563,540 @@ html[dir="ltr"] .nr-footer-links {
     max-height: 40px;
   }
 }
+
+/* =========================================================
+   NOUR — FINAL COMPACT LAYOUT
+   تحسين الهيدر، Hero، الأهداف، عن نور، وعرض التطبيق
+========================================================= */
+
+/* =========================
+   Header and logo
+========================= */
+
+.nr-nav {
+  min-height: 72px;
+}
+
+.nr-logo {
+  width: 84px;
+  height: 60px;
+  flex: 0 0 84px;
+  overflow: visible;
+}
+
+.nr-logo img {
+  width: 74px;
+  height: 58px;
+  max-height: 58px;
+  padding: 4px;
+  border-radius: 10px;
+  object-fit: contain;
+  background: #ffffff;
+}
+
+/* =========================
+   Compact hero
+========================= */
+
+@media (min-width: 921px) {
+  .nr-hero {
+    min-height: 680px;
+  }
+
+  .nr-hero-grid {
+    gap: 36px;
+    padding-block: 54px;
+  }
+
+  .nr-hero h1 {
+    max-width: 660px;
+    margin-block: 17px;
+    font-size: clamp(44px, 5.3vw, 68px);
+    line-height: 1.14;
+  }
+
+  .nr-hero p {
+    font-size: 17px;
+    line-height: 1.8;
+  }
+
+  .nr-actions {
+    margin-top: 25px;
+  }
+
+  .nr-phones {
+    min-height: 550px;
+  }
+
+  .nr-phone-back {
+    width: 490px;
+    top: 0;
+    inset-inline-end: -15px;
+  }
+
+  .nr-phone-front {
+    width: 300px;
+    bottom: -20px;
+    inset-inline-start: 20px;
+  }
+}
+
+/* =========================
+   Goals
+========================= */
+
+.nr-goals {
+  padding-block: 72px;
+}
+
+.nr-goals h2 {
+  margin: 0 0 36px;
+  text-align: center;
+}
+
+.nr-goals-grid {
+  gap: 20px;
+}
+
+.nr-goals article {
+  min-height: 205px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 26px;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.nr-goals article:hover {
+  transform: translateY(-6px);
+  border-color: rgba(23, 111, 232, 0.26);
+  box-shadow: 0 25px 58px rgba(18, 67, 130, 0.13);
+}
+
+.nr-goals article > span {
+  font-size: 28px;
+}
+
+.nr-goals h3 {
+  margin-top: 14px;
+}
+
+/* =========================
+   About section
+========================= */
+
+.nr-about {
+  padding-block: 78px;
+}
+
+.nr-about-grid {
+  gap: 48px;
+}
+
+.nr-about-visual {
+  min-height: 500px;
+}
+
+.nr-about-visual img {
+  width: 480px;
+  max-width: 100%;
+}
+
+.nr-visual-blob {
+  width: 465px;
+  height: 370px;
+}
+
+.nr-about-copy h2 {
+  margin-bottom: 20px;
+}
+
+.nr-about-copy p {
+  margin-bottom: 0;
+}
+
+/* =========================
+   Showcase section
+========================= */
+
+.nr-showcase {
+  padding-block: 78px;
+}
+
+.nr-showcase-grid {
+  gap: 50px;
+}
+
+.nr-showcase-devices {
+  min-height: 530px;
+}
+
+.nr-showcase-devices img:first-child {
+  width: 400px;
+  top: 10px;
+}
+
+.nr-showcase-devices img:last-child {
+  width: 270px;
+  bottom: 10px;
+}
+
+/* Modern feature list */
+
+.nr-showcase ul {
+  display: grid;
+  gap: 12px;
+  margin: 25px 0 0;
+  padding: 0;
+  list-style: none;
+  line-height: 1.8;
+}
+
+.nr-showcase li {
+  position: relative;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  padding: 8px 48px 8px 14px;
+  border: 1px solid var(--nr-border);
+  border-radius: 14px;
+  background: var(--nr-card);
+  color: var(--nr-text);
+  font-weight: 700;
+  box-shadow: 0 10px 25px rgba(18, 67, 130, 0.06);
+}
+
+.nr-showcase li::before {
+  content: "✓";
+  position: absolute;
+  inset-inline-start: 12px;
+  width: 27px;
+  height: 27px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: rgba(255, 195, 19, 0.18);
+  color: #c98b00;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+html[dir="ltr"] .nr-showcase li {
+  padding: 8px 14px 8px 48px;
+}
+
+/* =========================
+   Tablet
+========================= */
+
+@media (max-width: 920px) {
+  .nr-logo {
+    width: 76px;
+    flex-basis: 76px;
+  }
+
+  .nr-logo img {
+    width: 68px;
+    height: 55px;
+  }
+
+  .nr-hero-grid {
+    padding-block: 55px;
+  }
+
+  .nr-about,
+  .nr-showcase {
+    padding-block: 70px;
+  }
+
+  .nr-about-visual {
+    min-height: 460px;
+  }
+
+  .nr-about-visual img {
+    width: 450px;
+  }
+
+  .nr-showcase-devices {
+    min-height: 500px;
+  }
+}
+
+/* =========================
+   Mobile
+========================= */
+
+@media (max-width: 680px) {
+  .nr-goals {
+    padding-block: 58px;
+  }
+
+  .nr-about,
+  .nr-showcase {
+    padding-block: 62px;
+  }
+
+  .nr-goals h2 {
+    margin-bottom: 28px;
+  }
+
+  .nr-goals article {
+    min-height: auto;
+  }
+
+  .nr-about-visual {
+    min-height: 390px;
+  }
+
+  .nr-showcase-devices {
+    min-height: 430px;
+  }
+}
+
+@media (max-width: 420px) {
+  .nr-logo {
+    width: 60px;
+    height: 52px;
+    flex-basis: 60px;
+  }
+
+  .nr-logo img {
+    width: 56px;
+    height: 50px;
+  }
+
+  .nr-showcase li {
+    padding-block: 10px;
+    font-size: 14px;
+  }
+}
+/* =========================================================
+   NOUR — FINAL DARK MODE SPACING FIX
+========================================================= */
+
+/* إزالة أي ارتفاع إجباري يسبب الفراغات */
+.nr-goals,
+.nr-about,
+.nr-features,
+.nr-journey,
+.nr-showcase,
+.nr-payments,
+.nr-cta {
+  min-height: auto !important;
+  height: auto;
+}
+
+/* وسائل الدفع */
+.nr-payments {
+  padding-top: 72px;
+  padding-bottom: 58px;
+}
+
+.nr-payment-layout {
+  align-items: start;
+}
+
+.nr-payment-info {
+  align-self: start;
+}
+
+/* قسم المزايا */
+.nr-features {
+  padding-top: 76px;
+  padding-bottom: 76px;
+}
+
+/* قسم عرض التطبيق */
+.nr-showcase {
+  padding-top: 64px;
+  padding-bottom: 64px;
+}
+
+.nr-showcase-grid {
+  align-items: center;
+  gap: 42px;
+}
+
+.nr-showcase-devices {
+  min-height: 470px;
+}
+
+.nr-showcase-devices img:first-child {
+  width: 380px;
+  top: 0;
+}
+
+.nr-showcase-devices img:last-child {
+  width: 260px;
+  bottom: 0;
+}
+
+/* بطاقة تحميل التطبيق */
+.nr-cta {
+  padding-top: 64px;
+  padding-bottom: 64px;
+}
+
+.nr-cta-card {
+  min-height: 330px;
+  padding: 44px 52px;
+}
+
+.nr-cta-card > img {
+  width: 270px;
+  margin-bottom: -78px;
+}
+
+/* تقريب النص والأزرار */
+.nr-cta-card h2 {
+  margin-bottom: 16px;
+}
+
+.nr-cta-card .nr-store-buttons {
+  margin-top: 20px;
+}
+
+/* الفوتر */
+.nr-footer {
+  padding-top: 34px;
+  padding-bottom: 28px;
+}
+
+/* الأجهزة المتوسطة */
+@media (max-width: 920px) {
+  .nr-showcase-devices {
+    min-height: 450px;
+  }
+
+  .nr-cta-card {
+    padding: 38px 34px;
+  }
+
+  .nr-cta-card > img {
+    width: 245px;
+    margin-bottom: -68px;
+  }
+}
+
+/* الجوال */
+@media (max-width: 680px) {
+  .nr-payments,
+  .nr-features,
+  .nr-showcase,
+  .nr-cta {
+    padding-top: 54px;
+    padding-bottom: 54px;
+  }
+
+  .nr-showcase-devices {
+    min-height: 400px;
+  }
+
+  .nr-cta-card {
+    min-height: auto;
+    padding: 34px 22px;
+  }
+
+  .nr-cta-card > img {
+    width: 220px;
+    margin-bottom: -62px;
+  }
+}
+/* =========================================================
+   NOUR — UNIFIED FEATURE ICONS + APP STORE BADGE
+   Paste this block at the very end of the Nour CSS file.
+========================================================= */
+
+.nr-feature-icon {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 58px;
+  border-radius: 17px;
+  background: var(--nr-gold);
+  color: #14335c;
+  box-shadow: 0 12px 26px rgba(255, 195, 19, 0.2);
+}
+
+.nr-feature-icon svg {
+  width: 27px;
+  height: 27px;
+  display: block;
+}
+
+.nr-feature-icon-text {
+  font-size: 17px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.nr-store-badge-custom {
+  min-width: 180px;
+  height: 54px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  padding: 7px 15px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 10px;
+  background: #050505;
+  color: #ffffff;
+  direction: ltr;
+  cursor: default;
+}
+
+.nr-store-badge-custom.is-disabled {
+  opacity: 0.88;
+  pointer-events: none;
+}
+
+.nr-store-apple-icon {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+}
+
+.nr-store-badge-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1;
+}
+
+.nr-store-badge-copy small {
+  margin-bottom: 3px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 9px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.nr-store-badge-copy strong {
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+@media (max-width: 580px) {
+  .nr-feature-icon {
+    width: 52px;
+    height: 52px;
+    flex-basis: 52px;
+  }
+
+  .nr-feature-icon svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .nr-store-badge-custom {
+    width: auto;
+    min-width: 178px;
+  }
+}
