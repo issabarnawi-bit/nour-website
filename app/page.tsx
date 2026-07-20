@@ -634,29 +634,69 @@ export default function Home() {
   </div>
 </section>
 
-      <section className="nr-showcase">
-        <div className="nr-container nr-showcase-grid">
-          <div className="nr-showcase-devices">
-            <Image src="/images/site/tilted-right.png" alt="Nour booking details" width={460} height={650} />
-            <Image src="/images/site/front-view.png" alt="Nour app" width={360} height={620} />
-          </div>
+    <section className="nr-showcase">
+  <div className="nr-container nr-showcase-grid">
+    <motion.div
+      className="nr-showcase-devices"
+      initial={{ opacity: 0, x: 130 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{
+        duration: 0.9,
+        ease: [0.22, 1, 0.36, 1],
+      }}
+    >
+      <Image
+        className="nr-showcase-phone-back"
+        src="/images/site/tilted-right.png"
+        alt="Nour booking details"
+        width={460}
+        height={650}
+      />
 
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.25 }}
-            variants={fadeUp}
-          >
-            <h2>{t.showcaseTitle}</h2>
-            <p>{t.showcaseText}</p>
-            <ul>
-              <li>{language === "ar" ? "برامج وباقات واضحة" : "Clear programs and packages"}</li>
-              <li>{language === "ar" ? "تفاصيل الرحلة في مكان واحد" : "Journey details in one place"}</li>
-              <li>{language === "ar" ? "تجربة سريعة وآمنة" : "A fast and secure experience"}</li>
-            </ul>
-          </motion.div>
-        </div>
-      </section>
+      <Image
+        className="nr-showcase-phone-front"
+        src="/images/site/front-view.png"
+        alt="Nour app"
+        width={360}
+        height={620}
+      />
+    </motion.div>
+
+    <motion.div
+      className="nr-showcase-copy"
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.25 }}
+      variants={fadeUp}
+    >
+      <h2>{t.showcaseTitle}</h2>
+
+      <p>{t.showcaseText}</p>
+
+      <ul>
+        <li>
+          {language === "ar"
+            ? "برامج وباقات واضحة"
+            : "Clear programs and packages"}
+        </li>
+
+        <li>
+          {language === "ar"
+            ? "تفاصيل الرحلة في مكان واحد"
+            : "Journey details in one place"}
+        </li>
+
+        <li>
+          {language === "ar"
+            ? "تجربة سريعة وآمنة"
+            : "A fast and secure experience"}
+        </li>
+      </ul>
+    </motion.div>
+  </div>
+</section>
+
 <section className="nr-payments" id="payments">
   <div className="nr-container">
     <motion.div
