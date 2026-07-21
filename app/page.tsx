@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { motion, type Variants } from "framer-motion";
+import { AnimatePresence, motion, type Variants } from "framer-motion";
 import SiteEnhancements from "./components/SiteEnhancements";
 
 type Language = "ar" | "en";
@@ -309,12 +309,49 @@ function AppStoreBadge({ language }: { language: Language }) {
   );
 }
 
+const appScreens = [
+  {
+    src: "/images/app-screens/home.png",
+    altAr: "الصفحة الرئيسية في تطبيق نور",
+    altEn: "Nour app home screen",
+  },
+  {
+    src: "/images/app-screens/packages.png",
+    altAr: "صفحة برامج العمرة",
+    altEn: "Umrah packages screen",
+  },
+  {
+    src: "/images/app-screens/package-details.png",
+    altAr: "تفاصيل برنامج العمرة",
+    altEn: "Umrah package details screen",
+  },
+  {
+    src: "/images/app-screens/booking.png",
+    altAr: "صفحة حجز برنامج العمرة",
+    altEn: "Umrah booking screen",
+  },
+  {
+    src: "/images/app-screens/trip.png",
+    altAr: "صفحة متابعة الرحلة",
+    altEn: "Journey tracking screen",
+  },
+];
+
 export default function Home() {
   const [language, setLanguage] = useState<Language>("ar");
   const [theme, setTheme] = useState<Theme>("light");
   const t = copy[language];
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<SectionId>("home");
+  const [activeScreen, setActiveScreen] = useState(0);
+
+  useEffect(() => {
+    const sliderInterval = window.setInterval(() => {
+      setActiveScreen((current) => (current + 1) % appScreens.length);
+    }, 3500);
+
+    return () => window.clearInterval(sliderInterval);
+  }, []);
 
   useEffect(() => {
     const savedLanguage = localStorage.getItem("nour-language");
@@ -635,67 +672,128 @@ export default function Home() {
 </section>
 
     <section className="nr-showcase">
-  <div className="nr-container nr-showcase-grid">
-    <motion.div
-      className="nr-showcase-devices"
-      initial={{ opacity: 0, x: 130 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{
-        duration: 0.9,
-        ease: [0.22, 1, 0.36, 1],
-      }}
-    >
-      <Image
-        className="nr-showcase-phone-back"
-        src="/images/site/tilted-right.png"
-        alt="Nour booking details"
-        width={460}
-        height={650}
-      />
+      <div className="nr-container nr-showcase-grid">
+        <motion.div
+          className="nour-screen-carousel"
+          initial={{
+            opacity: 0,
+            x: language === "ar" ? 110 : -110,
+          }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{
+            duration: 0.85,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+        >
+          <div className="nour-screen-carousel-glow" aria-hidden="true" />
 
-      <Image
-        className="nr-showcase-phone-front"
-        src="/images/site/front-view.png"
-        alt="Nour app"
-        width={360}
-        height={620}
-      />
-    </motion.div>
+          <div className="nour-phone-frame">
+            <span className="nour-phone-side-button nour-phone-side-button-one" aria-hidden="true" />
+            <span className="nour-phone-side-button nour-phone-side-button-two" aria-hidden="true" />
+            <span className="nour-phone-side-button nour-phone-side-button-three" aria-hidden="true" />
 
-    <motion.div
-      className="nr-showcase-copy"
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.25 }}
-      variants={fadeUp}
-    >
-      <h2>{t.showcaseTitle}</h2>
+            <div className="nour-phone-screen" aria-live="polite">
+              <span className="nour-phone-island" aria-hidden="true" />
 
-      <p>{t.showcaseText}</p>
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={appScreens[activeScreen].src}
+                  className="nour-screen-slide"
+                  initial={{
+                    opacity: 0,
+                    x: language === "ar" ? 60 : -60,
+                    scale: 0.985,
+                  }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  exit={{
+                    opacity: 0,
+                    x: language === "ar" ? -60 : 60,
+                    scale: 0.985,
+                  }}
+                  transition={{
+                    duration: 0.48,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                >
+                  <Image
+                    src={appScreens[activeScreen].src}
+                    alt={
+                      language === "ar"
+                        ? appScreens[activeScreen].altAr
+                        : appScreens[activeScreen].altEn
+                    }
+                    fill
+                    sizes="(max-width: 680px) 220px, 270px"
+                    className="nour-screen-image"
+                    priority={activeScreen === 0}
+                  />
+                </motion.div>
+              </AnimatePresence>
 
-      <ul>
-        <li>
-          {language === "ar"
-            ? "برامج وباقات واضحة"
-            : "Clear programs and packages"}
-        </li>
+              <span className="nour-phone-home-line" aria-hidden="true" />
+            </div>
+          </div>
 
-        <li>
-          {language === "ar"
-            ? "تفاصيل الرحلة في مكان واحد"
-            : "Journey details in one place"}
-        </li>
+          <div
+            className="nour-screen-dots"
+            aria-label={
+              language === "ar"
+                ? "التنقل بين واجهات تطبيق نور"
+                : "Navigate Nour app screens"
+            }
+          >
+            {appScreens.map((screen, index) => (
+              <button
+                key={screen.src}
+                type="button"
+                className={
+                  activeScreen === index
+                    ? "nour-screen-dot is-active"
+                    : "nour-screen-dot"
+                }
+                onClick={() => setActiveScreen(index)}
+                aria-label={
+                  language === "ar"
+                    ? `عرض شاشة التطبيق رقم ${index + 1}`
+                    : `Show app screen ${index + 1}`
+                }
+                aria-current={activeScreen === index ? "true" : undefined}
+              />
+            ))}
+          </div>
+        </motion.div>
 
-        <li>
-          {language === "ar"
-            ? "تجربة سريعة وآمنة"
-            : "A fast and secure experience"}
-        </li>
-      </ul>
-    </motion.div>
-  </div>
-</section>
+        <motion.div
+          className="nr-showcase-copy"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.25 }}
+          variants={fadeUp}
+        >
+          <h2>{t.showcaseTitle}</h2>
+          <p>{t.showcaseText}</p>
+
+          <ul>
+            <li>
+              {language === "ar"
+                ? "برامج وباقات واضحة"
+                : "Clear programs and packages"}
+            </li>
+            <li>
+              {language === "ar"
+                ? "تفاصيل الرحلة في مكان واحد"
+                : "Journey details in one place"}
+            </li>
+            <li>
+              {language === "ar"
+                ? "تجربة سريعة وآمنة"
+                : "A fast and secure experience"}
+            </li>
+          </ul>
+        </motion.div>
+      </div>
+    </section>
 
 <section className="nr-payments" id="payments">
   <div className="nr-container">
