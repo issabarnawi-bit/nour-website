@@ -89,7 +89,12 @@ export default function ProgramsPreview({ language }: Props) {
   const featuredPrograms = programs.filter((program) => program.featured);
 
   return (
-    <section className="nr-programs-preview" id="programs">
+    <section
+      className="nr-programs-preview"
+      id="programs"
+      dir={language === "ar" ? "rtl" : "ltr"}
+      aria-labelledby="nr-programs-title"
+    >
       <div className="nr-programs-orb nr-programs-orb-one" aria-hidden="true" />
       <div className="nr-programs-orb nr-programs-orb-two" aria-hidden="true" />
 
@@ -107,7 +112,7 @@ export default function ProgramsPreview({ language }: Props) {
 
           <div className="nr-programs-heading-row">
             <div>
-              <h2>
+              <h2 id="nr-programs-title" lang={language === "ar" ? "ar" : "en"}>
                 {language === "ar"
                   ? "اختر البرنامج المناسب لرحلتك"
                   : "Choose the right program for your journey"}
@@ -431,7 +436,11 @@ export default function ProgramsPreview({ language }: Props) {
         }
 
         .nr-program-card {
+          position: relative;
+          z-index: 2;
           min-width: 0;
+          opacity: 1;
+          visibility: visible;
           overflow: hidden;
           border: 1px solid var(--nr-border);
           border-radius: 27px;
@@ -679,6 +688,11 @@ export default function ProgramsPreview({ language }: Props) {
           box-shadow: 0 15px 31px rgba(23, 111, 232, 0.28);
         }
 
+        .nr-programs-preview a:focus-visible {
+          outline: 3px solid rgba(23, 111, 232, 0.28);
+          outline-offset: 4px;
+        }
+
         .nr-programs-note {
           max-width: 830px;
           display: flex;
@@ -702,6 +716,33 @@ export default function ProgramsPreview({ language }: Props) {
           margin: 0;
           font-size: 11px;
           line-height: 1.7;
+        }
+
+
+        html[data-theme="dark"] .nr-programs-preview {
+          background:
+            radial-gradient(
+              circle at 10% 14%,
+              rgba(23, 111, 232, 0.14),
+              transparent 24%
+            ),
+            radial-gradient(
+              circle at 90% 86%,
+              rgba(255, 195, 19, 0.09),
+              transparent 24%
+            ),
+            linear-gradient(180deg, #07182c, #0a213d);
+        }
+
+        html[data-theme="dark"] .nr-program-card {
+          border-color: rgba(255, 255, 255, 0.1);
+          background: rgba(255, 255, 255, 0.055);
+          box-shadow: 0 24px 64px rgba(0, 0, 0, 0.24);
+        }
+
+        html[data-theme="dark"] .nr-program-features span {
+          border-color: rgba(255, 255, 255, 0.08);
+          background: rgba(255, 255, 255, 0.045);
         }
 
         @media (max-width: 1080px) {

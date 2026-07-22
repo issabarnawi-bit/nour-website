@@ -49,7 +49,15 @@ const metrics = [
   },
 ] as const;
 
-function AnimatedNumber({ value, suffix }: { value: number; suffix: string }) {
+function AnimatedNumber({
+  value,
+  suffix,
+  language,
+}: {
+  value: number;
+  suffix: string;
+  language: Language;
+}) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, amount: 0.6 });
   const [displayValue, setDisplayValue] = useState(0);
@@ -74,7 +82,7 @@ function AnimatedNumber({ value, suffix }: { value: number; suffix: string }) {
 
   return (
     <span ref={ref} className="nr-trust-metric-value">
-      {new Intl.NumberFormat("en-US").format(displayValue)}
+      {new Intl.NumberFormat(language === "ar" ? "ar-SA" : "en-US").format(displayValue)}
       {suffix}
     </span>
   );
@@ -82,7 +90,11 @@ function AnimatedNumber({ value, suffix }: { value: number; suffix: string }) {
 
 export default function TrustMetrics({ language }: Props) {
   return (
-    <section className="nr-trust-metrics" aria-labelledby="trust-metrics-title">
+    <section
+      className="nr-trust-metrics"
+      dir={language === "ar" ? "rtl" : "ltr"}
+      aria-labelledby="trust-metrics-title"
+    >
       <div className="nr-container">
         <motion.div
           className="nr-trust-metrics-heading"
@@ -95,7 +107,10 @@ export default function TrustMetrics({ language }: Props) {
           <span className="nr-trust-metrics-kicker">
             {language === "ar" ? "ثقة تبدأ من التجربة" : "Trust built through experience"}
           </span>
-          <h2 id="trust-metrics-title">
+          <h2
+            id="trust-metrics-title"
+            lang={language === "ar" ? "ar" : "en"}
+          >
             {language === "ar"
               ? "أرقام تعكس التزام نور بخدمة المعتمرين"
               : "Numbers that reflect Nour’s commitment to pilgrims"}
@@ -137,7 +152,11 @@ export default function TrustMetrics({ language }: Props) {
                 </span>
               </div>
 
-              <AnimatedNumber value={metric.value} suffix={metric.suffix} />
+              <AnimatedNumber
+                value={metric.value}
+                suffix={metric.suffix}
+                language={language}
+              />
               <h3>{language === "ar" ? metric.labelAr : metric.labelEn}</h3>
               <p>{language === "ar" ? metric.noteAr : metric.noteEn}</p>
               <span className="nr-trust-metric-line" />
@@ -218,6 +237,9 @@ export default function TrustMetrics({ language }: Props) {
 
         .nr-trust-metric-card {
           position: relative;
+          z-index: 2;
+          opacity: 1;
+          visibility: visible;
           min-height: 285px;
           overflow: hidden;
           padding: 24px;
@@ -322,10 +344,35 @@ export default function TrustMetrics({ language }: Props) {
         }
 
         @media (max-width: 620px) {
-          .nr-trust-metrics { padding: 76px 0; }
-          .nr-trust-metrics-heading { margin-bottom: 30px; }
-          .nr-trust-metrics-grid { grid-template-columns: 1fr; gap: 13px; }
-          .nr-trust-metric-card { min-height: 235px; }
+          .nr-trust-metrics {
+            padding: 76px 0;
+          }
+
+          .nr-trust-metrics-heading {
+            margin-bottom: 30px;
+            text-align: center;
+          }
+
+          .nr-trust-metrics-heading p {
+            margin-inline: auto;
+          }
+
+          .nr-trust-metrics-grid {
+            grid-template-columns: 1fr;
+            gap: 13px;
+          }
+
+          .nr-trust-metric-card {
+            min-height: 235px;
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .nr-trust-metric-card,
+          .nr-trust-metric-line,
+          .nr-trust-metric-card::before {
+            transition: none !important;
+          }
         }
       `}</style>
     </section>

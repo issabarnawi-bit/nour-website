@@ -5,6 +5,7 @@ import SiteEnhancements from "./components/SiteEnhancements";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 import Hero from "./components/home/Hero";
+import Statistics from "./components/home/NourStatistics";
 import WhyNour from "./components/home/WhyNour";
 import Goals from "./components/home/Goals";
 import About from "./components/home/About";
@@ -12,7 +13,6 @@ import Services from "./components/home/Services";
 import ProgramsPreview from "./components/home/ProgramsPreview";
 import TrustMetrics from "./components/home/TrustMetrics";
 import Journey from "./components/home/Journey";
-import Testimonials from "./components/home/testimonials";
 import Showcase from "./components/home/Showcase";
 import Payments from "./components/home/Payments";
 import CTA from "./components/home/CTA";
@@ -29,29 +29,34 @@ export default function Home() {
   const [language, setLanguage] = useState<Language>("ar");
   const [theme, setTheme] = useState<Theme>("light");
   const [menuOpen, setMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState<SectionId>("home");
+  const [activeSection, setActiveSection] =
+    useState<SectionId>("home");
   const [activeScreen, setActiveScreen] = useState(0);
+
   const t = copy[language];
 
   const navItems = useMemo(
-    () => sectionIds.map((id, index) => ({ id, label: t.nav[index] })),
+    () =>
+      sectionIds.map((id, index) => ({
+        id,
+        label: t.nav[index],
+      })),
     [t],
   );
 
   useEffect(() => {
-    const timer = window.setInterval(
-      () =>
-        setActiveScreen(
-          (current) => (current + 1) % appScreens.length,
-        ),
-      3500,
-    );
+    const timer = window.setInterval(() => {
+      setActiveScreen(
+        (current) => (current + 1) % appScreens.length,
+      );
+    }, 3500);
 
     return () => window.clearInterval(timer);
   }, []);
 
   useEffect(() => {
-    const savedLanguage = localStorage.getItem("nour-language");
+    const savedLanguage =
+      localStorage.getItem("nour-language");
     const savedTheme = localStorage.getItem("nour-theme");
 
     setLanguage(savedLanguage === "en" ? "en" : "ar");
@@ -60,7 +65,8 @@ export default function Home() {
 
   useEffect(() => {
     document.documentElement.lang = language;
-    document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
+    document.documentElement.dir =
+      language === "ar" ? "rtl" : "ltr";
     document.documentElement.dataset.theme = theme;
 
     localStorage.setItem("nour-language", language);
@@ -70,7 +76,10 @@ export default function Home() {
   useEffect(() => {
     const sections = sectionIds
       .map((id) => document.getElementById(id))
-      .filter((section): section is HTMLElement => Boolean(section));
+      .filter(
+        (section): section is HTMLElement =>
+          Boolean(section),
+      );
 
     if (!sections.length) return;
 
@@ -83,7 +92,9 @@ export default function Home() {
               b.intersectionRatio - a.intersectionRatio,
           )[0]?.target.id as SectionId | undefined;
 
-        if (current) setActiveSection(current);
+        if (current) {
+          setActiveSection(current);
+        }
       },
       {
         rootMargin: "-25% 0px -60% 0px",
@@ -91,7 +102,10 @@ export default function Home() {
       },
     );
 
-    sections.forEach((section) => observer.observe(section));
+    sections.forEach((section) =>
+      observer.observe(section),
+    );
+
     return () => observer.disconnect();
   }, []);
 
@@ -123,14 +137,19 @@ export default function Home() {
       />
 
       <Hero t={t} />
+      <Statistics language={language} />
       <WhyNour language={language} />
+
+      {/* يظهر قسم الأهداف مرة واحدة فقط */}
       <Goals t={t} />
+
+      {/* يحتوي هذا القسم على صورة الهاتف والبطاقات العائمة */}
       <About t={t} />
+
       <Services language={language} />
       <ProgramsPreview language={language} />
       <TrustMetrics language={language} />
       <Journey t={t} language={language} />
-      <Testimonials language={language} />
 
       <Showcase
         t={t}
