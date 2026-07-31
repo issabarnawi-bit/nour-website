@@ -1,0 +1,40 @@
+import type { Country } from "../types";
+
+export const countriesMock: Country[] = [
+  {
+    id: "sa",
+    nameAr: "المملكة العربية السعودية",
+    nameEn: "Saudi Arabia",
+    code: "SA",
+    currency: "SAR",
+    timezone: "Asia/Riyadh",
+    status: "active",
+    sortOrder: 1,
+    createdAt: "2026-07-24T00:00:00.000Z",
+    updatedAt: "2026-07-24T00:00:00.000Z",
+  },
+  {
+    id: "ng",
+    nameAr: "نيجيريا",
+    nameEn: "Nigeria",
+    code: "NG",
+    currency: "NGN",
+    timezone: "Africa/Lagos",
+    status: "active",
+    sortOrder: 2,
+    createdAt: "2026-07-24T00:00:00.000Z",
+    updatedAt: "2026-07-24T00:00:00.000Z",
+  },
+  {
+    id: "pk",
+    nameAr: "باكستان",
+    nameEn: "Pakistan",
+    code: "PK",
+    currency: "PKR",
+    timezone: "Asia/Karachi",
+    status: "inactive",
+    sortOrder: 3,
+    createdAt: "2026-07-24T00:00:00.000Z",
+    updatedAt: "2026-07-24T00:00:00.000Z",
+  },
+];

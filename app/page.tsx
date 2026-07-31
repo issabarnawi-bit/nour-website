@@ -56,8 +56,8 @@ export default function Home() {
 
   useEffect(() => {
     const savedLanguage =
-      localStorage.getItem("nour-language");
-    const savedTheme = localStorage.getItem("nour-theme");
+      localStorage.getItem("NourApp-language");
+    const savedTheme = localStorage.getItem("NourApp-theme");
 
     setLanguage(savedLanguage === "en" ? "en" : "ar");
     setTheme(savedTheme === "dark" ? "dark" : "light");
@@ -69,8 +69,8 @@ export default function Home() {
       language === "ar" ? "rtl" : "ltr";
     document.documentElement.dataset.theme = theme;
 
-    localStorage.setItem("nour-language", language);
-    localStorage.setItem("nour-theme", theme);
+    localStorage.setItem("NourApp-language", language);
+    localStorage.setItem("NourApp-theme", theme);
   }, [language, theme]);
 
   useEffect(() => {

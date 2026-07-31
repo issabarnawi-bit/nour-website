@@ -1565,8 +1565,8 @@ html[dir="ltr"] .nr-footer-links {
 }
 
 /* =========================================================
-   NOUR — FINAL COMPACT LAYOUT
-   تحسين الهيدر، Hero، الأهداف، عن نور، وعرض التطبيق
+   NourApp — FINAL COMPACT LAYOUT
+   تحسين الهيدر، Hero، الأهداف، عن  نور آب، وعرض التطبيق
 ========================================================= */
 
 /* =========================
@@ -1874,7 +1874,7 @@ html[dir="ltr"] .nr-showcase li {
   }
 }
 /* =========================================================
-   NOUR — FINAL DARK MODE SPACING FIX
+   NourApp — FINAL DARK MODE SPACING FIX
 ========================================================= */
 
 /* إزالة أي ارتفاع إجباري يسبب الفراغات */
@@ -2006,8 +2006,8 @@ html[dir="ltr"] .nr-showcase li {
   }
 }
 /* =========================================================
-   NOUR — UNIFIED FEATURE ICONS + APP STORE BADGE
-   Paste this block at the very end of the Nour CSS file.
+   NourApp — UNIFIED FEATURE ICONS + APP STORE BADGE
+   Paste this block at the very end of the NourApp CSS file.
 ========================================================= */
 
 .nr-feature-icon {
@@ -2320,7 +2320,7 @@ html[dir="rtl"] .nr-showcase li {
   }
 }
 /* =========================
-   Nour statistics
+   NourApp statistics
 ========================= */
 
 .nr-statistics {
@@ -2470,7 +2470,7 @@ html[data-theme="dark"] .nr-statistics-kicker {
 }
 
 /* =========================================================
-   SPRINT 3 — WHY NOUR
+   SPRINT 3 — WHY NourApp
 ========================================================= */
 
 .nr-why {

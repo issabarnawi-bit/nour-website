@@ -77,8 +77,7 @@ export default function Hero({ t }: Props) {
               <>
                 رفيقك الذكي لرحلة عمرة
                 <span> أكثر راحة وأمانًا</span>
-              </>
-            ) : (
+              </>            ) : (
               <>
                 Your smart companion for a
                 <span> smoother Umrah journey</span>
@@ -98,7 +97,7 @@ export default function Hero({ t }: Props) {
               <ArrowIcon isArabic={isArabic} />
             </a>
             <a className="nr-premium-secondary" href="#features">
-              <span>{isArabic ? "استكشف خدمات نور" : "Explore Nour services"}</span>
+              <span>{isArabic ? "استكشف خدمات  نور آب" : "Explore NourApp services"}</span>
               <PlayIcon />
             </a>
           </motion.div>
@@ -117,6 +116,13 @@ export default function Hero({ t }: Props) {
             <div>
               <strong>{isArabic ? "آمن" : "Secure"}</strong>
               <small>{isArabic ? "دفع وخصوصية" : "Payments & privacy"}</small>
+            </div>
+            <span className="nr-premium-trust-divider" />
+            <div>
+              <strong>{isArabic ? "تكلفة مرنة" : "Flexible pricing"}</strong>
+              <small>
+                {isArabic ? "خيارات تناسب ميزانيتك" : "Options for your budget"}
+              </small>
             </div>
           </motion.div>
         </motion.div>
@@ -139,7 +145,7 @@ export default function Hero({ t }: Props) {
             animate={{ y: [0, -18, 0], rotate: [-2, 2, -2] }}
             transition={{ duration: 5.8, repeat: Infinity, ease: "easeInOut" }}
           >
-            <Image src="/images/site/front-view.png" alt={isArabic ? "واجهة تطبيق نور" : "Nour app interface"} width={420} height={720} priority className="nr-premium-phone-front" />
+            <Image src="/images/site/front-view.png" alt={isArabic ? "واجهة تطبيق  نور آب" : "NourApp app interface"} width={420} height={720} priority className="nr-premium-phone-front" />
           </motion.div>
 
           <FloatingCard className="nr-floating-card nr-floating-card-booking" delay={0.55} icon={<CheckIcon />} title={isArabic ? "تم تأكيد الحجز" : "Booking confirmed"} subtitle={isArabic ? "البرنامج جاهز" : "Program ready"} />
@@ -308,9 +314,14 @@ export default function Hero({ t }: Props) {
         .nr-premium-trust {
           display: flex;
           align-items: center;
+          flex-wrap: wrap;
           gap: 17px;
           margin-top: 34px;
           color: rgba(255,255,255,.9);
+        }
+
+        .nr-premium-trust > div {
+          min-width: 92px;
         }
 
         .nr-premium-trust strong,
@@ -549,14 +560,22 @@ export default function Hero({ t }: Props) {
   .nr-premium-trust {
     width: 100% !important;
     display: grid !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    gap: 4px !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px 6px !important;
     margin-top: 19px !important;
     text-align: center !important;
   }
 
   .nr-premium-trust-divider {
     display: none !important;
+  }
+
+  .nr-premium-trust > div {
+    min-width: 0 !important;
+    padding: 9px 5px !important;
+    border: 1px solid rgba(255,255,255,.14) !important;
+    border-radius: 12px !important;
+    background: rgba(255,255,255,.07) !important;
   }
 
   .nr-premium-trust strong {

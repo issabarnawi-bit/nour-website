@@ -1,0 +1,124 @@
+/* src/styles/tokens.css */
+
+:root {
+  /* Brand */
+  --NourApp-primary: #176fe8;
+  --NourApp-primary-hover: #0f5ecb;
+  --NourApp-primary-soft: #edf5ff;
+
+  --NourApp-secondary: #ffc313;
+  --NourApp-secondary-soft: #fff8db;
+
+  /* Backgrounds */
+  --NourApp-background: #f5f7fb;
+  --NourApp-surface: #ffffff;
+  --NourApp-surface-muted: #f8fafc;
+
+  /* Text */
+  --NourApp-text-primary: #15233b;
+  --NourApp-text-secondary: #64748b;
+  --NourApp-text-muted: #94a3b8;
+  --NourApp-text-inverse: #ffffff;
+
+  /* Borders */
+  --NourApp-border: #e2e8f0;
+  --NourApp-border-strong: #cbd5e1;
+
+  /* Status */
+  --NourApp-success: #16a34a;
+  --NourApp-success-soft: #dcfce7;
+
+  --NourApp-warning: #d97706;
+  --NourApp-warning-soft: #fef3c7;
+
+  --NourApp-danger: #dc2626;
+  --NourApp-danger-soft: #fee2e2;
+
+  --NourApp-info: #0284c7;
+  --NourApp-info-soft: #e0f2fe;
+
+  /* Radius */
+  --NourApp-radius-sm: 8px;
+  --NourApp-radius-md: 12px;
+  --NourApp-radius-lg: 16px;
+  --NourApp-radius-xl: 24px;
+
+  /* Shadows */
+  --NourApp-shadow-sm: 0 1px 3px rgb(15 23 42 / 0.06);
+  --NourApp-shadow-md: 0 8px 24px rgb(15 23 42 / 0.08);
+  --NourApp-shadow-lg: 0 20px 45px rgb(15 23 42 / 0.12);
+
+  /* Layout */
+  --NourApp-sidebar-width: 280px;
+  --NourApp-topbar-height: 72px;
+
+  /* Motion */
+  --NourApp-transition-fast: 150ms ease;
+  --NourApp-transition-normal: 250ms ease;
+}
+
+/* Admin theme tokens */
+
+.nr-admin-theme {
+  --nour-background: #f5f7fb;
+  --nour-surface: #ffffff;
+  --nour-surface-muted: #f8fafc;
+  --nour-surface-soft: #eef3f8;
+
+  --nour-text-primary: #15233b;
+  --nour-text-secondary: #6d7b91;
+  --nour-text-muted: #94a3b8;
+  --nour-text-inverse: #ffffff;
+
+  --nour-border: #dbe2ea;
+  --nour-border-strong: #cbd5e1;
+
+  --nour-primary: #176fe8;
+  --nour-primary-hover: #0b5fd1;
+
+  --nour-danger: #dc2626;
+  --nour-success: #16a34a;
+  --nour-warning: #d97706;
+
+  --nour-shadow-sm:
+    0 2px 8px rgba(15, 23, 42, 0.06);
+
+  --nour-shadow-md:
+    0 12px 30px rgba(15, 23, 42, 0.1);
+
+  --nour-shadow-lg:
+    0 24px 60px rgba(15, 23, 42, 0.16);
+}
+
+.nr-admin-theme--dark {
+  --nour-background: #0b1220;
+  --nour-surface: #111b2d;
+  --nour-surface-muted: #172236;
+  --nour-surface-soft: #1d2a40;
+
+  --nour-text-primary: #f1f5f9;
+  --nour-text-secondary: #a9b6c9;
+  --nour-text-muted: #7f8da3;
+  --nour-text-inverse: #0b1220;
+
+  --nour-border: #26354d;
+  --nour-border-strong: #354761;
+
+  --nour-primary: #4b91f1;
+  --nour-primary-hover: #6aa7f6;
+
+  --nour-danger: #f87171;
+  --nour-success: #4ade80;
+  --nour-warning: #fbbf24;
+
+  --nour-shadow-sm:
+    0 2px 8px rgba(0, 0, 0, 0.22);
+
+  --nour-shadow-md:
+    0 14px 36px rgba(0, 0, 0, 0.3);
+
+  --nour-shadow-lg:
+    0 28px 70px rgba(0, 0, 0, 0.42);
+
+  color-scheme: dark;
+}

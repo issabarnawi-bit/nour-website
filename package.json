@@ -1,5 +1,5 @@
 {
-  "name": "nour-website",
+  "name": "NourApp-website",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,6 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.12.3",
+    "@supabase/supabase-js": "^2.110.8",
+    "@tanstack/react-query": "^5.101.4",
     "framer-motion": "^12.42.2",
     "next": "16.2.10",
     "react": "19.2.4",
@@ -21,6 +24,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
+    "supabase": "^2.109.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

@@ -44,6 +44,10 @@ export default function TestimonialCard({
         />
       </div>
 
+      <span className={styles.quoteMark} aria-hidden="true">
+        “
+      </span>
+
       <blockquote>“{quote}”</blockquote>
 
       <footer className={styles.customer}>
@@ -52,7 +56,7 @@ export default function TestimonialCard({
             src={testimonial.avatar}
             alt={testimonial.name}
             fill
-            sizes={active ? "116px" : "78px"}
+            sizes={active ? "76px" : "64px"}
           />
         </div>
 

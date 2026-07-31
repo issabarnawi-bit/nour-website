@@ -23,8 +23,8 @@ const metrics = [
     suffix: "+",
     labelAr: "معتمر",
     labelEn: "Pilgrims",
-    noteAr: "استفادوا من خدمات وتجارب نور",
-    noteEn: "Served through Nour journeys and services",
+    noteAr: "استفادوا من خدمات وتجارب  نور آب",
+    noteEn: "Served through NourApp journeys and services",
     icon: "pilgrims",
   },
   {
@@ -46,6 +46,16 @@ const metrics = [
     noteAr: "مساندة خلال مراحل الرحلة",
     noteEn: "Assistance throughout the journey",
     icon: "support",
+  },
+  {
+    id: "flexible-pricing",
+    valueAr: "مرنة",
+    valueEn: "Flexible",
+    labelAr: "التكلفة المرنة",
+    labelEn: "Flexible pricing",
+    noteAr: "خيارات متنوعة تناسب ميزانيتك واحتياج رحلتك",
+    noteEn: "Flexible options that suit your budget and journey needs",
+    icon: "pricing",
   },
 ] as const;
 
@@ -112,8 +122,8 @@ export default function TrustMetrics({ language }: Props) {
             lang={language === "ar" ? "ar" : "en"}
           >
             {language === "ar"
-              ? "أرقام تعكس التزام نور بخدمة المعتمرين"
-              : "Numbers that reflect Nour’s commitment to pilgrims"}
+              ? "أرقام تعكس التزام  نور آب بخدمة المعتمرين"
+              : "Numbers that reflect NourApp’s commitment to pilgrims"}
           </h2>
           <p>
             {language === "ar"
@@ -152,11 +162,17 @@ export default function TrustMetrics({ language }: Props) {
                 </span>
               </div>
 
-              <AnimatedNumber
-                value={metric.value}
-                suffix={metric.suffix}
-                language={language}
-              />
+              {"value" in metric ? (
+                <AnimatedNumber
+                  value={metric.value}
+                  suffix={metric.suffix}
+                  language={language}
+                />
+              ) : (
+                <span className="nr-trust-metric-value nr-trust-metric-value--text">
+                  {language === "ar" ? metric.valueAr : metric.valueEn}
+                </span>
+              )}
               <h3>{language === "ar" ? metric.labelAr : metric.labelEn}</h3>
               <p>{language === "ar" ? metric.noteAr : metric.noteEn}</p>
               <span className="nr-trust-metric-line" />
@@ -231,8 +247,8 @@ export default function TrustMetrics({ language }: Props) {
 
         .nr-trust-metrics-grid {
           display: grid;
-          grid-template-columns: repeat(4, minmax(0,1fr));
-          gap: 18px;
+          grid-template-columns: repeat(5, minmax(0,1fr));
+          gap: 16px;
         }
 
         .nr-trust-metric-card {
@@ -308,6 +324,12 @@ export default function TrustMetrics({ language }: Props) {
           letter-spacing: -.035em;
         }
 
+        .nr-trust-metric-value--text {
+          font-size: clamp(31px, 3vw, 43px);
+          letter-spacing: 0;
+          line-height: 1.15;
+        }
+
         .nr-trust-metric-card h3 {
           position: relative;
           z-index: 2;
@@ -339,8 +361,14 @@ export default function TrustMetrics({ language }: Props) {
 
         .nr-trust-metric-card:hover .nr-trust-metric-line { width: 76px; }
 
-        @media (max-width: 1020px) {
-          .nr-trust-metrics-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+        @media (max-width: 1180px) {
+          .nr-trust-metrics-grid {
+            grid-template-columns: repeat(2, minmax(0,1fr));
+          }
+
+          .nr-trust-metric-card:last-child {
+            grid-column: 1 / -1;
+          }
         }
 
         @media (max-width: 620px) {
@@ -360,6 +388,10 @@ export default function TrustMetrics({ language }: Props) {
           .nr-trust-metrics-grid {
             grid-template-columns: 1fr;
             gap: 13px;
+          }
+
+          .nr-trust-metric-card:last-child {
+            grid-column: auto;
           }
 
           .nr-trust-metric-card {
@@ -404,6 +436,17 @@ function MetricIcon({ type }: { type: (typeof metrics)[number]["icon"] }) {
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">
         <circle cx="12" cy="12" r="9" />
         <path d="M3 12h18M12 3c2.2 2.5 3.3 5.5 3.3 9S14.2 18.5 12 21M12 3C9.8 5.5 8.7 8.5 8.7 12S9.8 18.5 12 21" />
+      </svg>
+    );
+  }
+
+  if (type === "pricing") {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">
+        <path d="M4 7.5h13.5A2.5 2.5 0 0 1 20 10v7.5A2.5 2.5 0 0 1 17.5 20h-11A2.5 2.5 0 0 1 4 17.5v-10Z" strokeLinejoin="round" />
+        <path d="M4.5 8 15 4.2a2 2 0 0 1 2.6 1.2L18.2 7" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M15.5 12.2H20v3.4h-4.5a1.7 1.7 0 1 1 0-3.4Z" strokeLinejoin="round" />
+        <circle cx="16" cy="13.9" r=".55" fill="currentColor" stroke="none" />
       </svg>
     );
   }

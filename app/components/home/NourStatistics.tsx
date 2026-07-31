@@ -27,8 +27,8 @@ const statistics: Statistic[] = [
     suffix: "+",
     labelAr: "شريك خدمة",
     labelEn: "Service partners",
-    descriptionAr: "ضمن شبكة خدمات نور المتنامية",
-    descriptionEn: "Across Nour's growing service network",
+    descriptionAr: "ضمن شبكة خدمات  نور آب المتنامية",
+    descriptionEn: "Across NourApp's growing service network",
   },
   {
     value: 18,
@@ -88,7 +88,7 @@ export default function Statistics({ language }: { language: Language }) {
           variants={fadeUp}
         >
           <span className="nr-kicker nr-statistics-kicker">
-            {language === "ar" ? "نور بالأرقام" : "Nour in Numbers"}
+            {language === "ar" ? " نور آب بالأرقام" : "NourApp in Numbers"}
           </span>
           <h2 id="nr-statistics-title">
             {language === "ar"
@@ -97,8 +97,8 @@ export default function Statistics({ language }: { language: Language }) {
           </h2>
           <p>
             {language === "ar"
-              ? "مؤشرات مستهدفة تعكس طموح نور في بناء منظومة موثوقة ومتكاملة لخدمات العمرة."
-              : "Target indicators reflecting Nour's ambition to build a trusted, integrated Umrah services ecosystem."}
+              ? "مؤشرات مستهدفة تعكس طموح  نور آب في بناء منظومة موثوقة ومتكاملة لخدمات العمرة."
+              : "Target indicators reflecting NourApp's ambition to build a trusted, integrated Umrah services ecosystem."}
           </p>
         </motion.div>
 

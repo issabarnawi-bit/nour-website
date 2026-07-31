@@ -354,19 +354,19 @@ html[data-theme="dark"] .nr-goals article {
 
 .nr-phone-back {
   transform-origin: center;
-  animation: nourPhoneBackFloat 7s ease-in-out infinite;
+  animation: NourAppPhoneBackFloat 7s ease-in-out infinite;
   will-change: transform;
 }
 
 .nr-phone-front {
   transform-origin: center;
-  animation: nourPhoneFrontFloat 5.5s ease-in-out infinite;
+  animation: NourAppPhoneFrontFloat 5.5s ease-in-out infinite;
   will-change: transform;
 }
 
 /* الهاتف الخلفي الكبير */
 
-@keyframes nourPhoneBackFloat {
+@keyframes NourAppPhoneBackFloat {
   0% {
     transform:
       translate3d(0, 0, 0)
@@ -398,7 +398,7 @@ html[data-theme="dark"] .nr-goals article {
 
 /* الهاتف الأمامي الصغير */
 
-@keyframes nourPhoneFrontFloat {
+@keyframes NourAppPhoneFrontFloat {
   0% {
     transform:
       translate3d(0, 0, 25px)
@@ -447,10 +447,10 @@ html[data-theme="dark"] .nr-goals article {
       transparent 70%
     );
   filter: blur(10px);
-  animation: nourPhoneGlow 6s ease-in-out infinite;
+  animation: NourAppPhoneGlow 6s ease-in-out infinite;
 }
 
-@keyframes nourPhoneGlow {
+@keyframes NourAppPhoneGlow {
   0%,
   100% {
     opacity: 0.7;
@@ -871,10 +871,10 @@ html[dir="rtl"] .nr-installment-card::after {
 }
 
 /* =========================================================
-   NOUR APP SCREEN CAROUSEL — CLEAN PHONE FRAME
+   NourApp APP SCREEN CAROUSEL — CLEAN PHONE FRAME
 ========================================================= */
 
-.nour-screen-carousel {
+.NourApp-screen-carousel {
   position: relative;
   min-height: 620px;
   display: flex;
@@ -884,7 +884,7 @@ html[dir="rtl"] .nr-installment-card::after {
   isolation: isolate;
 }
 
-.nour-screen-carousel-glow {
+.NourApp-screen-carousel-glow {
   position: absolute;
   z-index: -1;
   width: 430px;
@@ -898,10 +898,10 @@ html[dir="rtl"] .nr-installment-card::after {
     );
   opacity: 0.72;
   filter: blur(2px);
-  animation: nourCarouselGlow 7s ease-in-out infinite;
+  animation: NourAppCarouselGlow 7s ease-in-out infinite;
 }
 
-.nour-phone-frame {
+.NourApp-phone-frame {
   position: relative;
   z-index: 2;
   width: 276px;
@@ -917,11 +917,11 @@ html[dir="rtl"] .nr-installment-card::after {
   transform: rotate(-2deg);
 }
 
-html[dir="ltr"] .nour-phone-frame {
+html[dir="ltr"] .NourApp-phone-frame {
   transform: rotate(2deg);
 }
 
-.nour-phone-frame::before {
+.NourApp-phone-frame::before {
   content: "";
   position: absolute;
   inset: 5px;
@@ -931,7 +931,7 @@ html[dir="ltr"] .nour-phone-frame {
   pointer-events: none;
 }
 
-.nour-phone-frame::after {
+.NourApp-phone-frame::after {
   content: "";
   position: absolute;
   top: 55px;
@@ -949,7 +949,7 @@ html[dir="ltr"] .nour-phone-frame {
   pointer-events: none;
 }
 
-.nour-phone-screen {
+.NourApp-phone-screen {
   position: absolute;
   inset: 9px;
   overflow: hidden;
@@ -957,14 +957,14 @@ html[dir="ltr"] .nour-phone-frame {
   background: #ffffff;
 }
 
-.nour-screen-slide {
+.NourApp-screen-slide {
   position: absolute;
   inset: 0;
   overflow: hidden;
   background: #ffffff;
 }
 
-.nour-screen-image {
+.NourApp-screen-image {
   display: block !important;
   width: 100% !important;
   height: 100% !important;
@@ -978,7 +978,7 @@ html[dir="ltr"] .nour-phone-frame {
   pointer-events: none;
 }
 
-.nour-phone-island {
+.NourApp-phone-island {
   position: absolute;
   top: 12px;
   left: 50%;
@@ -992,7 +992,7 @@ html[dir="ltr"] .nour-phone-frame {
   pointer-events: none;
 }
 
-.nour-phone-home-line {
+.NourApp-phone-home-line {
   position: absolute;
   bottom: 9px;
   left: 50%;
@@ -1005,7 +1005,7 @@ html[dir="ltr"] .nour-phone-frame {
   pointer-events: none;
 }
 
-.nour-phone-side-button {
+.NourApp-phone-side-button {
   position: absolute;
   z-index: 1;
   width: 4px;
@@ -1013,26 +1013,26 @@ html[dir="ltr"] .nour-phone-frame {
   background: #1d2836;
 }
 
-.nour-phone-side-button-one {
+.NourApp-phone-side-button-one {
   top: 112px;
   left: -5px;
   height: 38px;
 }
 
-.nour-phone-side-button-two {
+.NourApp-phone-side-button-two {
   top: 166px;
   left: -5px;
   height: 62px;
 }
 
-.nour-phone-side-button-three {
+.NourApp-phone-side-button-three {
   top: 126px;
   right: -5px;
   height: 82px;
   border-radius: 0 4px 4px 0;
 }
 
-.nour-screen-dots {
+.NourApp-screen-dots {
   position: relative;
   z-index: 5;
   display: flex;
@@ -1048,7 +1048,7 @@ html[dir="ltr"] .nour-phone-frame {
   backdrop-filter: blur(14px);
 }
 
-.nour-screen-dot {
+.NourApp-screen-dot {
   width: 9px;
   height: 9px;
   padding: 0;
@@ -1063,19 +1063,18 @@ html[dir="ltr"] .nour-phone-frame {
     background 0.25s ease;
 }
 
-.nour-screen-dot.is-active {
+.NourApp-screen-dot.is-active {
   width: 28px;
   background: var(--nr-gold);
   opacity: 1;
 }
 
-.nour-screen-dot:focus-visible {
+.NourApp-screen-dot:focus-visible {
   outline: 3px solid rgba(23, 111, 232, 0.28);
   outline-offset: 3px;
 }
 
-@keyframes nourCarouselGlow {
-  0%,
+@keyframes NourAppCarouselGlow {  0%,
   100% {
     transform: scale(1) rotate(0deg);
   }
@@ -1085,14 +1084,14 @@ html[dir="ltr"] .nour-phone-frame {
   }
 }
 
-html[data-theme="dark"] .nour-phone-frame {
+html[data-theme="dark"] .NourApp-phone-frame {
   border-color: rgba(255, 255, 255, 0.2);
   box-shadow:
     0 38px 85px rgba(0, 0, 0, 0.46),
     inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
-html[data-theme="dark"] .nour-screen-carousel-glow {
+html[data-theme="dark"] .NourApp-screen-carousel-glow {
   opacity: 0.5;
 }
 
@@ -1101,69 +1100,69 @@ html[data-theme="dark"] .nour-screen-carousel-glow {
     grid-template-columns: 1fr;
   }
 
-  .nour-screen-carousel {
+  .NourApp-screen-carousel {
     min-height: 590px;
   }
 
-  .nour-phone-frame {
+  .NourApp-phone-frame {
     width: 255px;
   }
 }
 
 @media (max-width: 680px) {
-  .nour-screen-carousel {
+  .NourApp-screen-carousel {
     width: 100%;
     min-height: 510px;
   }
 
-  .nour-screen-carousel-glow {
+  .NourApp-screen-carousel-glow {
     width: 310px;
     height: 310px;
   }
 
-  .nour-phone-frame,
-  html[dir="ltr"] .nour-phone-frame {
+  .NourApp-phone-frame,
+  html[dir="ltr"] .NourApp-phone-frame {
     width: 222px;
     max-width: 68vw;
     border-radius: 41px;
     transform: none;
   }
 
-  .nour-phone-screen {
+  .NourApp-phone-screen {
     border-radius: 31px;
   }
 
-  .nour-phone-frame::before {
+  .NourApp-phone-frame::before {
     border-radius: 35px;
   }
 
-  .nour-phone-island {
+  .NourApp-phone-island {
     top: 10px;
     height: 20px;
   }
 
-  .nour-screen-dots {
+  .NourApp-screen-dots {
     margin-top: 17px;
   }
 }
 
 @media (max-width: 420px) {
-  .nour-screen-carousel {
+  .NourApp-screen-carousel {
     min-height: 475px;
   }
 
-  .nour-phone-frame {
+  .NourApp-phone-frame {
     width: 205px;
   }
 
-  .nour-screen-carousel-glow {
+  .NourApp-screen-carousel-glow {
     width: 275px;
     height: 275px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .nour-screen-carousel-glow {
+  .NourApp-screen-carousel-glow {
     animation: none;
   }
 }

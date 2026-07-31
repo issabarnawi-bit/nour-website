@@ -104,7 +104,7 @@ export default function Header({
             >
               <Image
                 src="/images/site/v-logo.png"
-                alt="Nour"
+                alt="NourApp"
                 width={160}
                 height={64}
                 priority

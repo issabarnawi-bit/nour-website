@@ -247,8 +247,8 @@ export default function ProgramsPreview({ language }: Props) {
                       >
                         <span>
                           {language === "ar"
-                            ? "ابدأ عبر نور"
-                            : "Start with Nour"}
+                            ? "ابدأ عبر  نور آب"
+                            : "Start with NourApp"}
                         </span>
                         <ArrowIcon language={language} />
                       </a>

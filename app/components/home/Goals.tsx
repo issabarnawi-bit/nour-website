@@ -50,7 +50,7 @@ export default function Goals({ t }: Props) {
         >
           <span className="nr-goals-kicker">
             <TargetIcon />
-            {isArabic ? "رؤية نور" : "Nour vision"}
+            {isArabic ? "رؤية  نور آب" : "NourApp vision"}
           </span>
 
           <h2 lang={isArabic ? "ar" : "en"}>
@@ -59,8 +59,8 @@ export default function Goals({ t }: Props) {
 
           <p>
             {isArabic
-              ? "أهداف واضحة تقود تجربة نور نحو رحلة عمرة أكثر سهولة وراحة وثقة."
-              : "Clear goals guiding Nour toward a simpler, more comfortable, and more trusted Umrah journey."}
+              ? "أهداف واضحة تقود تجربة  نور آب نحو رحلة عمرة أكثر سهولة وراحة وثقة."
+              : "Clear goals guiding NourApp toward a simpler, more comfortable, and more trusted Umrah journey."}
           </p>
         </motion.header>
 

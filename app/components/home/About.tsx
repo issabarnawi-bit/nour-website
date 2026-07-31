@@ -151,8 +151,8 @@ export default function About({ t }: Props) {
           <a className="nr-about-link" href="#features">
             <span>
               {isArabic
-                ? "اكتشف خدمات نور"
-                : "Discover Nour services"}
+                ? "اكتشف خدمات  نور آب"
+                : "Discover NourApp services"}
             </span>
 
             <ArrowIcon isArabic={isArabic} />
@@ -200,8 +200,8 @@ export default function About({ t }: Props) {
               src="/images/site/rotated-left.png"
               alt={
                 isArabic
-                  ? "واجهة برامج نور"
-                  : "Nour programs screen"
+                  ? "واجهة برامج  نور آب"
+                  : "NourApp programs screen"
               }
               width={650}
               height={650}

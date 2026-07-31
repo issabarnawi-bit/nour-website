@@ -9,7 +9,7 @@ type ServiceIconName =
   | "hotel"
   | "transport"
   | "guidance"
-  | "support";
+  | "payment";
 
 type Service = {
   titleAr: string;
@@ -20,6 +20,9 @@ type Service = {
   labelEn: string;
   icon: ServiceIconName;
   accent: "blue" | "gold" | "cyan";
+  badgeAr?: string;
+  badgeEn?: string;
+  paymentMethods?: string[];
 };
 
 const services: Service[] = [
@@ -34,6 +37,8 @@ const services: Service[] = [
     labelEn: "Explore programs",
     icon: "packages",
     accent: "blue",
+    badgeAr: "الأكثر طلبًا",
+    badgeEn: "Most popular",
   },
   {
     titleAr: "خدمات التأشيرات",
@@ -46,6 +51,8 @@ const services: Service[] = [
     labelEn: "Learn more",
     icon: "visa",
     accent: "gold",
+    badgeAr: "إجراءات مبسطة",
+    badgeEn: "Simplified",
   },
   {
     titleAr: "حجوزات الفنادق",
@@ -70,6 +77,8 @@ const services: Service[] = [
     labelEn: "Transport details",
     icon: "transport",
     accent: "blue",
+    badgeAr: "تنسيق أسرع",
+    badgeEn: "Faster coordination",
   },
   {
     titleAr: "الإرشاد والمساندة",
@@ -84,16 +93,19 @@ const services: Service[] = [
     accent: "gold",
   },
   {
-    titleAr: "دعم العملاء",
-    titleEn: "Customer support",
+    titleAr: "الدفع المرن",
+    titleEn: "Flexible payment",
     textAr:
-      "قنوات تواصل واضحة للرد على الاستفسارات وتقديم المساعدة خلال مراحل الرحلة المختلفة.",
+      "خيارات دفع آمنة ومرنة تساعدك على اختيار الطريقة الأنسب لميزانيتك وإتمام الحجز بسهولة.",
     textEn:
-      "Clear support channels for questions and assistance throughout the different stages of the journey.",
-    labelAr: "تواصل معنا",
-    labelEn: "Contact us",
-    icon: "support",
+      "Secure and flexible payment options that help you choose what fits your budget and complete booking easily.",
+    labelAr: "استعرض خيارات الدفع",
+    labelEn: "View payment options",
+    icon: "payment",
     accent: "cyan",
+    badgeAr: "خيارات متعددة",
+    badgeEn: "Multiple options",
+    paymentMethods: ["Tabby", "Tamara", "Visa", "Mastercard", "Apple Pay"],
   },
 ];
 
@@ -154,7 +166,7 @@ export default function Services({
         >
           <span className="nr-services-kicker">
             <SparkleIcon />
-            {isArabic ? "خدمات نور" : "Nour services"}
+            {isArabic ? "خدمات  نور آب" : "NourApp services"}
           </span>
 
           <h2
@@ -190,10 +202,20 @@ export default function Services({
                 scale: 1.018,
               }}
             >
-              <div className="nr-service-card-head">
-                <span className="nr-service-icon">
-                  <ServiceIcon name={service.icon} />
+              {service.badgeAr && (
+                <span className="nr-service-badge">
+                  {isArabic ? service.badgeAr : service.badgeEn}
                 </span>
+              )}
+
+              <div className="nr-service-card-head">
+                <motion.span
+                  className="nr-service-icon"
+                  whileHover={{ rotate: isArabic ? -7 : 7, scale: 1.1 }}
+                  transition={{ type: "spring", stiffness: 260, damping: 18 }}
+                >
+                  <ServiceIcon name={service.icon} />
+                </motion.span>
 
                 <span className="nr-service-index" aria-hidden="true">
                   {String(index + 1).padStart(2, "0")}
@@ -208,23 +230,29 @@ export default function Services({
                 {isArabic ? service.textAr : service.textEn}
               </p>
 
+              {service.paymentMethods && (
+                <div
+                  className="nr-payment-methods"
+                  aria-label={isArabic ? "وسائل الدفع المتاحة" : "Available payment methods"}
+                >
+                  {service.paymentMethods.map((method) => (
+                    <span key={method}>{method}</span>
+                  ))}
+                </div>
+              )}
+
               <a
                 className="nr-service-link"
                 href={
-                  service.icon === "support"
-                    ? "#contact"
-                    : service.icon === "packages"
-                      ? "#programs"
+                  service.icon === "packages"
+                    ? "#programs"
+                    : service.icon === "payment"
+                      ? "#payments"
                       : "#journey"
                 }
-                aria-label={
-                  isArabic ? service.labelAr : service.labelEn
-                }
+                aria-label={isArabic ? service.labelAr : service.labelEn}
               >
-                <span>
-                  {isArabic ? service.labelAr : service.labelEn}
-                </span>
-
+                <span>{isArabic ? service.labelAr : service.labelEn}</span>
                 <ArrowIcon isArabic={isArabic} />
               </a>
 
@@ -431,6 +459,24 @@ export default function Services({
           color: #00a5c8;
         }
 
+        .nr-service-badge {
+          position: absolute;
+          top: 18px;
+          inset-inline-end: 18px;
+          z-index: 4;
+          display: inline-flex;
+          align-items: center;
+          min-height: 27px;
+          padding-inline: 10px;
+          border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+          border-radius: 999px;
+          color: currentColor;
+          background: color-mix(in srgb, currentColor 8%, var(--nr-card));
+          font-size: 10px;
+          font-weight: 900;
+          backdrop-filter: blur(10px);
+        }
+
         .nr-service-card-head {
           position: relative;
           z-index: 2;
@@ -439,6 +485,7 @@ export default function Services({
           justify-content: space-between;
           gap: 14px;
           margin-bottom: 29px;
+          padding-top: 18px;
         }
 
         .nr-service-icon {
@@ -506,22 +553,56 @@ export default function Services({
           line-height: 1.82;
         }
 
+        .nr-payment-methods {
+          position: relative;
+          z-index: 2;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          margin-top: 16px;
+          padding-bottom: 66px;
+        }
+
+        .nr-payment-methods span {
+          display: inline-flex;
+          align-items: center;
+          min-height: 25px;
+          padding-inline: 8px;
+          border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+          border-radius: 999px;
+          color: var(--nr-text);
+          background: color-mix(in srgb, var(--nr-card) 88%, currentColor 5%);
+          font-size: 9px;
+          font-weight: 850;
+        }
+
         .nr-service-link {
           position: absolute;
           inset-inline-start: 26px;
-          bottom: 28px;
+          bottom: 24px;
           z-index: 2;
           display: inline-flex;
           align-items: center;
+          justify-content: center;
           gap: 8px;
+          min-height: 38px;
+          padding-inline: 14px;
+          border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+          border-radius: 12px;
           color: currentColor;
+          background: color-mix(in srgb, currentColor 7%, var(--nr-card));
           font-size: 12px;
           font-weight: 900;
-          transition: gap 0.22s ease;
+          transition:
+            gap 0.22s ease,
+            transform 0.22s ease,
+            background 0.22s ease;
         }
 
         .nr-service-link:hover {
           gap: 12px;
+          transform: translateY(-2px);
+          background: color-mix(in srgb, currentColor 12%, var(--nr-card));
         }
 
         .nr-service-link svg {
@@ -532,7 +613,7 @@ export default function Services({
         .nr-service-line {
           position: absolute;
           inset-inline-start: 26px;
-          bottom: 18px;
+          bottom: 14px;
           width: 40px;
           height: 3px;
           border-radius: 999px;
@@ -694,9 +775,9 @@ function ServiceIcon({
 
   return (
     <svg {...common}>
-      <path d="M4 13v-2a8 8 0 0 1 16 0v2" />
-      <path d="M4 13a2 2 0 0 1 2-2h1v6H6a2 2 0 0 1-2-2v-2ZM20 13a2 2 0 0 0-2-2h-1v6h1a2 2 0 0 0 2-2v-2Z" />
-      <path d="M17 17c0 2-2 3-5 3" />
+      <rect x="3" y="5" width="18" height="14" rx="3" />
+      <path d="M3 10h18M7 15h4" />
+      <path d="M16.5 14.2c1.4.4 2.3 1.3 2.7 2.6" />
     </svg>
   );
 }

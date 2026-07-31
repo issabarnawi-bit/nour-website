@@ -9,6 +9,7 @@ import {
 } from "framer-motion";
 import type { MouseEvent, ReactNode } from "react";
 import type { Language } from "../../data/home";
+import NourWorldMap from "./why-nour/NourWorldMap";
 
 type Props = {
   language: Language;
@@ -41,7 +42,7 @@ const cardVariants: Variants = {
   },
 };
 
-export default function WhyNour({ language }: Props) {
+export default function WhyNourApp({ language }: Props) {
   const isArabic = language === "ar";
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -126,9 +127,9 @@ export default function WhyNour({ language }: Props) {
       titleAr: "شبكة خدمات قابلة للتوسع",
       titleEn: "A growing service network",
       descriptionAr:
-        "منصة مصممة لدعم خدمات متعددة وشركاء أكثر مع توسع نور مستقبلًا.",
+        "منصة مصممة لدعم خدمات متعددة وشركاء أكثر مع توسع  نور آب مستقبلًا.",
       descriptionEn:
-        "A platform designed to support more services and partners as Nour continues to grow.",
+        "A platform designed to support more services and partners as NourApp continues to grow.",
       icon: <GlobeIcon />,
       accent: "rose",
     },
@@ -172,7 +173,7 @@ export default function WhyNour({ language }: Props) {
         >
           <span className="nr-why-kicker">
             <SparkleIcon />
-            {isArabic ? "لماذا نور" : "Why Nour"}
+            {isArabic ? "لماذا  نور آب" : "Why NourApp"}
           </span>
 
           <h2
@@ -180,8 +181,8 @@ export default function WhyNour({ language }: Props) {
             dir={isArabic ? "rtl" : "ltr"}
           >
             {isArabic
-              ? "لماذا يختار العملاء نور لرحلة عمرة أكثر سهولة؟"
-              : "Why do customers choose Nour for a smoother Umrah journey?"}
+              ? "لماذا يختار العملاء  نور آب لرحلة عمرة أكثر سهولة؟"
+              : "Why do customers choose NourApp for a smoother Umrah journey?"}
           </h2>
 
           <p
@@ -193,6 +194,8 @@ export default function WhyNour({ language }: Props) {
               : "We combine technology, clarity, and support to help customers understand their options and move forward with confidence."}
           </p>
         </motion.header>
+
+        <NourWorldMap language={language} />
 
         <motion.div
           className="nr-why-grid"
