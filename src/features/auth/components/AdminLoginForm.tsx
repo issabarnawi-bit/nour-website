@@ -1,14 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 
 import Button from "../../../components/ui/Button";
 import { createClient } from "../../../lib/supabase/client";
 import { signInAdmin } from "../services";
 
 export default function AdminLoginForm() {
-  const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
 
   const [email, setEmail] = useState("");
@@ -24,13 +22,16 @@ export default function AdminLoginForm() {
     setIsSubmitting(true);
 
     try {
-      await signInAdmin(supabase, {
-        email,
-        password,
-      });
+    await signInAdmin(supabase, {
+  email,
+  password,
+});
 
-      router.replace("/admin/dashboard");
-      router.refresh();
+window.location.assign(
+  "/admin/dashboard",
+);
+      
+  
     } catch (error) {
       setErrorMessage(
         error instanceof Error

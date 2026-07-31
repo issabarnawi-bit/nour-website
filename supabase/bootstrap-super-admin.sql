@@ -1,7 +1,7 @@
 do $$
 declare
   target_email text :=
-    'issa.barnawi@norappglobal.com';
+    'issa.barnawi@nourappglobal.com';
 
   target_full_name text :=
     'Issa Barnawi';
