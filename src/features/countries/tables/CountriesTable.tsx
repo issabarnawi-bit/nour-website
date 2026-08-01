@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import Badge from "../../../components/ui/Badge";
 import Button from "../../../components/ui/Button";
 import {
@@ -20,7 +22,7 @@ type CountriesTableProps = {
   onSearchChange: (value: string) => void;
   onEdit: (country: Country) => void;
   onToggleStatus: (country: Country) => void;
-  onDelete: (country: Country) => void;
+  onDelete: (country: Country) => void | Promise<void>;
   isStatusUpdating?: boolean;
   isDeleting?: boolean;
 };
@@ -38,7 +40,32 @@ export default function CountriesTable({
   const { language } = useLanguage();
   const t = getAdminTranslations(language);
 
+  const [countryPendingDelete, setCountryPendingDelete] =
+    useState<Country | null>(null);
+
   const hasSearchValue = searchValue.trim().length > 0;
+  const isArabic = language === "ar";
+
+  function openDeleteConfirmation(country: Country) {
+    setCountryPendingDelete(country);
+  }
+
+  function closeDeleteConfirmation() {
+    if (isDeleting) {
+      return;
+    }
+
+    setCountryPendingDelete(null);
+  }
+
+  async function confirmDelete() {
+    if (!countryPendingDelete || isDeleting) {
+      return;
+    }
+
+    await onDelete(countryPendingDelete);
+    setCountryPendingDelete(null);
+  }
 
   return (
     <>
@@ -58,7 +85,7 @@ export default function CountriesTable({
             }
             placeholder={t.countries.searchPlaceholder}
             aria-label={
-              language === "ar"
+              isArabic
                 ? "البحث عن دولة"
                 : "Search for a country"
             }
@@ -69,37 +96,19 @@ export default function CountriesTable({
       <Table>
         <thead>
           <tr>
-            <th>
-              {language === "ar" ? "الترتيب" : "Order"}
-            </th>
+            <th>{isArabic ? "الترتيب" : "Order"}</th>
+            <th>{isArabic ? "الدولة" : "Country"}</th>
+            <th>{isArabic ? "الرمز" : "Code"}</th>
+            <th>{isArabic ? "العملة" : "Currency"}</th>
 
             <th>
-              {language === "ar" ? "الدولة" : "Country"}
-            </th>
-
-            <th>
-              {language === "ar" ? "الرمز" : "Code"}
-            </th>
-
-            <th>
-              {language === "ar" ? "العملة" : "Currency"}
-            </th>
-
-            <th>
-              {language === "ar"
+              {isArabic
                 ? "المنطقة الزمنية"
                 : "Timezone"}
             </th>
 
-            <th>
-              {language === "ar" ? "الحالة" : "Status"}
-            </th>
-
-            <th>
-              {language === "ar"
-                ? "الإجراءات"
-                : "Actions"}
-            </th>
+            <th>{isArabic ? "الحالة" : "Status"}</th>
+            <th>{isArabic ? "الإجراءات" : "Actions"}</th>
           </tr>
         </thead>
 
@@ -116,7 +125,7 @@ export default function CountriesTable({
                         className="nr-country-flag"
                         src={country.flagUrl}
                         alt={
-                          language === "ar"
+                          isArabic
                             ? `علم ${country.nameAr}`
                             : `${country.nameEn} flag`
                         }
@@ -129,13 +138,13 @@ export default function CountriesTable({
 
                     <div className="nr-country-name-copy">
                       <strong>
-                        {language === "ar"
+                        {isArabic
                           ? country.nameAr
                           : country.nameEn}
                       </strong>
 
                       <small>
-                        {language === "ar"
+                        {isArabic
                           ? country.nameEn
                           : country.nameAr}
                       </small>
@@ -156,10 +165,10 @@ export default function CountriesTable({
                     }
                   >
                     {country.status === "active"
-                      ? language === "ar"
+                      ? isArabic
                         ? "نشطة"
                         : "Active"
-                      : language === "ar"
+                      : isArabic
                         ? "غير نشطة"
                         : "Inactive"}
                   </Badge>
@@ -172,9 +181,7 @@ export default function CountriesTable({
                       variant="secondary"
                       onClick={() => onEdit(country)}
                     >
-                      {language === "ar"
-                        ? "تعديل"
-                        : "Edit"}
+                      {isArabic ? "تعديل" : "Edit"}
                     </Button>
 
                     <Button
@@ -190,10 +197,10 @@ export default function CountriesTable({
                       }
                     >
                       {country.status === "active"
-                        ? language === "ar"
+                        ? isArabic
                           ? "تعطيل"
                           : "Disable"
-                        : language === "ar"
+                        : isArabic
                           ? "تفعيل"
                           : "Enable"}
                     </Button>
@@ -202,11 +209,11 @@ export default function CountriesTable({
                       type="button"
                       variant="danger"
                       disabled={isDeleting}
-                      onClick={() => onDelete(country)}
+                      onClick={() =>
+                        openDeleteConfirmation(country)
+                      }
                     >
-                      {language === "ar"
-                        ? "حذف"
-                        : "Delete"}
+                      {isArabic ? "حذف" : "Delete"}
                     </Button>
                   </div>
                 </td>
@@ -217,10 +224,10 @@ export default function CountriesTable({
               <td colSpan={7}>
                 <div className="nr-table-empty">
                   {hasSearchValue
-                    ? language === "ar"
+                    ? isArabic
                       ? "لا توجد دول مطابقة للبحث."
                       : "No countries match your search."
-                    : language === "ar"
+                    : isArabic
                       ? "لا توجد دول مضافة حتى الآن."
                       : "No countries have been added yet."}
                 </div>
@@ -229,6 +236,83 @@ export default function CountriesTable({
           )}
         </tbody>
       </Table>
+
+      {countryPendingDelete ? (
+        <div
+          className="nr-confirm-dialog-backdrop"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              closeDeleteConfirmation();
+            }
+          }}
+        >
+          <div
+            className="nr-confirm-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-country-title"
+            aria-describedby="delete-country-description"
+            dir={isArabic ? "rtl" : "ltr"}
+          >
+            <button
+              className="nr-confirm-dialog-close"
+              type="button"
+              onClick={closeDeleteConfirmation}
+              disabled={isDeleting}
+              aria-label={
+                isArabic
+                  ? "إغلاق نافذة التأكيد"
+                  : "Close confirmation dialog"
+              }
+            >
+              ×
+            </button>
+
+            <div className="nr-confirm-dialog-icon" aria-hidden="true">
+              !
+            </div>
+
+            <h3 id="delete-country-title">
+              {isArabic
+                ? "تأكيد حذف الدولة"
+                : "Confirm country deletion"}
+            </h3>
+
+            <p id="delete-country-description">
+              {isArabic
+                ? `هل أنت متأكد من حذف دولة «${countryPendingDelete.nameAr}»؟ ستُنقل إلى سلة المحذوفات ويمكن استعادتها لاحقًا.`
+                : `Are you sure you want to delete “${countryPendingDelete.nameEn}”? It will be moved to the recycle bin and can be restored later.`}
+            </p>
+
+            <div className="nr-confirm-dialog-actions">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={closeDeleteConfirmation}
+                disabled={isDeleting}
+              >
+                {isArabic ? "إلغاء" : "Cancel"}
+              </Button>
+
+              <Button
+                type="button"
+                variant="danger"
+                onClick={confirmDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting
+                  ? isArabic
+                    ? "جارٍ الحذف..."
+                    : "Deleting..."
+                  : isArabic
+                    ? "نعم، حذف الدولة"
+                    : "Yes, delete country"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </>
   );
 }
