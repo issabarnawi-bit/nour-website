@@ -310,13 +310,9 @@ export async function deleteProgram(
 export async function getDeletedPrograms(
   supabase: SupabaseClient,
 ): Promise<Program[]> {
-  const { data, error } = await supabase
-    .from("programs")
-    .select(programSelect)
-    .not("deleted_at", "is", null)
-    .order("deleted_at", {
-      ascending: false,
-    });
+  const { data, error } = await supabase.rpc(
+    "get_deleted_programs",
+  );
 
   if (error) {
     throw new Error(
@@ -324,7 +320,7 @@ export async function getDeletedPrograms(
     );
   }
 
-  return (data as ProgramRow[]).map(
+  return ((data ?? []) as ProgramRow[]).map(
     mapProgram,
   );
 }
@@ -333,19 +329,23 @@ export async function restoreProgram(
   supabase: SupabaseClient,
   programId: string,
 ): Promise<void> {
-  const { data, error } = await supabase
-    .from("programs")
-    .update({
-      deleted_at: null,
-      is_active: false,
-      status: "draft",
-    })
-    .eq("id", programId)
-    .not("deleted_at", "is", null)
-    .select("id")
-    .maybeSingle();
+  const { data, error } = await supabase.rpc(
+    "restore_program",
+    {
+      p_program_id: programId,
+    },
+  );
 
   if (error) {
+    if (
+      error.code === "42501" ||
+      error.message.includes("صلاحية")
+    ) {
+      throw new Error(
+        "ليس لديك صلاحية استعادة هذا البرنامج.",
+      );
+    }
+
     throw new Error(
       `تعذر استعادة البرنامج: ${error.message}`,
     );
@@ -353,7 +353,7 @@ export async function restoreProgram(
 
   if (!data) {
     throw new Error(
-      "لم يتم العثور على البرنامج داخل سلة المحذوفات أو ليست لديك صلاحية استعادته.",
+      "لم يتم العثور على البرنامج داخل سلة المحذوفات.",
     );
   }
 }
