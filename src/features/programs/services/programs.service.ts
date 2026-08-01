@@ -1,8 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { uploadMedia } from "../../media/repositories/media.repository";
-import type { ProgramFormValues } from "../forms/ProgramForm";
-import type { Program } from "../types";
+import type { ProgramFormValues } from "../types";import type { Program } from "../types";
 
 import {
   createProgram as createProgramRecord,

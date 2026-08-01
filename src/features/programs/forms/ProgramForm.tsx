@@ -6,24 +6,10 @@ import Button from "../../../components/ui/Button";
 import MediaUploader from "../../../components/ui/media/MediaUploader";
 import { useLanguage } from "../../../core/i18n";
 
-export type ProgramFormValues = {
-  titleAr: string;
-  titleEn: string;
-  slug: string;
-  summaryAr: string;
-  summaryEn: string;
-  descriptionAr: string;
-  descriptionEn: string;
-  countryId: string;
-  durationDays: number;
-  durationNights: number;
-  basePrice: number;
-  currencyCode: string;
-  isFeatured: boolean;
-  isActive: boolean;
-  sortOrder: number;
-  coverFile: File | null;
-};
+import type {
+  ProgramFormValues,
+  ProgramStatus,
+} from "../types";
 
 type CountryOption = {
   id: string;
@@ -51,6 +37,7 @@ const defaultValues: ProgramFormValues = {
   durationNights: 0,
   basePrice: 0,
   currencyCode: "SAR",
+  status: "draft",
   isFeatured: false,
   isActive: true,
   sortOrder: 0,
@@ -87,7 +74,18 @@ export default function ProgramForm({
     event: React.FormEvent<HTMLFormElement>,
   ) {
     event.preventDefault();
-    await onSubmit(values);
+
+    await onSubmit({
+      ...values,
+      titleAr: values.titleAr.trim(),
+      titleEn: values.titleEn.trim(),
+      slug: values.slug.trim(),
+      summaryAr: values.summaryAr.trim(),
+      summaryEn: values.summaryEn.trim(),
+      descriptionAr: values.descriptionAr.trim(),
+      descriptionEn: values.descriptionEn.trim(),
+      currencyCode: values.currencyCode.trim().toUpperCase(),
+    });
   }
 
   return (
@@ -181,7 +179,9 @@ export default function ProgramForm({
                   "slug",
                   event.target.value
                     .toLowerCase()
-                    .replace(/\s+/g, "-"),
+                    .trim()
+                    .replace(/[^a-z0-9]+/g, "-")
+                    .replace(/^-+|-+$/g, ""),
                 )
               }
               placeholder="ramadan-umrah"
@@ -433,7 +433,10 @@ export default function ProgramForm({
         onChange={(event) =>
           updateValue(
             "currencyCode",
-            event.target.value.toUpperCase(),
+            event.target.value
+              .toUpperCase()
+              .replace(/[^A-Z]/g, "")
+              .slice(0, 3),
           )
         }
         placeholder="SAR"
@@ -463,6 +466,38 @@ export default function ProgramForm({
   </div>
 
   <div className="nr-country-form-grid">
+    <label>
+      <span>
+        {isArabic
+          ? "حالة البرنامج"
+          : "Program Status"}
+      </span>
+
+      <select
+        className="nr-input"
+        value={values.status}
+        onChange={(event) =>
+          updateValue(
+            "status",
+            event.target.value as ProgramStatus,
+          )
+        }
+        required
+      >
+        <option value="draft">
+          {isArabic ? "مسودة" : "Draft"}
+        </option>
+
+        <option value="published">
+          {isArabic ? "منشور" : "Published"}
+        </option>
+
+        <option value="inactive">
+          {isArabic ? "غير نشط" : "Inactive"}
+        </option>
+      </select>
+    </label>
+
     <label>
       <span>
         {isArabic

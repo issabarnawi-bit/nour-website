@@ -18,9 +18,7 @@ import { useToast } from "../../core/notifications";
 import { createClient } from "../../lib/supabase/client";
 import { countriesQuery } from "../countries/services";
 
-import ProgramForm, {
-  type ProgramFormValues,
-} from "./forms/ProgramForm";
+import ProgramForm from "./forms/ProgramForm";
 import {
   createProgram,
   deleteProgram,
@@ -30,7 +28,10 @@ import {
   restoreProgram,
   updateProgram,
 } from "./services";
-import type { Program } from "./types";
+import type {
+  Program,
+  ProgramFormValues,
+} from "./types";
 
 type ProgramStatusFilter =
   | "all"
@@ -1211,11 +1212,12 @@ export default function ProgramsPage() {
                         editingProgram.basePrice,
                       currencyCode:
                         editingProgram.currencyCode,
+                      status:
+                        editingProgram.status,
                       isFeatured:
                         editingProgram.isFeatured,
                       isActive:
-                        editingProgram.status ===
-                        "published",
+                        editingProgram.isActive,
                       sortOrder:
                         editingProgram.sortOrder,
                     }

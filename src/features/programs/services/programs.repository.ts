@@ -1,7 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import type { ProgramFormValues } from "../forms/ProgramForm";
-import type { Program } from "../types";
+import type {
+  Program,
+  ProgramFormValues,
+} from "../types";
 
 type CoverMediaRow = {
   bucket: string;
@@ -20,7 +22,7 @@ type ProgramRow = {
   country_id: string | null;
   duration_days: number;
   duration_nights: number;
-  base_price: number;
+  base_price: number | string;
   currency_code: string;
   cover_media_id: string | null;
   cover_media:
@@ -31,6 +33,8 @@ type ProgramRow = {
   is_featured: boolean;
   is_active: boolean;
   sort_order: number;
+  created_by: string | null;
+  updated_by: string | null;
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
@@ -52,16 +56,16 @@ function getCoverMedia(
 
 function createPublicMediaUrl(
   media: CoverMediaRow | null,
-): string | undefined {
+): string | null {
   if (!media) {
-    return undefined;
+    return null;
   }
 
   const supabaseUrl =
     process.env.NEXT_PUBLIC_SUPABASE_URL;
 
   if (!supabaseUrl) {
-    return undefined;
+    return null;
   }
 
   return `${supabaseUrl}/storage/v1/object/public/${media.bucket}/${media.path}`;
@@ -84,7 +88,7 @@ function mapProgram(row: ProgramRow): Program {
     countryId: row.country_id,
     durationDays: row.duration_days,
     durationNights: row.duration_nights,
-    basePrice: row.base_price,
+    basePrice: Number(row.base_price),
     currencyCode: row.currency_code,
     coverMediaId: row.cover_media_id,
     coverUrl: createPublicMediaUrl(
@@ -92,9 +96,13 @@ function mapProgram(row: ProgramRow): Program {
     ),
     status: row.status,
     isFeatured: row.is_featured,
+    isActive: row.is_active,
     sortOrder: row.sort_order,
+    createdBy: row.created_by,
+    updatedBy: row.updated_by,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+    deletedAt: row.deleted_at,
   };
 }
 
@@ -117,6 +125,8 @@ const programSelect = `
   is_featured,
   is_active,
   sort_order,
+  created_by,
+  updated_by,
   created_at,
   updated_at,
   deleted_at,
@@ -151,9 +161,7 @@ export async function createProgram(
         .trim()
         .toUpperCase(),
       cover_media_id: coverMediaId,
-      status: values.isActive
-        ? "published"
-        : "inactive",
+      status: values.status,
       is_featured: values.isFeatured,
       is_active: values.isActive,
       sort_order: values.sortOrder,
@@ -241,9 +249,7 @@ export async function updateProgram(
         .trim()
         .toUpperCase(),
       cover_media_id: coverMediaId,
-      status: values.isActive
-        ? "published"
-        : "inactive",
+      status: values.status,
       is_featured: values.isFeatured,
       is_active: values.isActive,
       sort_order: values.sortOrder,
@@ -251,11 +257,17 @@ export async function updateProgram(
     .eq("id", programId)
     .is("deleted_at", null)
     .select(programSelect)
-    .single();
+    .maybeSingle();
 
   if (error) {
     throw new Error(
       `تعذر تحديث البرنامج: ${error.message}`,
+    );
+  }
+
+  if (!data) {
+    throw new Error(
+      "لم يتم العثور على البرنامج أو ليست لديك صلاحية تعديله.",
     );
   }
 
@@ -266,19 +278,23 @@ export async function deleteProgram(
   supabase: SupabaseClient,
   programId: string,
 ): Promise<void> {
-  const { data, error } = await supabase
-    .from("programs")
-    .update({
-      deleted_at: new Date().toISOString(),
-      is_active: false,
-      status: "inactive",
-    })
-    .eq("id", programId)
-    .is("deleted_at", null)
-    .select("id")
-    .maybeSingle();
+  const { data, error } = await supabase.rpc(
+    "soft_delete_program",
+    {
+      p_program_id: programId,
+    },
+  );
 
   if (error) {
+    if (
+      error.code === "42501" ||
+      error.message.includes("صلاحية")
+    ) {
+      throw new Error(
+        "ليس لديك صلاحية حذف هذا البرنامج.",
+      );
+    }
+
     throw new Error(
       `تعذر حذف البرنامج: ${error.message}`,
     );
@@ -321,8 +337,8 @@ export async function restoreProgram(
     .from("programs")
     .update({
       deleted_at: null,
-      is_active: true,
-      status: "published",
+      is_active: false,
+      status: "draft",
     })
     .eq("id", programId)
     .not("deleted_at", "is", null)
@@ -337,7 +353,7 @@ export async function restoreProgram(
 
   if (!data) {
     throw new Error(
-      "لم يتم العثور على البرنامج داخل سلة المحذوفات.",
+      "لم يتم العثور على البرنامج داخل سلة المحذوفات أو ليست لديك صلاحية استعادته.",
     );
   }
 }
@@ -362,7 +378,7 @@ export async function permanentlyDeleteProgram(
 
   if (!data) {
     throw new Error(
-      "لم يتم العثور على البرنامج داخل سلة المحذوفات.",
+      "لم يتم العثور على البرنامج داخل سلة المحذوفات أو ليست لديك صلاحية حذفه نهائيًا.",
     );
   }
 }
