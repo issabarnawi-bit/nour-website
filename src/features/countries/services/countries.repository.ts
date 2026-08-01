@@ -314,17 +314,25 @@ export async function softDeleteCountry(
   supabase: SupabaseClient,
   countryId: string,
 ): Promise<void> {
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("countries")
     .update({
       deleted_at: new Date().toISOString(),
       is_active: false,
     })
-    .eq("id", countryId);
+    .eq("id", countryId)
+    .select("id")
+    .maybeSingle();
 
   if (error) {
     throw new Error(
       `Failed to delete country: ${error.message}`,
+    );
+  }
+
+  if (!data) {
+    throw new Error(
+      "ليس لديك صلاحية حذف هذه الدولة.",
     );
   }
 }
