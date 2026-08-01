@@ -42,6 +42,17 @@ const defaultValues: CountryFormValues = {
   flagFile: null,
 };
 
+type CountryFormErrors = Partial<
+  Record<keyof CountryFormValues | "form", string>
+>;
+
+function normalizeUppercaseCode(value: string, maxLength: number) {
+  return value
+    .toUpperCase()
+    .replace(/[^A-Z]/g, "")
+    .slice(0, maxLength);
+}
+
 const timezoneOptions = [
   "Asia/Riyadh",
   "Africa/Lagos",
@@ -65,6 +76,8 @@ export default function CountryForm({
       flagFile: null,
     });
 
+  const [errors, setErrors] = useState<CountryFormErrors>({});
+
   const isArabic = language === "ar";
 
   function updateValue<
@@ -77,20 +90,90 @@ export default function CountryForm({
       ...currentValues,
       [key]: value,
     }));
+
+    setErrors((currentErrors) => ({
+      ...currentErrors,
+      [key]: undefined,
+      form: undefined,
+    }));
+  }
+
+  function validateForm() {
+    const nextErrors: CountryFormErrors = {};
+
+    if (!/^[A-Z]{2}$/.test(values.iso2)) {
+      nextErrors.iso2 = isArabic
+        ? "رمز ISO2 يجب أن يتكون من حرفين إنجليزيين."
+        : "ISO2 must contain exactly two English letters.";
+    }
+
+    if (!/^[A-Z]{3}$/.test(values.iso3)) {
+      nextErrors.iso3 = isArabic
+        ? "رمز ISO3 يجب أن يتكون من ثلاثة أحرف إنجليزية."
+        : "ISO3 must contain exactly three English letters.";
+    }
+
+    if (!/^[A-Z]{3}$/.test(values.currencyCode)) {
+      nextErrors.currencyCode = isArabic
+        ? "رمز العملة يجب أن يتكون من ثلاثة أحرف إنجليزية."
+        : "Currency code must contain exactly three English letters.";
+    }
+
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
   }
 
   async function handleSubmit(
     event: React.FormEvent<HTMLFormElement>,
   ) {
     event.preventDefault();
-    await onSubmit(values);
+
+    if (!validateForm()) return;
+
+    try {
+      setErrors({});
+      await onSubmit({
+        ...values,
+        nameAr: values.nameAr.trim(),
+        nameEn: values.nameEn.trim(),
+        iso2: values.iso2.trim(),
+        iso3: values.iso3.trim(),
+        phoneCode: values.phoneCode.trim(),
+        currencyCode: values.currencyCode.trim(),
+        currencyNameAr: values.currencyNameAr.trim(),
+        currencyNameEn: values.currencyNameEn.trim(),
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "";
+      const lowerMessage = message.toLowerCase();
+
+      if (lowerMessage.includes("uq_countries_iso2") || lowerMessage.includes("iso2")) {
+        setErrors({ form: isArabic ? "رمز ISO2 مستخدم لدولة أخرى." : "ISO2 code is already in use." });
+        return;
+      }
+
+      if (lowerMessage.includes("uq_countries_iso3") || lowerMessage.includes("iso3")) {
+        setErrors({ form: isArabic ? "رمز ISO3 مستخدم لدولة أخرى." : "ISO3 code is already in use." });
+        return;
+      }
+
+      setErrors({
+        form: message || (isArabic ? "تعذر حفظ الدولة." : "Unable to save the country."),
+      });
+    }
   }
 
   return (
     <form
       className="nr-country-form"
       onSubmit={handleSubmit}
+      noValidate
     >
+      {errors.form ? (
+        <div className="nr-form-error" role="alert">
+          {errors.form}
+        </div>
+      ) : null}
       <MediaUploader
         label={
           isArabic
@@ -176,12 +259,17 @@ export default function CountryForm({
               onChange={(event) =>
                 updateValue(
                   "iso2",
-                  event.target.value.toUpperCase(),
+                  normalizeUppercaseCode(event.target.value, 2),
                 )
               }
               placeholder="SA"
+              aria-invalid={Boolean(errors.iso2)}
               required
             />
+
+            {errors.iso2 ? (
+              <small className="nr-field-error">{errors.iso2}</small>
+            ) : null}
           </label>
 
           <label>
@@ -198,12 +286,17 @@ export default function CountryForm({
               onChange={(event) =>
                 updateValue(
                   "iso3",
-                  event.target.value.toUpperCase(),
+                  normalizeUppercaseCode(event.target.value, 3),
                 )
               }
               placeholder="SAU"
+              aria-invalid={Boolean(errors.iso3)}
               required
             />
+
+            {errors.iso3 ? (
+              <small className="nr-field-error">{errors.iso3}</small>
+            ) : null}
           </label>
         </div>
       </section>
@@ -263,12 +356,17 @@ export default function CountryForm({
               onChange={(event) =>
                 updateValue(
                   "currencyCode",
-                  event.target.value.toUpperCase(),
+                  normalizeUppercaseCode(event.target.value, 3),
                 )
               }
               placeholder="SAR"
+              aria-invalid={Boolean(errors.currencyCode)}
               required
             />
+
+            {errors.currencyCode ? (
+              <small className="nr-field-error">{errors.currencyCode}</small>
+            ) : null}
           </label>
 
           <label>
