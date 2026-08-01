@@ -1,0 +1,5 @@
+update
+deactivate
+activate
+delete
+restore
