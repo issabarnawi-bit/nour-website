@@ -23,6 +23,9 @@ type CountriesTableProps = {
   onEdit: (country: Country) => void;
   onToggleStatus: (country: Country) => void;
   onDelete: (country: Country) => void | Promise<void>;
+  canUpdate?: boolean;
+  canPublish?: boolean;
+  canDelete?: boolean;
   isStatusUpdating?: boolean;
   isDeleting?: boolean;
 };
@@ -34,6 +37,9 @@ export default function CountriesTable({
   onEdit,
   onToggleStatus,
   onDelete,
+  canUpdate = false,
+  canPublish = false,
+  canDelete = false,
   isStatusUpdating = false,
   isDeleting = false,
 }: CountriesTableProps) {
@@ -45,21 +51,21 @@ export default function CountriesTable({
 
   const hasSearchValue = searchValue.trim().length > 0;
   const isArabic = language === "ar";
+  const canManageCountries =
+    canUpdate || canPublish || canDelete;
 
   function openDeleteConfirmation(country: Country) {
+    if (!canDelete) return;
     setCountryPendingDelete(country);
   }
 
   function closeDeleteConfirmation() {
-    if (isDeleting) {
-      return;
-    }
-
+    if (isDeleting) return;
     setCountryPendingDelete(null);
   }
 
   async function confirmDelete() {
-    if (!countryPendingDelete || isDeleting) {
+    if (!countryPendingDelete || !canDelete || isDeleting) {
       return;
     }
 
@@ -100,15 +106,11 @@ export default function CountriesTable({
             <th>{isArabic ? "الدولة" : "Country"}</th>
             <th>{isArabic ? "الرمز" : "Code"}</th>
             <th>{isArabic ? "العملة" : "Currency"}</th>
-
-            <th>
-              {isArabic
-                ? "المنطقة الزمنية"
-                : "Timezone"}
-            </th>
-
+            <th>{isArabic ? "المنطقة الزمنية" : "Timezone"}</th>
             <th>{isArabic ? "الحالة" : "Status"}</th>
-            <th>{isArabic ? "الإجراءات" : "Actions"}</th>
+            {canManageCountries ? (
+              <th>{isArabic ? "الإجراءات" : "Actions"}</th>
+            ) : null}
           </tr>
         </thead>
 
@@ -142,7 +144,6 @@ export default function CountriesTable({
                           ? country.nameAr
                           : country.nameEn}
                       </strong>
-
                       <small>
                         {isArabic
                           ? country.nameEn
@@ -174,54 +175,60 @@ export default function CountriesTable({
                   </Badge>
                 </td>
 
-                <td>
-                  <div className="nr-table-actions">
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      onClick={() => onEdit(country)}
-                    >
-                      {isArabic ? "تعديل" : "Edit"}
-                    </Button>
+                {canManageCountries ? (
+                  <td>
+                    <div className="nr-table-actions">
+                      {canUpdate ? (
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          onClick={() => onEdit(country)}
+                        >
+                          {isArabic ? "تعديل" : "Edit"}
+                        </Button>
+                      ) : null}
 
-                    <Button
-                      type="button"
-                      variant={
-                        country.status === "active"
-                          ? "outline"
-                          : "primary"
-                      }
-                      disabled={isStatusUpdating}
-                      onClick={() =>
-                        onToggleStatus(country)
-                      }
-                    >
-                      {country.status === "active"
-                        ? isArabic
-                          ? "تعطيل"
-                          : "Disable"
-                        : isArabic
-                          ? "تفعيل"
-                          : "Enable"}
-                    </Button>
+                      {canPublish ? (
+                        <Button
+                          type="button"
+                          variant={
+                            country.status === "active"
+                              ? "outline"
+                              : "primary"
+                          }
+                          disabled={isStatusUpdating}
+                          onClick={() => onToggleStatus(country)}
+                        >
+                          {country.status === "active"
+                            ? isArabic
+                              ? "تعطيل"
+                              : "Disable"
+                            : isArabic
+                              ? "تفعيل"
+                              : "Enable"}
+                        </Button>
+                      ) : null}
 
-                    <Button
-                      type="button"
-                      variant="danger"
-                      disabled={isDeleting}
-                      onClick={() =>
-                        openDeleteConfirmation(country)
-                      }
-                    >
-                      {isArabic ? "حذف" : "Delete"}
-                    </Button>
-                  </div>
-                </td>
+                      {canDelete ? (
+                        <Button
+                          type="button"
+                          variant="danger"
+                          disabled={isDeleting}
+                          onClick={() =>
+                            openDeleteConfirmation(country)
+                          }
+                        >
+                          {isArabic ? "حذف" : "Delete"}
+                        </Button>
+                      ) : null}
+                    </div>
+                  </td>
+                ) : null}
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan={7}>
+              <td colSpan={canManageCountries ? 7 : 6}>
                 <div className="nr-table-empty">
                   {hasSearchValue
                     ? isArabic
@@ -237,7 +244,7 @@ export default function CountriesTable({
         </tbody>
       </Table>
 
-      {countryPendingDelete ? (
+      {countryPendingDelete && canDelete ? (
         <div
           className="nr-confirm-dialog-backdrop"
           role="presentation"
