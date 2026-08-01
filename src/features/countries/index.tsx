@@ -60,6 +60,87 @@ export default function CountriesPage() {
   const isArabic = language === "ar";
 
   const {
+    data: currentUser,
+    isLoading: isCurrentUserLoading,
+    isError: isCurrentUserError,
+  } = useQuery({
+    queryKey: ["auth", "current-user"],
+    queryFn: async () => {
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
+
+      if (error) {
+        throw error;
+      }
+
+      return user;
+    },
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
+  });
+
+  const {
+    data: permissions,
+    isLoading: isPermissionsLoading,
+    isError: isPermissionsError,
+  } = useQuery({
+    queryKey: [
+      "countries",
+      "permissions",
+      currentUser?.id ?? "anonymous",
+    ],
+    enabled: Boolean(currentUser?.id),
+    queryFn: async () => {
+      const permissionKeys = [
+        "countries.create",
+        "countries.update",
+        "countries.publish",
+        "countries.delete",
+        "countries.archive",
+      ] as const;
+
+      const results = await Promise.all(
+        permissionKeys.map(async (permissionKey) => {
+          const { data, error } = await supabase.rpc(
+            "current_user_has_permission",
+            {
+              permission_code: permissionKey,
+            },
+          );
+
+          if (error) {
+            throw error;
+          }
+
+          return [permissionKey, Boolean(data)] as const;
+        }),
+      );
+
+      return Object.fromEntries(results) as Record<
+        (typeof permissionKeys)[number],
+        boolean
+      >;
+    },
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
+  });
+
+  const canCreate =
+    permissions?.["countries.create"] ?? false;
+  const canUpdate =
+    permissions?.["countries.update"] ?? false;
+  const canPublish =
+    permissions?.["countries.publish"] ?? false;
+  const canDelete =
+    permissions?.["countries.delete"] ?? false;
+  const canArchive =
+    permissions?.["countries.archive"] ?? false;
+
+  const {
     data: countries = [],
     isLoading,
     isError,
@@ -72,7 +153,7 @@ export default function CountriesPage() {
     isError: isDeletedCountriesError,
   } = useQuery({
     ...deletedCountriesQuery(supabase),
-    enabled: isRecycleBinOpen,
+    enabled: isRecycleBinOpen && canArchive,
   });
 
   const createMutation = useMutation({
@@ -283,6 +364,8 @@ export default function CountriesPage() {
   }, [filteredCountries, currentPage, pageSize]);
 
   function openCreateDialog() {
+    if (!canCreate) return;
+
     setFormError("");
     setEditingCountry(null);
     setDeletingCountry(null);
@@ -296,6 +379,8 @@ export default function CountriesPage() {
   }
 
   function openEditDialog(country: Country) {
+    if (!canUpdate) return;
+
     setFormError("");
     setIsCreateOpen(false);
     setDeletingCountry(null);
@@ -309,6 +394,8 @@ export default function CountriesPage() {
   }
 
   function openDeleteDialog(country: Country) {
+    if (!canDelete) return;
+
     setFormError("");
     setIsCreateOpen(false);
     setEditingCountry(null);
@@ -337,22 +424,31 @@ export default function CountriesPage() {
           <p>{t.countries.pageDescription}</p>
         </div>
 
-        <div className="nr-country-heading-actions">
-          <button
-            type="button"
-            className="nr-secondary-button"
-            onClick={() => setIsRecycleBinOpen(true)}
-          >
-            {t.countries.recycleBin}
-            {deletedCountries.length > 0
-              ? ` (${deletedCountries.length})`
-              : ""}
-          </button>
+        {canArchive || canCreate ? (
+          <div className="nr-country-heading-actions">
+            {canArchive ? (
+              <button
+                type="button"
+                className="nr-secondary-button"
+                onClick={() => setIsRecycleBinOpen(true)}
+              >
+                {t.countries.recycleBin}
+                {deletedCountries.length > 0
+                  ? ` (${deletedCountries.length})`
+                  : ""}
+              </button>
+            ) : null}
 
-          <Button type="button" onClick={openCreateDialog}>
-            {t.countries.addCountry}
-          </Button>
-        </div>
+            {canCreate ? (
+              <Button
+                type="button"
+                onClick={openCreateDialog}
+              >
+                {t.countries.addCountry}
+              </Button>
+            ) : null}
+          </div>
+        ) : null}
       </div>
 
       {formError &&
@@ -362,8 +458,38 @@ export default function CountriesPage() {
         <p className="nr-admin-login-error">{formError}</p>
       ) : null}
 
-      {isLoading ? (
-        <TableSkeleton rows={6} columns={7} />
+      {isCurrentUserLoading ||
+      isPermissionsLoading ||
+      isLoading ? (
+        <TableSkeleton
+          rows={6}
+          columns={
+            canUpdate || canPublish || canDelete ? 7 : 6
+          }
+        />
+      ) : isCurrentUserError || isPermissionsError ? (
+        <ErrorState
+          title={
+            isArabic
+              ? "تعذر تحميل صلاحيات الدول"
+              : "Unable to load country permissions"
+          }
+          description={
+            isArabic
+              ? "تعذر التحقق من صلاحيات حسابك. أعد تحميل الصفحة."
+              : "Your account permissions could not be verified. Reload the page."
+          }
+          onRetry={() => {
+            void Promise.all([
+              queryClient.invalidateQueries({
+                queryKey: ["auth", "current-user"],
+              }),
+              queryClient.invalidateQueries({
+                queryKey: ["countries", "permissions"],
+              }),
+            ]);
+          }}
+        />
       ) : isError ? (
         <ErrorState
           title={isArabic ? "تعذر تحميل الدول" : "Unable to load countries"}
@@ -395,6 +521,9 @@ export default function CountriesPage() {
               statusMutation.mutate(country);
             }}
             onDelete={openDeleteDialog}
+            canUpdate={canUpdate}
+            canPublish={canPublish}
+            canDelete={canDelete}
             isStatusUpdating={statusMutation.isPending}
             isDeleting={deleteMutation.isPending}
           />
@@ -412,7 +541,7 @@ export default function CountriesPage() {
         </>
       )}
 
-      {isCreateOpen ? (
+      {isCreateOpen && canCreate ? (
         <div
           className="nr-modal-backdrop"
           role="presentation"
@@ -461,7 +590,7 @@ export default function CountriesPage() {
         </div>
       ) : null}
 
-      {editingCountry ? (
+      {editingCountry && canUpdate ? (
         <div
           className="nr-modal-backdrop"
           role="presentation"
@@ -531,7 +660,7 @@ export default function CountriesPage() {
         </div>
       ) : null}
 
-      {isRecycleBinOpen ? (
+      {isRecycleBinOpen && canArchive ? (
         <div
           className="nr-modal-backdrop"
           role="presentation"
@@ -620,8 +749,14 @@ export default function CountriesPage() {
                     <button
                       type="button"
                       className="nr-secondary-button"
-                      disabled={restoreMutation.isPending}
-                      onClick={() => restoreMutation.mutate(country.id)}
+                      disabled={
+                        restoreMutation.isPending ||
+                        !canArchive
+                      }
+                      onClick={() => {
+                        if (!canArchive) return;
+                        restoreMutation.mutate(country.id);
+                      }}
                     >
                       {restoreMutation.isPending
                         ? isArabic
@@ -640,7 +775,7 @@ export default function CountriesPage() {
       ) : null}
 
       <ConfirmDialog
-        open={Boolean(deletingCountry)}
+        open={Boolean(deletingCountry) && canDelete}
         title={isArabic ? "حذف الدولة" : "Delete Country"}
         description={
           deletingCountry
@@ -662,7 +797,7 @@ export default function CountriesPage() {
         isLoading={deleteMutation.isPending}
         onCancel={closeDeleteDialog}
         onConfirm={() => {
-          if (!deletingCountry) return;
+          if (!deletingCountry || !canDelete) return;
           setFormError("");
           deleteMutation.mutate(deletingCountry.id);
         }}
