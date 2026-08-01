@@ -362,15 +362,23 @@ export async function permanentlyDeleteProgram(
   supabase: SupabaseClient,
   programId: string,
 ): Promise<void> {
-  const { data, error } = await supabase
-    .from("programs")
-    .delete()
-    .eq("id", programId)
-    .not("deleted_at", "is", null)
-    .select("id")
-    .maybeSingle();
+  const { data, error } = await supabase.rpc(
+    "permanently_delete_program",
+    {
+      p_program_id: programId,
+    },
+  );
 
   if (error) {
+    if (
+      error.code === "42501" ||
+      error.message.includes("صلاحية")
+    ) {
+      throw new Error(
+        "ليس لديك صلاحية حذف هذا البرنامج نهائيًا.",
+      );
+    }
+
     throw new Error(
       `تعذر حذف البرنامج نهائيًا: ${error.message}`,
     );
@@ -378,7 +386,7 @@ export async function permanentlyDeleteProgram(
 
   if (!data) {
     throw new Error(
-      "لم يتم العثور على البرنامج داخل سلة المحذوفات أو ليست لديك صلاحية حذفه نهائيًا.",
+      "لم يتم العثور على البرنامج داخل سلة المحذوفات.",
     );
   }
 }

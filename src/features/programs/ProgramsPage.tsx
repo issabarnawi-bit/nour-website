@@ -106,6 +106,84 @@ export default function ProgramsPage() {
     useState(1);
 
   const {
+    data: currentUser,
+    isLoading: isCurrentUserLoading,
+    isError: isCurrentUserError,
+  } = useQuery({
+    queryKey: ["auth", "current-user"],
+    queryFn: async () => {
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
+
+      if (error) {
+        throw error;
+      }
+
+      return user;
+    },
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
+  });
+
+  const {
+    data: permissions,
+    isLoading: isPermissionsLoading,
+    isError: isPermissionsError,
+  } = useQuery({
+    queryKey: [
+      "programs",
+      "permissions",
+      currentUser?.id ?? "anonymous",
+    ],
+    enabled: Boolean(currentUser?.id),
+    queryFn: async () => {
+      const permissionKeys = [
+        "programs.create",
+        "programs.update",
+        "programs.publish",
+        "programs.delete",
+      ] as const;
+
+      const results = await Promise.all(
+        permissionKeys.map(async (permissionKey) => {
+          const { data, error } = await supabase.rpc(
+            "current_user_has_permission",
+            {
+              permission_code: permissionKey,
+            },
+          );
+
+          if (error) {
+            throw error;
+          }
+
+          return [permissionKey, Boolean(data)] as const;
+        }),
+      );
+
+      return Object.fromEntries(results) as Record<
+        (typeof permissionKeys)[number],
+        boolean
+      >;
+    },
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
+  });
+
+  const canCreate =
+    permissions?.["programs.create"] ?? false;
+  const canUpdate =
+    permissions?.["programs.update"] ?? false;
+  const canPublish =
+    permissions?.["programs.publish"] ?? false;
+  const canDelete =
+    permissions?.["programs.delete"] ?? false;
+
+  const {
     data: countries = [],
     isLoading: isCountriesLoading,
     isError: isCountriesError,
@@ -120,8 +198,13 @@ export default function ProgramsPage() {
     error: programsError,
     refetch: refetchPrograms,
   } = useQuery({
-    queryKey: ["programs"],
+    queryKey: [
+      "programs",
+      "list",
+      currentUser?.id ?? "anonymous",
+    ],
     queryFn: () => getPrograms(supabase),
+    enabled: Boolean(currentUser?.id),
   });
 
   const {
@@ -131,10 +214,17 @@ export default function ProgramsPage() {
     error: deletedProgramsError,
     refetch: refetchDeletedPrograms,
   } = useQuery({
-    queryKey: ["programs", "deleted"],
+    queryKey: [
+      "programs",
+      "deleted",
+      currentUser?.id ?? "anonymous",
+    ],
     queryFn: () =>
       getDeletedPrograms(supabase),
-    enabled: isTrashOpen,
+    enabled:
+      Boolean(currentUser?.id) &&
+      isTrashOpen &&
+      canDelete,
   });
 
   const filteredPrograms = programs.filter(
@@ -246,7 +336,8 @@ export default function ProgramsPage() {
   useEffect(() => {
     if (
       !isProgramsSuccess ||
-      !editProgramId
+      !editProgramId ||
+      !canUpdate
     ) {
       return;
     }
@@ -267,9 +358,14 @@ export default function ProgramsPage() {
     editProgramId,
     isProgramsSuccess,
     programs,
+    canUpdate,
   ]);
 
   function openCreateDialog() {
+    if (!canCreate) {
+      return;
+    }
+
     setFormError("");
     setEditingProgram(null);
     setIsCreateOpen(true);
@@ -292,6 +388,10 @@ export default function ProgramsPage() {
   function openEditDialog(
     program: Program,
   ) {
+    if (!canUpdate) {
+      return;
+    }
+
     setFormError("");
     setEditingProgram(program);
     setIsCreateOpen(true);
@@ -300,6 +400,19 @@ export default function ProgramsPage() {
   async function handleCreateProgram(
     values: ProgramFormValues,
   ) {
+    const hasRequiredPermission =
+      editingProgram ? canUpdate : canCreate;
+
+    if (!hasRequiredPermission) {
+      showToast({
+        title: isArabic
+          ? "ليس لديك صلاحية تنفيذ هذه العملية"
+          : "You do not have permission to perform this action",
+        variant: "error",
+      });
+      return;
+    }
+
     setFormError("");
     setIsSubmitting(true);
 
@@ -369,6 +482,10 @@ export default function ProgramsPage() {
   async function handleDeleteProgram(
     programId: string,
   ) {
+    if (!canDelete) {
+      return;
+    }
+
     const confirmed = window.confirm(
       isArabic
         ? "هل أنت متأكد من حذف هذا البرنامج؟"
@@ -423,6 +540,10 @@ export default function ProgramsPage() {
   async function handleRestoreProgram(
     programId: string,
   ) {
+    if (!canDelete) {
+      return;
+    }
+
     setRestoringProgramId(programId);
 
     try {
@@ -465,6 +586,10 @@ export default function ProgramsPage() {
   async function handlePermanentDeleteProgram(
     programId: string,
   ) {
+    if (!canDelete) {
+      return;
+    }
+
     const confirmed = window.confirm(
       isArabic
         ? "تحذير: سيتم حذف البرنامج نهائيًا ولا يمكن استعادته. هل تريد المتابعة؟"
@@ -546,27 +671,33 @@ export default function ProgramsPage() {
           </p>
         </div>
 
-        <div className="nr-programs-heading-actions">
-          <Button
-            type="button"
-            onClick={() => {
-              setIsTrashOpen(true);
-            }}
-          >
-            {isArabic
-              ? `سلة المحذوفات (${deletedPrograms.length})`
-              : `Recycle Bin (${deletedPrograms.length})`}
-          </Button>
+        {canDelete || canCreate ? (
+          <div className="nr-programs-heading-actions">
+            {canDelete ? (
+              <Button
+                type="button"
+                onClick={() => {
+                  setIsTrashOpen(true);
+                }}
+              >
+                {isArabic
+                  ? `سلة المحذوفات (${deletedPrograms.length})`
+                  : `Recycle Bin (${deletedPrograms.length})`}
+              </Button>
+            ) : null}
 
-          <Button
-            type="button"
-            onClick={openCreateDialog}
-          >
-            {isArabic
-              ? "إضافة برنامج"
-              : "Add Program"}
-          </Button>
-        </div>
+            {canCreate ? (
+              <Button
+                type="button"
+                onClick={openCreateDialog}
+              >
+                {isArabic
+                  ? "إضافة برنامج"
+                  : "Add Program"}
+              </Button>
+            ) : null}
+          </div>
+        ) : null}
       </div>
 
       <div className="nr-programs-toolbar">
@@ -706,13 +837,30 @@ export default function ProgramsPage() {
         </button>
       </div>
 
-      {isProgramsLoading ? (
+      {isCurrentUserLoading ||
+      isPermissionsLoading ||
+      isProgramsLoading ? (
         <div className="nr-state">
           <strong>
             {isArabic
               ? "جاري تحميل البرامج..."
               : "Loading programs..."}
           </strong>
+        </div>
+      ) : isCurrentUserError ||
+      isPermissionsError ? (
+        <div className="nr-state">
+          <strong>
+            {isArabic
+              ? "تعذر تحميل صلاحيات البرامج"
+              : "Unable to load program permissions"}
+          </strong>
+
+          <p>
+            {isArabic
+              ? "تعذر التحقق من صلاحيات حسابك. أعد تحميل الصفحة."
+              : "Your account permissions could not be verified. Reload the page."}
+          </p>
         </div>
       ) : isProgramsError ? (
         <div className="nr-state">
@@ -809,42 +957,46 @@ export default function ProgramsPage() {
                           : "View Details"}
                       </Link>
 
-                      <button
-                        type="button"
-                        className="nr-program-action nr-program-action-edit"
-                        onClick={() => {
-                          openEditDialog(
-                            program,
-                          );
-                        }}
-                      >
-                        {isArabic
-                          ? "تعديل"
-                          : "Edit"}
-                      </button>
+                      {canUpdate ? (
+                        <button
+                          type="button"
+                          className="nr-program-action nr-program-action-edit"
+                          onClick={() => {
+                            openEditDialog(
+                              program,
+                            );
+                          }}
+                        >
+                          {isArabic
+                            ? "تعديل"
+                            : "Edit"}
+                        </button>
+                      ) : null}
 
-                      <button
-                        type="button"
-                        className="nr-program-action nr-program-action-delete"
-                        onClick={() => {
-                          void handleDeleteProgram(
-                            program.id,
-                          );
-                        }}
-                        disabled={
-                          deletingProgramId ===
+                      {canDelete ? (
+                        <button
+                          type="button"
+                          className="nr-program-action nr-program-action-delete"
+                          onClick={() => {
+                            void handleDeleteProgram(
+                              program.id,
+                            );
+                          }}
+                          disabled={
+                            deletingProgramId ===
+                            program.id
+                          }
+                        >
+                          {deletingProgramId ===
                           program.id
-                        }
-                      >
-                        {deletingProgramId ===
-                        program.id
-                          ? isArabic
-                            ? "جاري الحذف..."
-                            : "Deleting..."
-                          : isArabic
-                            ? "حذف"
-                            : "Delete"}
-                      </button>
+                            ? isArabic
+                              ? "جاري الحذف..."
+                              : "Deleting..."
+                            : isArabic
+                              ? "حذف"
+                              : "Delete"}
+                        </button>
+                      ) : null}
                     </div>
                   </div>
 
@@ -926,7 +1078,7 @@ export default function ProgramsPage() {
         </>
       )}
 
-      {isTrashOpen ? (
+      {isTrashOpen && canDelete ? (
         <div
           className="nr-modal-backdrop"
           role="presentation"
@@ -1103,7 +1255,9 @@ export default function ProgramsPage() {
         </div>
       ) : null}
 
-      {isCreateOpen ? (
+      {isCreateOpen &&
+      ((editingProgram && canUpdate) ||
+        (!editingProgram && canCreate)) ? (
         <div
           className="nr-modal-backdrop"
           role="presentation"
@@ -1171,6 +1325,16 @@ export default function ProgramsPage() {
             {formError ? (
               <p className="nr-admin-login-error">
                 {formError}
+              </p>
+            ) : null}
+
+            {editingProgram &&
+            canUpdate &&
+            !canPublish ? (
+              <p className="nr-admin-login-error">
+                {isArabic
+                  ? "يمكنك تعديل بيانات البرنامج، لكن نشره يتطلب صلاحية النشر."
+                  : "You can edit program details, but publishing requires publish permission."}
               </p>
             ) : null}
 
