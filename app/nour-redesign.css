@@ -2947,3 +2947,212 @@ html[data-theme="dark"] .nr-service-card-gold .nr-service-link {
     margin-top: 28px;
   }
 }
+
+/* =========================================================
+   NEWSLETTER
+========================================================= */
+
+.nr-newsletter {
+  padding: 72px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.nr-newsletter-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 48px;
+  align-items: center;
+}
+
+.nr-newsletter-copy {
+  max-width: 560px;
+}
+
+.nr-newsletter-copy .nr-kicker {
+  display: inline-flex;
+  margin-bottom: 14px;
+}
+
+.nr-newsletter-copy h2 {
+  margin: 0;
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  line-height: 1.3;
+  color: #ffffff;
+}
+
+.nr-newsletter-copy p {
+  margin: 16px 0 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 1rem;
+  line-height: 1.9;
+}
+
+.nr-newsletter-form {
+  display: grid;
+  gap: 18px;
+  padding: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.16);
+  backdrop-filter: blur(16px);
+}
+
+.nr-newsletter-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.nr-newsletter-field {
+  display: grid;
+  gap: 8px;
+}
+
+.nr-newsletter-field span {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.nr-newsletter-field input {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 16px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 14px;
+  outline: none;
+  background: rgba(255, 255, 255, 0.09);
+  color: #ffffff;
+  font: inherit;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.nr-newsletter-field input::placeholder {
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.nr-newsletter-field input:focus {
+  border-color: #3b8cff;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 0 4px rgba(59, 140, 255, 0.16);
+}
+
+.nr-newsletter-consent {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.86rem;
+  line-height: 1.7;
+  cursor: pointer;
+}
+
+.nr-newsletter-consent input {
+  width: 18px;
+  height: 18px;
+  margin-top: 4px;
+  flex: 0 0 auto;
+  accent-color: #2379f5;
+}
+
+.nr-newsletter-submit {
+  min-height: 52px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #2379f5, #0b5fd4);
+  color: #ffffff;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 14px 32px rgba(11, 95, 212, 0.28);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.nr-newsletter-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 38px rgba(11, 95, 212, 0.34);
+}
+
+.nr-newsletter-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.nr-newsletter-message {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.nr-newsletter-message--success {
+  background: rgba(24, 180, 113, 0.14);
+  color: #8ff0c1;
+  border: 1px solid rgba(24, 180, 113, 0.3);
+}
+
+.nr-newsletter-message--error {
+  background: rgba(233, 74, 74, 0.14);
+  color: #ffaaaa;
+  border: 1px solid rgba(233, 74, 74, 0.3);
+}
+
+@media (max-width: 900px) {
+  .nr-newsletter-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .nr-newsletter-copy {
+    max-width: none;
+    text-align: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .nr-newsletter {
+    padding: 52px 0;
+  }
+
+  .nr-newsletter-form {
+    padding: 20px;
+    border-radius: 20px;
+  }
+
+  .nr-newsletter-fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+.nr-newsletter-field select {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 16px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 14px;
+  outline: none;
+  background: rgba(255, 255, 255, 0.09);
+  color: #ffffff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.nr-newsletter-field select:focus {
+  border-color: #3b8cff;
+  box-shadow: 0 0 0 4px rgba(59, 140, 255, 0.16);
+}
+
+.nr-newsletter-field select option {
+  background: #102746;
+  color: #ffffff;
+}

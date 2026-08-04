@@ -134,3 +134,309 @@
     margin-top: 20px;
   }
 }
+
+/* =========================================================
+   SIDEBAR DARK MODE FIX
+========================================================= */
+
+.nr-admin-theme--dark .nr-admin-sidebar,
+html.dark .nr-admin-sidebar,
+body.dark .nr-admin-sidebar,
+[data-theme="dark"] .nr-admin-sidebar {
+  background: var(--nour-surface);
+  color: var(--nour-text-primary);
+  border-color: var(--nour-border);
+}
+
+.nr-admin-theme--dark .nr-admin-sidebar-brand,
+html.dark .nr-admin-sidebar-brand,
+body.dark .nr-admin-sidebar-brand,
+[data-theme="dark"] .nr-admin-sidebar-brand {
+  border-color: var(--nour-border);
+}
+
+.nr-admin-theme--dark .nr-admin-sidebar-brand strong,
+html.dark .nr-admin-sidebar-brand strong,
+body.dark .nr-admin-sidebar-brand strong,
+[data-theme="dark"] .nr-admin-sidebar-brand strong {
+  color: var(--nour-text-primary);
+}
+
+.nr-admin-theme--dark .nr-admin-sidebar-brand small,
+html.dark .nr-admin-sidebar-brand small,
+body.dark .nr-admin-sidebar-brand small,
+[data-theme="dark"] .nr-admin-sidebar-brand small {
+  color: var(--nour-text-secondary);
+}
+
+.nr-admin-theme--dark .nr-admin-sidebar-link,
+html.dark .nr-admin-sidebar-link,
+body.dark .nr-admin-sidebar-link,
+[data-theme="dark"] .nr-admin-sidebar-link {
+  color: var(--nour-text-secondary);
+}
+
+.nr-admin-theme--dark .nr-admin-sidebar-link:hover,
+html.dark .nr-admin-sidebar-link:hover,
+body.dark .nr-admin-sidebar-link:hover,
+[data-theme="dark"] .nr-admin-sidebar-link:hover {
+  background: var(--nour-surface-muted);
+  color: var(--nour-primary);
+}
+
+.nr-admin-theme--dark
+  .nr-admin-sidebar-link[aria-current="page"],
+html.dark
+  .nr-admin-sidebar-link[aria-current="page"],
+body.dark
+  .nr-admin-sidebar-link[aria-current="page"],
+[data-theme="dark"]
+  .nr-admin-sidebar-link[aria-current="page"] {
+  background: var(--nour-primary);
+  color: #ffffff;
+}
+
+.nr-admin-theme--dark .nr-admin-sidebar-status,
+html.dark .nr-admin-sidebar-status,
+body.dark .nr-admin-sidebar-status,
+[data-theme="dark"] .nr-admin-sidebar-status {
+  background: var(--nour-surface-muted);
+  color: var(--nour-text-primary);
+  border-color: var(--nour-border);
+}
+
+/* Mobile sidebar */
+
+@media (max-width: 900px) {
+  .nr-admin-sidebar {
+    min-height: auto;
+    height: auto;
+    background: var(--nour-surface);
+  }
+
+  .nr-admin-sidebar-nav {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .nr-admin-sidebar-link {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 520px) {
+  .nr-admin-sidebar-nav {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   COMPACT MODERN SIDEBAR
+========================================================= */
+
+@media (min-width: 901px) {
+  .nr-admin-sidebar {
+    position: sticky;
+    top: 0;
+    width: 92px;
+    min-height: 100vh;
+    height: 100vh;
+    padding: 14px 10px;
+    border-left: 1px solid var(--NourApp-border);
+    background: var(--NourApp-surface);
+    box-shadow: none;
+  }
+
+  .nr-admin-sidebar-brand {
+    justify-content: center;
+    padding: 4px 0 16px;
+  }
+
+  .nr-admin-sidebar-logo {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    font-size: 20px;
+  }
+
+  .nr-admin-sidebar-brand-text {
+    display: none;
+  }
+
+  .nr-admin-sidebar-nav {
+    align-items: center;
+    gap: 8px;
+    padding-top: 16px;
+  }
+
+  .nr-admin-sidebar-link {
+    width: 52px;
+    height: 48px;
+    justify-content: center;
+    padding: 0;
+    border-radius: 14px;
+  }
+
+  .nr-admin-sidebar-link > span:not(.nr-admin-sidebar-link-icon) {
+    display: none;
+  }
+
+  .nr-admin-sidebar-link-icon {
+    width: auto;
+    font-size: 20px;
+  }
+
+  .nr-admin-sidebar-link:hover {
+    background: var(--NourApp-primary-soft);
+    color: var(--NourApp-primary);
+  }
+
+  .nr-admin-sidebar-link[aria-current="page"] {
+    background: var(--NourApp-primary);
+    color: #ffffff;
+    box-shadow: 0 10px 24px rgb(23 111 232 / 24%);
+  }
+
+  .nr-admin-sidebar-footer {
+    display: flex;
+    justify-content: center;
+    margin-top: auto;
+    padding-top: 18px;
+  }
+
+  .nr-admin-sidebar-status {
+    width: 46px;
+    height: 46px;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid var(--NourApp-border);
+    border-radius: 14px;
+    background: var(--NourApp-surface-muted);
+  }
+
+  .nr-admin-sidebar-status div {
+    display: none;
+  }
+
+  .nr-admin-sidebar-status-dot {
+    margin: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .nr-admin-sidebar {
+    min-height: auto;
+    height: auto;
+    padding: 14px 16px;
+  }
+
+  .nr-admin-sidebar-brand {
+    padding-bottom: 14px;
+  }
+
+  .nr-admin-sidebar-nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .nr-admin-sidebar-link {
+    width: 100%;
+  }
+
+  .nr-admin-sidebar-footer {
+    display: none;
+  }
+}
+
+/* =========================================================
+   SIDEBAR BRAND LOGO
+========================================================= */
+
+.nr-admin-sidebar-logo {
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.nr-admin-sidebar-logo img {
+  display: block;
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.nr-admin-theme--dark .nr-admin-sidebar-logo,
+html.dark .nr-admin-sidebar-logo,
+body.dark .nr-admin-sidebar-logo,
+[data-theme="dark"] .nr-admin-sidebar-logo {
+  background: var(--nour-surface-muted);
+}
+
+/* =========================================================
+   SIDEBAR LUCIDE ICONS
+========================================================= */
+
+.nr-admin-sidebar-link-icon {
+  display: inline-flex;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 11px;
+  color: var(--nour-text-muted);
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.nr-admin-sidebar-link-icon svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+.nr-admin-sidebar-link:hover
+.nr-admin-sidebar-link-icon {
+  color: var(--nour-primary);
+  background: rgba(31, 111, 235, 0.1);
+  transform: translateY(-1px);
+}
+
+.nr-admin-sidebar-link[aria-current="page"]
+.nr-admin-sidebar-link-icon {
+  color: #ffffff;
+  background: var(--nour-primary);
+  box-shadow: 0 8px 20px rgba(31, 111, 235, 0.24);
+}
+
+.nr-admin-theme--dark
+.nr-admin-sidebar-link-icon {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.nr-admin-theme--dark
+.nr-admin-sidebar-link:hover
+.nr-admin-sidebar-link-icon {
+  color: #75adff;
+  background: rgba(59, 140, 255, 0.14);
+}
+
+@media (min-width: 1024px) {
+  .nr-admin-sidebar-link {
+    justify-content: center;
+  }
+
+  .nr-admin-sidebar-link-icon {
+    width: 42px;
+    height: 42px;
+    flex-basis: 42px;
+  }
+
+  .nr-admin-sidebar-link-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+}

@@ -163,3 +163,141 @@
   border-color: var(--nour-primary, #176fe8);
   color: var(--nour-primary, #176fe8);
 }
+
+/* =========================================================
+   COMPACT MODERN TOPBAR
+========================================================= */
+
+.nr-admin-topbar {
+  min-height: 64px;
+  padding: 10px 18px;
+  gap: 16px;
+  border-bottom: 1px solid var(--NourApp-border);
+  background: color-mix(
+    in srgb,
+    var(--NourApp-surface) 94%,
+    transparent
+  );
+  box-shadow: none;
+  backdrop-filter: blur(14px);
+}
+
+.nr-admin-topbar-title {
+  min-width: 0;
+}
+
+.nr-admin-topbar-title span {
+  color: var(--NourApp-text-primary);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.nr-admin-topbar-title small {
+  margin-top: 2px;
+  color: var(--NourApp-text-secondary);
+  font-size: 11px;
+}
+
+.nr-admin-topbar-actions {
+  gap: 10px;
+}
+
+.nr-admin-search {
+  width: min(360px, 34vw);
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 12px;
+  background: var(--NourApp-surface-muted);
+}
+
+.nr-admin-search:focus-within {
+  border-color: var(--NourApp-primary);
+  box-shadow: 0 0 0 3px var(--NourApp-primary-soft);
+}
+
+.nr-admin-search input {
+  font-size: 13px;
+}
+
+.nr-admin-icon-button,
+.nr-topbar-language,
+.nr-topbar-theme {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 12px;
+}
+
+.nr-admin-icon-button:hover,
+.nr-topbar-language:hover,
+.nr-topbar-theme:hover {
+  border-color: var(--NourApp-primary);
+  background: var(--NourApp-primary-soft);
+  color: var(--NourApp-primary);
+}
+
+.nr-admin-user {
+  min-height: 40px;
+  padding: 5px 9px;
+  border-radius: 12px;
+}
+
+.nr-admin-user:hover {
+  border-color: var(--NourApp-primary);
+  background: var(--NourApp-primary-soft);
+}
+
+.nr-admin-user-avatar {
+  width: 30px;
+  height: 30px;
+  font-size: 12px;
+}
+
+.nr-admin-user-copy strong {
+  font-size: 12px;
+}
+
+.nr-admin-user-copy small {
+  font-size: 10px;
+}
+
+@media (max-width: 900px) {
+  .nr-admin-topbar {
+    min-height: auto;
+    align-items: stretch;
+    padding: 12px 16px;
+  }
+
+  .nr-admin-topbar-title {
+    width: 100%;
+  }
+
+  .nr-admin-topbar-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns:
+      minmax(0, 1fr)
+      repeat(3, 40px);
+  }
+
+  .nr-admin-search {
+    width: 100%;
+  }
+
+  .nr-admin-user {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 560px) {
+  .nr-admin-topbar-actions {
+    grid-template-columns:
+      minmax(0, 1fr)
+      repeat(2, 40px);
+  }
+
+  .nr-admin-icon-button {
+    display: none;
+  }
+}

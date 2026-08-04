@@ -60,3 +60,48 @@ body {
   background: var(--nour-background);
   color: var(--nour-text-primary);
 }
+
+/* =========================================================
+   COMPACT PORTAL LAYOUT
+========================================================= */
+
+@media (min-width: 901px) {
+  .admin-shell {
+    grid-template-columns:
+      minmax(0, 1fr)
+      92px;
+  }
+
+  .admin-main {
+    min-width: 0;
+  }
+
+  .admin-content {
+    padding: 20px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .admin-content {
+    padding: 24px 28px;
+  }
+}
+
+@media (max-width: 900px) {
+  .admin-shell {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "sidebar"
+      "main";
+  }
+
+  .admin-content {
+    padding: 18px;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-content {
+    padding: 14px;
+  }
+}

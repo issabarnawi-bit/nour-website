@@ -1,41 +1,67 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
+import {
+  BarChart3,
+  CircleGauge,
+  FolderOpen,
+  Globe2,
+  Images,
+  Settings,
+  Users,
+} from "lucide-react";
+
+import type { LucideIcon } from "lucide-react";
 
 import {
   getAdminTranslations,
   useLanguage,
 } from "../../../core/i18n";
 
+type SidebarNavigationItem = {
+  label: string;
+  href: string;
+  icon: LucideIcon;
+};
+
 export default function Sidebar() {
   const { language } = useLanguage();
   const t = getAdminTranslations(language);
 
-  const navigationItems = [
+  const navigationItems: SidebarNavigationItem[] = [
     {
       label: t.sidebar.dashboard,
       href: "/admin/dashboard",
-      icon: "⌂",
+      icon: CircleGauge,
     },
     {
       label: t.sidebar.countries,
       href: "/admin/countries",
-      icon: "◎",
+      icon: Globe2,
     },
     {
       label: t.sidebar.programs,
       href: "/admin/programs",
-      icon: "▣",
+      icon: FolderOpen,
     },
     {
       label: t.sidebar.media,
       href: "/admin/media",
-      icon: "□",
+      icon: Images,
     },
     {
       label: t.sidebar.users,
       href: "/admin/users",
-      icon: "◇",
+      icon: Users,
+    },
+    {
+      label:
+        language === "ar"
+          ? "التحليلات"
+          : "Analytics",
+      href: "/admin/analytics",
+      icon: BarChart3,
     },
     {
       label:
@@ -43,18 +69,21 @@ export default function Sidebar() {
           ? "الإعدادات"
           : "Settings",
       href: "/admin/settings",
-      icon: "⚙",
+      icon: Settings,
     },
   ];
 
   return (
     <aside className="nr-admin-sidebar">
       <div className="nr-admin-sidebar-brand">
-        <span
-          className="nr-admin-sidebar-logo"
-          aria-hidden="true"
-        >
-          ن
+        <span className="nr-admin-sidebar-logo">
+          <Image
+            src="/images/nour-logo.jpg"
+            alt="NourApp"
+            width={34}
+            height={34}
+            priority
+          />
         </span>
 
         <div className="nr-admin-sidebar-brand-text">
@@ -76,29 +105,39 @@ export default function Sidebar() {
             : "Admin navigation"
         }
       >
-        {navigationItems.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className="nr-admin-sidebar-link"
-          >
-            <span
-              className="nr-admin-sidebar-link-icon"
-              aria-hidden="true"
-            >
-              {item.icon}
-            </span>
+        {navigationItems.map((item) => {
+          const Icon = item.icon;
 
-            <span>{item.label}</span>
-          </Link>
-        ))}
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="nr-admin-sidebar-link"
+              title={item.label}
+            >
+              <span
+                className="nr-admin-sidebar-link-icon"
+                aria-hidden={true}
+              >
+                <Icon
+                  size={20}
+                  strokeWidth={1.9}
+                />
+              </span>
+
+              <span className="nr-admin-sidebar-link-label">
+                {item.label}
+              </span>
+            </Link>
+          );
+        })}
       </nav>
 
       <div className="nr-admin-sidebar-footer">
         <div className="nr-admin-sidebar-status">
           <span
             className="nr-admin-sidebar-status-dot"
-            aria-hidden="true"
+            aria-hidden={true}
           />
 
           <div>
@@ -108,9 +147,7 @@ export default function Sidebar() {
                 : "System Online"}
             </strong>
 
-            <small>
-              Supabase Production
-            </small>
+            <small>Supabase Production</small>
           </div>
         </div>
       </div>
