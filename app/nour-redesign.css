@@ -3156,3 +3156,20 @@ html[data-theme="dark"] .nr-service-card-gold .nr-service-link {
   background: #102746;
   color: #ffffff;
 }
+
+.nr-footer-contact {
+  display: grid;
+  gap: 12px;
+}
+
+.nr-footer-contact a,
+.nr-footer-contact span {
+  width: fit-content;
+  max-width: 100%;
+}
+
+html[dir="rtl"] .nr-footer-contact a[dir="ltr"] {
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: right;
+}

@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 
 import type {
@@ -6,6 +8,7 @@ import type {
 } from "../../data/home";
 
 import NewsletterSubscribeForm from "../../../src/features/subscribers/components/NewsletterSubscribeForm";
+import { usePublicSettings } from "../../../src/features/settings/providers/PublicSettingsProvider";
 
 type FooterProps = {
   t: HomeCopy;
@@ -16,6 +19,68 @@ export default function Footer({
   t,
   language,
 }: FooterProps) {
+  const { getText } = usePublicSettings();
+
+  const platformName = getText(
+    language === "ar"
+      ? "general.platform_name"
+      : "general.platform_name_en",
+    language === "ar"
+      ? "نور آب"
+      : "NourApp",
+  );
+
+  const supportPhone = getText(
+    "contact.support_phone",
+    "+966567488377",
+  );
+
+  const whatsappNumber = getText(
+    "contact.whatsapp_number",
+    supportPhone,
+  );
+
+  const supportEmail = getText(
+    "contact.support_email",
+    "support@nourappglobal.com",
+  );
+
+  const websiteUrl = getText(
+    "contact.website_url",
+    "https://nourappglobal.com",
+  );
+
+  const address = getText(
+    language === "ar"
+      ? "contact.address_ar"
+      : "contact.address_en",
+    language === "ar"
+      ? "المملكة العربية السعودية"
+      : "Saudi Arabia",
+  );
+
+  const normalizedPhone = supportPhone.replace(
+    /[^\d+]/g,
+    "",
+  );
+
+  const normalizedWhatsappNumber =
+    whatsappNumber.replace(/\D/g, "");
+
+  const whatsappUrl = normalizedWhatsappNumber
+    ? `https://wa.me/${normalizedWhatsappNumber}`
+    : "#";
+
+  const normalizedWebsiteUrl =
+    websiteUrl.startsWith("http://") ||
+    websiteUrl.startsWith("https://")
+      ? websiteUrl
+      : `https://${websiteUrl}`;
+
+  const displayedWebsite = websiteUrl
+    .replace(/^https?:\/\//, "")
+    .replace(/\/$/, "");
+
   return (
     <footer className="nr-footer">
       <section className="nr-newsletter">
@@ -29,8 +94,8 @@ export default function Footer({
 
             <h2>
               {language === "ar"
-                ? "اشترك في تحديثات نور آب"
-                : "Subscribe to NourApp updates"}
+                ? `اشترك في تحديثات ${platformName}`
+                : `Subscribe to ${platformName} updates`}
             </h2>
 
             <p>
@@ -40,7 +105,9 @@ export default function Footer({
             </p>
           </div>
 
-          <NewsletterSubscribeForm language={language} />
+          <NewsletterSubscribeForm
+            language={language}
+          />
         </div>
       </section>
 
@@ -48,30 +115,56 @@ export default function Footer({
         <div className="nr-footer-brand">
           <Image
             src="/images/site/v-logo.png"
-            alt="NourApp"
+            alt={platformName}
             width={170}
             height={58}
           />
 
-          <span>{t.footer}</span>
+          <span>
+            © {new Date().getFullYear()}{" "}
+            {platformName}.{" "}
+            {language === "ar"
+              ? "جميع الحقوق محفوظة"
+              : "All rights reserved"}
+          </span>
         </div>
 
         <div className="nr-footer-contact">
-          <a
-            href="tel:+966567488377"
-            dir="ltr"
-          >
-            +966 56 748 8377
-          </a>
+  <a
+    href={`tel:${normalizedPhone}`}
+    dir="ltr"
+  >
+    {supportPhone}
+  </a>
 
-          <a
-            href="https://NourAppappglobal.com"
-            target="_blank"
-            rel="noreferrer"
-          >
-            NourAppappglobal.com
-          </a>
-        </div>
+  <a
+    href={`mailto:${supportEmail}`}
+    dir="ltr"
+  >
+    {supportEmail}
+  </a>
+
+  <a
+    href={whatsappUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    {language === "ar"
+      ? "تواصل عبر واتساب"
+      : "Contact via WhatsApp"}
+  </a>
+
+  <a
+    href={normalizedWebsiteUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    dir="ltr"
+  >
+    {displayedWebsite}
+  </a>
+
+  <span>{address}</span>
+</div>
 
         <div className="nr-footer-links">
           <a href="/privacy">
