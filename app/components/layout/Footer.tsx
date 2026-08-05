@@ -1,6 +1,15 @@
 "use client";
 
+import type { ComponentType } from "react";
 import Image from "next/image";
+import {
+  FaFacebookF,
+  FaInstagram,
+  FaLinkedinIn,
+  FaTiktok,
+  FaXTwitter,
+  FaYoutube,
+} from "react-icons/fa6";
 
 import type {
   HomeCopy,
@@ -15,19 +24,47 @@ type FooterProps = {
   language: Language;
 };
 
+type SocialIcon = ComponentType<{
+  size?: number;
+  "aria-hidden"?: boolean;
+}>;
+
+type SocialLink = {
+  key: string;
+  label: string;
+  url: string;
+  icon: SocialIcon;
+};
+
+function normalizeExternalUrl(value: string): string {
+  const trimmedValue = value.trim();
+
+  if (!trimmedValue) {
+    return "";
+  }
+
+  if (
+    trimmedValue.startsWith("http://") ||
+    trimmedValue.startsWith("https://")
+  ) {
+    return trimmedValue;
+  }
+
+  return `https://${trimmedValue}`;
+}
+
 export default function Footer({
-  t,
   language,
 }: FooterProps) {
   const { getText } = usePublicSettings();
 
+  const isArabic = language === "ar";
+
   const platformName = getText(
-    language === "ar"
+    isArabic
       ? "general.platform_name"
       : "general.platform_name_en",
-    language === "ar"
-      ? "نور آب"
-      : "NourApp",
+    isArabic ? "نور آب" : "NourApp",
   );
 
   const supportPhone = getText(
@@ -51,10 +88,10 @@ export default function Footer({
   );
 
   const address = getText(
-    language === "ar"
+    isArabic
       ? "contact.address_ar"
       : "contact.address_en",
-    language === "ar"
+    isArabic
       ? "المملكة العربية السعودية"
       : "Saudi Arabia",
   );
@@ -69,17 +106,82 @@ export default function Footer({
 
   const whatsappUrl = normalizedWhatsappNumber
     ? `https://wa.me/${normalizedWhatsappNumber}`
-    : "#";
+    : "";
 
   const normalizedWebsiteUrl =
-    websiteUrl.startsWith("http://") ||
-    websiteUrl.startsWith("https://")
-      ? websiteUrl
-      : `https://${websiteUrl}`;
+    normalizeExternalUrl(websiteUrl);
 
   const displayedWebsite = websiteUrl
+    .trim()
     .replace(/^https?:\/\//, "")
     .replace(/\/$/, "");
+
+  const socialLinks: SocialLink[] = [
+    {
+      key: "facebook",
+      label: "Facebook",
+      url: getText(
+        "social.facebook_url",
+        "",
+      ),
+      icon: FaFacebookF,
+    },
+    {
+      key: "instagram",
+      label: "Instagram",
+      url: getText(
+        "social.instagram_url",
+        "",
+      ),
+      icon: FaInstagram,
+    },
+    {
+      key: "x",
+      label: "X",
+      url: getText(
+        "social.x_url",
+        "",
+      ),
+      icon: FaXTwitter,
+    },
+    {
+      key: "youtube",
+      label: "YouTube",
+      url: getText(
+        "social.youtube_url",
+        "",
+      ),
+      icon: FaYoutube,
+    },
+    {
+      key: "linkedin",
+      label: "LinkedIn",
+      url: getText(
+        "social.linkedin_url",
+        "",
+      ),
+      icon: FaLinkedinIn,
+    },
+    {
+      key: "tiktok",
+      label: "TikTok",
+      url: getText(
+        "social.tiktok_url",
+        "",
+      ),
+      icon: FaTiktok,
+    },
+  ]
+    .filter(
+      (socialLink) =>
+        socialLink.url.trim().length > 0,
+    )
+    .map((socialLink) => ({
+      ...socialLink,
+      url: normalizeExternalUrl(
+        socialLink.url,
+      ),
+    }));
 
   return (
     <footer className="nr-footer">
@@ -87,19 +189,19 @@ export default function Footer({
         <div className="nr-container nr-newsletter-grid">
           <div className="nr-newsletter-copy">
             <span className="nr-kicker">
-              {language === "ar"
+              {isArabic
                 ? "ابقَ على اطلاع"
                 : "Stay informed"}
             </span>
 
             <h2>
-              {language === "ar"
+              {isArabic
                 ? `اشترك في تحديثات ${platformName}`
                 : `Subscribe to ${platformName} updates`}
             </h2>
 
             <p>
-              {language === "ar"
+              {isArabic
                 ? "احصل على أحدث البرامج والعروض والتحديثات المتعلقة بخدمات العمرة."
                 : "Receive the latest programs, offers, and updates related to Umrah services."}
             </p>
@@ -123,58 +225,106 @@ export default function Footer({
           <span>
             © {new Date().getFullYear()}{" "}
             {platformName}.{" "}
-            {language === "ar"
+            {isArabic
               ? "جميع الحقوق محفوظة"
               : "All rights reserved"}
           </span>
+
+          {socialLinks.length > 0 ? (
+            <div
+              className="nr-footer-social"
+              aria-label={
+                isArabic
+                  ? "روابط التواصل الاجتماعي"
+                  : "Social media links"
+              }
+            >
+              {socialLinks.map(
+                (socialLink) => {
+                  const Icon =
+                    socialLink.icon;
+
+                  return (
+                    <a
+                      key={socialLink.key}
+                      href={socialLink.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={
+                        socialLink.label
+                      }
+                      title={
+                        socialLink.label
+                      }
+                    >
+                      <Icon
+                        size={19}
+                        aria-hidden={true}
+                      />
+                    </a>
+                  );
+                },
+              )}
+            </div>
+          ) : null}
         </div>
 
         <div className="nr-footer-contact">
-  <a
-    href={`tel:${normalizedPhone}`}
-    dir="ltr"
-  >
-    {supportPhone}
-  </a>
+          {normalizedPhone ? (
+            <a
+              href={`tel:${normalizedPhone}`}
+              dir="ltr"
+            >
+              {supportPhone}
+            </a>
+          ) : null}
 
-  <a
-    href={`mailto:${supportEmail}`}
-    dir="ltr"
-  >
-    {supportEmail}
-  </a>
+          {supportEmail ? (
+            <a
+              href={`mailto:${supportEmail}`}
+              dir="ltr"
+            >
+              {supportEmail}
+            </a>
+          ) : null}
 
-  <a
-    href={whatsappUrl}
-    target="_blank"
-    rel="noopener noreferrer"
-  >
-    {language === "ar"
-      ? "تواصل عبر واتساب"
-      : "Contact via WhatsApp"}
-  </a>
+          {whatsappUrl ? (
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {isArabic
+                ? "تواصل عبر واتساب"
+                : "Contact via WhatsApp"}
+            </a>
+          ) : null}
 
-  <a
-    href={normalizedWebsiteUrl}
-    target="_blank"
-    rel="noopener noreferrer"
-    dir="ltr"
-  >
-    {displayedWebsite}
-  </a>
+          {normalizedWebsiteUrl ? (
+            <a
+              href={normalizedWebsiteUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              dir="ltr"
+            >
+              {displayedWebsite}
+            </a>
+          ) : null}
 
-  <span>{address}</span>
-</div>
+          {address ? (
+            <span>{address}</span>
+          ) : null}
+        </div>
 
         <div className="nr-footer-links">
           <a href="/privacy">
-            {language === "ar"
+            {isArabic
               ? "سياسة الخصوصية"
               : "Privacy Policy"}
           </a>
 
           <a href="/terms">
-            {language === "ar"
+            {isArabic
               ? "الشروط والأحكام"
               : "Terms and Conditions"}
           </a>
