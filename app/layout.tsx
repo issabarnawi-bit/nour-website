@@ -2,23 +2,31 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Cairo } from "next/font/google";
 
-import QueryProvider from "../src/components/providers/QueryProvider"
+import QueryProvider from "../src/components/providers/QueryProvider";
 import VisitorAnalyticsTracker from "../src/features/analytics/components/VisitorAnalyticsTracker";
+import { LanguageProvider } from "../src/core/i18n";
+
 import "./globals.css";
 import "./nour-redesign.css";
 import "./modern-upgrade.css";
+
 import {
   getPublicServerSettings,
   getServerTextSetting,
 } from "../src/features/settings/services/public-settings.server";
+
 const cairo = Cairo({
   subsets: ["arabic", "latin"],
-  weight: ["400", "500", "600", "700", "800"],
+  weight: [
+    "400",
+    "500",
+    "600",
+    "700",
+    "800",
+  ],
   variable: "--font-cairo",
   display: "swap",
 });
-
-
 
 type RootLayoutProps = Readonly<{
   children: React.ReactNode;
@@ -28,17 +36,19 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings =
     await getPublicServerSettings();
 
-  const titleAr = getServerTextSetting(
-    settings,
-    "seo.meta_title_ar",
-    "نور آب | خدمات وبرامج العمرة",
-  );
+  const titleAr =
+    getServerTextSetting(
+      settings,
+      "seo.meta_title_ar",
+      "نور آب | خدمات وبرامج العمرة",
+    );
 
-  const titleEn = getServerTextSetting(
-    settings,
-    "seo.meta_title_en",
-    "NourApp | Umrah Services",
-  );
+  const titleEn =
+    getServerTextSetting(
+      settings,
+      "seo.meta_title_en",
+      "NourApp | Umrah Services",
+    );
 
   const descriptionAr =
     getServerTextSetting(
@@ -54,11 +64,12 @@ export async function generateMetadata(): Promise<Metadata> {
       "NourApp digital platform for Umrah programs and services.",
     );
 
-  const siteUrl = getServerTextSetting(
-    settings,
-    "contact.website_url",
-    "https://nourappglobal.com",
-  );
+  const siteUrl =
+    getServerTextSetting(
+      settings,
+      "contact.website_url",
+      "https://nourappglobal.com",
+    );
 
   const normalizedSiteUrl =
     siteUrl.startsWith("http://") ||
@@ -67,7 +78,8 @@ export async function generateMetadata(): Promise<Metadata> {
       : `https://${siteUrl}`;
 
   return {
-    metadataBase: new URL(normalizedSiteUrl),
+    metadataBase:
+      new URL(normalizedSiteUrl),
 
     title: {
       default: titleAr,
@@ -114,23 +126,25 @@ export default function RootLayout({
     <html
       lang="ar"
       dir="rtl"
-      className={cairo.variable}
       suppressHydrationWarning
     >
-     <body
-  style={{
-    fontFamily:
-      "var(--font-cairo), sans-serif",
-  }}
->
-  <QueryProvider>
-    <Suspense fallback={null}>
-      <VisitorAnalyticsTracker />
-    </Suspense>
+      <body
+        className={cairo.variable}
+        style={{
+          fontFamily:
+            "var(--font-cairo), sans-serif",
+        }}
+      >
+        <QueryProvider>
+          <LanguageProvider>
+            <Suspense fallback={null}>
+              <VisitorAnalyticsTracker />
+            </Suspense>
 
-    {children}
-  </QueryProvider>
-</body>
+            {children}
+          </LanguageProvider>
+        </QueryProvider>
+      </body>
     </html>
   );
 }

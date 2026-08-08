@@ -3210,3 +3210,844 @@ html[dir="rtl"] .nr-footer-contact a[dir="ltr"] {
   font-weight: 800;
   letter-spacing: 0.02em;
 }
+
+/* =========================================================
+   NourApp — DESKTOP SCALE & FULL-SCREEN BALANCE
+   Final responsive sizing pass
+   الهدف:
+   - استغلال أفضل لعرض الشاشات الكبيرة
+   - تقليل الإحساس بالتكبير
+   - Hero أقصر وأكثر توازنًا
+   - ظهور جزء من القسم التالي على الشاشات الشائعة
+========================================================= */
+
+/* Wider content canvas on desktop */
+.nr-container {
+  width: min(1360px, calc(100% - 56px));
+  margin-inline: auto;
+}
+
+/* -------------------------
+   Header: more compact
+------------------------- */
+
+.nr-nav {
+  min-height: 64px;
+  gap: 18px;
+}
+
+.nr-logo {
+  width: 68px;
+  height: 52px;
+  flex: 0 0 68px;
+}
+
+.nr-logo img {
+  width: 58px;
+  height: 50px;
+  max-height: 50px;
+  padding: 4px;
+  border-radius: 9px;
+}
+
+.nr-nav nav {
+  gap: clamp(16px, 1.55vw, 26px);
+  font-size: 14px;
+}
+
+.nr-controls {
+  gap: 7px;
+}
+
+.nr-controls button {
+  height: 36px;
+  padding-inline: 13px;
+  border-radius: 11px;
+  font-size: 13px;
+}
+
+.nr-theme,
+.nr-menu-button {
+  width: 36px;
+}
+
+/* -------------------------
+   Hero: compact + wider
+------------------------- */
+
+@media (min-width: 921px) {
+  .nr-hero {
+    min-height: clamp(610px, 69vh, 700px);
+    height: auto;
+  }
+
+  .nr-hero-grid {
+    grid-template-columns: minmax(0, 0.95fr) minmax(520px, 1.05fr);
+    gap: clamp(26px, 3vw, 52px);
+    padding-block: clamp(38px, 4.4vh, 54px);
+  }
+
+  .nr-hero .nr-kicker {
+    padding: 7px 12px;
+    font-size: 13px;
+  }
+
+  .nr-hero h1 {
+    max-width: 720px;
+    margin: 15px 0 14px;
+    font-size: clamp(46px, 4.35vw, 72px);
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+  }
+
+  .nr-hero p {
+    max-width: 700px;
+    font-size: clamp(15px, 1.05vw, 17px);
+    line-height: 1.75;
+  }
+
+  .nr-actions {
+    gap: 10px;
+    margin-top: 22px;
+  }
+
+  .nr-actions a {
+    min-height: 48px;
+    padding-inline: 22px;
+    border-radius: 12px;
+    font-size: 14px;
+  }
+
+  .nr-phones {
+    min-height: clamp(470px, 50vw, 545px);
+  }
+
+  .nr-phone-back {
+    width: clamp(410px, 30vw, 475px);
+    top: 8px;
+    inset-inline-end: 0;
+  }
+
+  .nr-phone-front {
+    width: clamp(250px, 18vw, 290px);
+    bottom: -4px;
+    inset-inline-start: 30px;
+  }
+
+  .nr-orb-one {
+    width: 220px;
+    height: 220px;
+  }
+
+  .nr-orb-two {
+    width: 250px;
+    height: 250px;
+  }
+}
+
+/* -------------------------
+   Shared section typography
+------------------------- */
+
+.nr-goals h2,
+.nr-about h2,
+.nr-features h2,
+.nr-showcase h2,
+.nr-cta h2,
+.nr-journey-heading h2,
+.nr-statistics-heading h2,
+.nr-why-heading h2,
+.nr-services-heading h2 {
+  font-size: clamp(30px, 3vw, 46px);
+  line-height: 1.22;
+}
+
+.nr-heading,
+.nr-journey-heading,
+.nr-statistics-heading,
+.nr-why-heading,
+.nr-services-heading {
+  max-width: 760px;
+}
+
+/* -------------------------
+   Global vertical rhythm
+------------------------- */
+
+.nr-goals,
+.nr-features,
+.nr-journey,
+.nr-statistics,
+.nr-why,
+.nr-services,
+.nr-payments {
+  padding-block: clamp(62px, 6vw, 82px);
+}
+
+.nr-about,
+.nr-showcase {
+  padding-block: clamp(66px, 6vw, 86px);
+}
+
+.nr-cta {
+  padding-block: clamp(54px, 5vw, 70px);
+}
+
+/* -------------------------
+   Cards: slightly tighter
+------------------------- */
+
+.nr-goals-grid,
+.nr-feature-grid,
+.nr-journey-steps,
+.nr-statistics-grid,
+.nr-why-grid,
+.nr-services-grid {
+  gap: 16px;
+}
+
+.nr-goals article,
+.nr-feature-grid article,
+.nr-journey-step,
+.nr-statistic-card,
+.nr-why-card,
+.nr-service-card {
+  border-radius: 20px;
+}
+
+.nr-goals article {
+  min-height: 180px;
+  padding: 22px;
+}
+
+.nr-journey-step {
+  min-height: 245px;
+  padding: 23px;
+}
+
+.nr-statistic-card {
+  min-height: 215px;
+  padding: 23px;
+}
+
+.nr-why-card {
+  min-height: 235px;
+  padding: 23px;
+}
+
+.nr-service-card {
+  min-height: 292px;
+  padding: 24px;
+}
+
+.nr-service-card h3 {
+  margin-top: 27px;
+}
+
+/* -------------------------
+   About
+------------------------- */
+
+@media (min-width: 921px) {
+  .nr-about-grid {
+    grid-template-columns: minmax(0, 0.96fr) minmax(0, 1.04fr);
+    gap: 44px;
+  }
+
+  .nr-about-visual {
+    min-height: 440px;
+  }
+
+  .nr-about-visual img {
+    width: min(440px, 90%);
+  }
+
+  .nr-visual-blob {
+    width: 430px;
+    height: 340px;
+  }
+}
+
+/* -------------------------
+   Showcase
+------------------------- */
+
+@media (min-width: 921px) {
+  .nr-showcase-grid {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: 44px;
+  }
+
+  .nr-showcase-devices {
+    min-height: 440px;
+  }
+
+  .nr-showcase-devices img:first-child {
+    width: 350px;
+    top: 0;
+  }
+
+  .nr-showcase-devices img:last-child {
+    width: 235px;
+    bottom: 0;
+  }
+
+  .nr-showcase li {
+    min-height: 44px;
+    padding-block: 8px !important;
+    font-size: 14px;
+  }
+}
+
+/* -------------------------
+   Payments
+------------------------- */
+
+@media (min-width: 921px) {
+  .nr-payment-layout {
+    grid-template-columns: minmax(0, 1.55fr) minmax(250px, 0.45fr);
+    gap: 22px;
+  }
+
+  .nr-payment-methods {
+    gap: 14px;
+  }
+
+  .nr-payment-card {
+    min-height: 138px;
+    padding: 15px 10px;
+    border-radius: 18px;
+  }
+
+  .nr-payment-logo {
+    width: 145px;
+    height: 66px;
+  }
+
+  .nr-payment-logo img {
+    max-width: 126px;
+    max-height: 48px;
+  }
+
+  .nr-payment-info {
+    padding: 17px;
+    border-radius: 20px;
+  }
+}
+
+/* -------------------------
+   CTA
+------------------------- */
+
+@media (min-width: 921px) {
+  .nr-cta-card {
+    min-height: 300px;
+    padding: 38px 48px;
+    border-radius: 28px;
+  }
+
+  .nr-cta-card > img {
+    width: 235px;
+    margin-bottom: -70px;
+  }
+
+  .nr-store-badge img,
+  .nr-store-badge-custom {
+    height: 50px;
+  }
+}
+
+/* -------------------------
+   Footer
+------------------------- */
+
+.nr-footer {
+  padding-block: 28px 24px;
+}
+
+.nr-footer .nr-container.nr-footer-content {
+  gap: 36px;
+}
+
+.nr-footer-brand img,
+.nr-footer img {
+  width: 94px;
+  height: 94px;
+  padding: 8px;
+}
+
+/* -------------------------
+   Large screens
+------------------------- */
+
+@media (min-width: 1500px) {
+  .nr-container {
+    width: min(1460px, calc(100% - 72px));
+  }
+
+  .nr-hero-grid {
+    grid-template-columns: minmax(0, 0.92fr) minmax(560px, 1.08fr);
+  }
+
+  .nr-hero h1 {
+    font-size: clamp(56px, 4vw, 76px);
+  }
+
+  .nr-phone-back {
+    width: 500px;
+  }
+
+  .nr-phone-front {
+    width: 300px;
+  }
+}
+
+/* -------------------------
+   Laptop screens
+------------------------- */
+
+@media (min-width: 921px) and (max-width: 1366px) {
+  .nr-container {
+    width: min(1200px, calc(100% - 40px));
+  }
+
+  .nr-hero {
+    min-height: 600px;
+  }
+
+  .nr-hero-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(440px, 0.95fr);
+    gap: 24px;
+    padding-block: 38px;
+  }
+
+  .nr-hero h1 {
+    font-size: clamp(42px, 4.7vw, 60px);
+  }
+
+  .nr-hero p {
+    font-size: 15px;
+  }
+
+  .nr-phones {
+    min-height: 460px;
+  }
+
+  .nr-phone-back {
+    width: 405px;
+  }
+
+  .nr-phone-front {
+    width: 245px;
+  }
+
+  .nr-nav nav {
+    gap: 16px;
+    font-size: 13px;
+  }
+}
+
+/* -------------------------
+   Tablet
+------------------------- */
+
+@media (max-width: 920px) {
+  .nr-container {
+    width: min(100% - 32px, 760px);
+  }
+
+  .nr-nav {
+    min-height: 62px;
+  }
+
+  .nr-logo {
+    width: 64px;
+    height: 50px;
+    flex-basis: 64px;
+  }
+
+  .nr-logo img {
+    width: 56px;
+    height: 48px;
+  }
+
+  .nr-hero-grid {
+    gap: 20px;
+    padding-block: 48px;
+  }
+
+  .nr-hero h1 {
+    font-size: clamp(38px, 8vw, 54px);
+  }
+
+  .nr-hero p {
+    font-size: 15px;
+  }
+}
+
+/* -------------------------
+   Mobile
+------------------------- */
+
+@media (max-width: 580px) {
+  .nr-container {
+    width: min(100% - 22px, 540px);
+  }
+
+  .nr-nav {
+    min-height: 58px;
+  }
+
+  .nr-logo {
+    width: 56px;
+    height: 46px;
+    flex-basis: 56px;
+  }
+
+  .nr-logo img {
+    width: 50px;
+    height: 44px;
+  }
+
+  .nr-controls button {
+    height: 34px;
+    font-size: 11px;
+  }
+
+  .nr-theme,
+  .nr-menu-button {
+    width: 34px;
+  }
+
+  .nr-hero-grid {
+    padding-block: 40px;
+  }
+
+  .nr-hero h1 {
+    font-size: clamp(34px, 10vw, 42px);
+    line-height: 1.14;
+  }
+
+  .nr-hero p {
+    font-size: 14px;
+    line-height: 1.75;
+  }
+
+  .nr-actions a {
+    min-height: 46px;
+    font-size: 13px;
+  }
+
+  .nr-phones {
+    min-height: 395px;
+  }
+
+  .nr-goals,
+  .nr-features,
+  .nr-journey,
+  .nr-statistics,
+  .nr-why,
+  .nr-services,
+  .nr-payments,
+  .nr-about,
+  .nr-showcase,
+  .nr-cta {
+    padding-block: 52px;
+  }
+}
+
+/* =========================================================
+   NourApp — PAYMENT SECTION V2
+   Full-width balanced payment experience
+========================================================= */
+
+.nr-payments-modern {
+  position: relative;
+  overflow: hidden;
+  padding-block: 68px;
+  background:
+    radial-gradient(
+      circle at 12% 18%,
+      rgba(23, 111, 232, 0.1),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 88% 82%,
+      rgba(255, 195, 19, 0.09),
+      transparent 26%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--nr-soft) 76%, var(--nr-bg)),
+      var(--nr-bg)
+    );
+}
+
+html[data-theme="dark"] .nr-payments-modern {
+  background:
+    radial-gradient(
+      circle at 12% 18%,
+      rgba(23, 111, 232, 0.16),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 88% 82%,
+      rgba(255, 195, 19, 0.07),
+      transparent 28%
+    ),
+    #091828;
+}
+
+.nr-payment-heading-centered {
+  max-width: 820px;
+  margin: 0 auto 34px;
+  text-align: center;
+}
+
+.nr-payment-heading-centered .nr-kicker {
+  justify-content: center;
+}
+
+.nr-payment-heading-centered h2 {
+  margin: 12px 0;
+  font-size: clamp(30px, 3vw, 44px);
+}
+
+.nr-payment-heading-centered p {
+  max-width: 760px;
+  margin-inline: auto;
+}
+
+.nr-payment-modern-shell {
+  position: relative;
+  padding: 22px;
+  border: 1px solid var(--nr-border);
+  border-radius: 26px;
+  background:
+    color-mix(
+      in srgb,
+      var(--nr-card) 90%,
+      transparent
+    );
+  box-shadow:
+    0 22px 60px
+      rgba(18, 67, 130, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+.nr-payment-methods-modern {
+  display: grid;
+  grid-template-columns:
+    repeat(6, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.nr-payment-methods-modern .nr-payment-card {
+  min-height: 124px;
+  gap: 7px;
+  padding: 13px 9px;
+  border-radius: 17px;
+  box-shadow:
+    0 10px 30px
+      rgba(18, 67, 130, 0.055);
+}
+
+.nr-payment-methods-modern .nr-payment-logo {
+  width: min(128px, 100%);
+  height: 54px;
+  padding: 7px 9px;
+  border-radius: 12px;
+}
+
+.nr-payment-methods-modern
+  .nr-payment-logo img {
+  max-width: 112px;
+  max-height: 40px;
+}
+
+.nr-payment-methods-modern
+  .nr-payment-card strong {
+  font-size: 12px;
+}
+
+.nr-payment-kind {
+  display: inline-flex;
+  min-height: 23px;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 8px;
+  border-radius: 999px;
+  color: var(--nr-muted);
+  background: var(--nr-soft);
+  font-size: 9px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.nr-payment-kind.is-flexible {
+  color: #7a5a00;
+  background:
+    rgba(255, 195, 19, 0.16);
+}
+
+html[data-theme="dark"]
+  .nr-payment-kind.is-flexible {
+  color: #ffd765;
+}
+
+.nr-payment-card-upcoming {
+  border-style: dashed;
+  opacity: 0.82;
+}
+
+.nr-payment-status {
+  position: absolute;
+  top: 8px;
+  inset-inline-end: 8px;
+  z-index: 2;
+  display: inline-flex;
+  min-height: 21px;
+  align-items: center;
+  padding-inline: 7px;
+  border-radius: 999px;
+  color: var(--nr-blue);
+  background:
+    rgba(23, 111, 232, 0.09);
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.nr-payment-text-logo {
+  display: grid;
+  place-items: center;
+}
+
+.nr-payment-text-logo span {
+  color: var(--nr-text);
+  font-size: 16px;
+  font-weight: 950;
+  letter-spacing: -0.02em;
+}
+
+.nr-payment-benefits {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.nr-payment-benefits article {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  min-height: 100px;
+  padding: 15px;
+  border: 1px solid var(--nr-border);
+  border-radius: 15px;
+  background: var(--nr-card);
+}
+
+.nr-payment-benefit-icon {
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  color: #14335c;
+  background: var(--nr-gold);
+}
+
+.nr-payment-benefit-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.nr-payment-benefits strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--nr-text);
+  font-size: 13px;
+}
+
+.nr-payment-benefits p {
+  margin: 0;
+  color: var(--nr-muted);
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.nr-payment-security-note {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 14px;
+  padding-inline: 14px;
+  border-radius: 12px;
+  color: var(--nr-muted);
+  background:
+    color-mix(
+      in srgb,
+      var(--nr-blue) 6%,
+      transparent
+    );
+  font-size: 10px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.nr-payment-security-note svg {
+  width: 15px;
+  color: var(--nr-blue);
+}
+
+@media (max-width: 1250px) {
+  .nr-payment-methods-modern {
+    grid-template-columns:
+      repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 920px) {
+  .nr-payment-methods-modern {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+
+  .nr-payment-benefits {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .nr-payments-modern {
+    padding-block: 52px;
+  }
+
+  .nr-payment-modern-shell {
+    padding: 14px;
+    border-radius: 20px;
+  }
+
+  .nr-payment-methods-modern {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .nr-payment-methods-modern
+    .nr-payment-card {
+    min-height: 115px;
+  }
+
+  .nr-payment-heading-centered {
+    margin-bottom: 26px;
+  }
+
+  .nr-payment-heading-centered h2 {
+    font-size: 30px;
+  }
+}

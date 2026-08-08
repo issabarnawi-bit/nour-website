@@ -3,6 +3,7 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useMemo,
   type ReactNode,
 } from "react";
@@ -30,34 +31,47 @@ export default function LanguageProvider({
 }: LanguageProviderProps) {
   const [language, setLanguage] =
     usePersistentState<AdminLanguage>(
-      "admin-language",
+      "nour-language",
       "ar",
     );
 
   const direction: "rtl" | "ltr" =
-  language === "ar" ? "rtl" : "ltr";
+    language === "ar" ? "rtl" : "ltr";
 
- const contextValue =
-  useMemo<LanguageContextValue>(
-    () => ({
-      language,
-      direction,
-      setLanguage,
-      toggleLanguage: () => {
-        setLanguage((currentLanguage) =>
-          currentLanguage === "ar" ? "en" : "ar",
-        );
-      },
-    }),
-    [direction, language, setLanguage],
-  );
+  useEffect(() => {
+    document.documentElement.lang = language;
+    document.documentElement.dir = direction;
+  }, [language, direction]);
+
+  const contextValue =
+    useMemo<LanguageContextValue>(
+      () => ({
+        language,
+        direction,
+        setLanguage,
+        toggleLanguage: () => {
+          setLanguage((currentLanguage) =>
+            currentLanguage === "ar"
+              ? "en"
+              : "ar",
+          );
+        },
+      }),
+      [
+        direction,
+        language,
+        setLanguage,
+      ],
+    );
 
   return (
-    <LanguageContext.Provider value={contextValue}>
+    <LanguageContext.Provider
+      value={contextValue}
+    >
       <div
         dir={direction}
         lang={language}
-        className={`nr-admin-language nr-admin-language--${language}`}
+        className={`nr-language-root nr-admin-language nr-admin-language--${language}`}
       >
         {children}
       </div>
@@ -66,7 +80,8 @@ export default function LanguageProvider({
 }
 
 export function useLanguage() {
-  const context = useContext(LanguageContext);
+  const context =
+    useContext(LanguageContext);
 
   if (!context) {
     throw new Error(

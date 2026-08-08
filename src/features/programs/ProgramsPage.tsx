@@ -17,12 +17,15 @@ import { useLanguage } from "../../core/i18n";
 import { useToast } from "../../core/notifications";
 import { createClient } from "../../lib/supabase/client";
 import { countriesQuery } from "../countries/services";
+import { listHotels } from "../hotels/services";
 
 import ProgramForm from "./forms/ProgramForm";
 import {
   createProgram,
   deleteProgram,
   getDeletedPrograms,
+  getFlightsForProgram,
+  getHotelsForProgram,
   getPrograms,
   permanentlyDeleteProgram,
   restoreProgram,
@@ -30,7 +33,9 @@ import {
 } from "./services";
 import type {
   Program,
+  ProgramFlightFormValue,
   ProgramFormValues,
+  ProgramHotelFormValue,
 } from "./types";
 
 type ProgramStatusFilter =
@@ -86,6 +91,26 @@ export default function ProgramsPage() {
 
   const [editingProgram, setEditingProgram] =
     useState<Program | null>(null);
+
+  const [
+    editingProgramHotels,
+    setEditingProgramHotels,
+  ] = useState<ProgramHotelFormValue[]>([]);
+
+  const [
+    editingProgramFlights,
+    setEditingProgramFlights,
+  ] = useState<ProgramFlightFormValue[]>([]);
+
+  const [
+    isEditingHotelsLoading,
+    setIsEditingHotelsLoading,
+  ] = useState(false);
+
+  const [
+    isEditingFlightsLoading,
+    setIsEditingFlightsLoading,
+  ] = useState(false);
 
   const [formError, setFormError] =
     useState("");
@@ -189,6 +214,27 @@ export default function ProgramsPage() {
     isError: isCountriesError,
     error: countriesError,
   } = useQuery(countriesQuery(supabase));
+
+  const {
+    data: hotels = [],
+    isLoading: isHotelsLoading,
+    isError: isHotelsError,
+    error: hotelsError,
+  } = useQuery({
+    queryKey: [
+      "hotels",
+      "program-options",
+      currentUser?.id ?? "anonymous",
+    ],
+    queryFn: () => listHotels(supabase),
+    enabled: Boolean(currentUser?.id),
+    staleTime: 0,
+    refetchOnMount: "always",
+  });
+
+  const activeHotels = hotels.filter(
+    (hotel) => hotel.status === "active",
+  );
 
   const {
     data: programs = [],
@@ -351,9 +397,8 @@ export default function ProgramsPage() {
       return;
     }
 
-    setFormError("");
-    setEditingProgram(programToEdit);
-    setIsCreateOpen(true);
+    void openEditDialog(programToEdit);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     editProgramId,
     isProgramsSuccess,
@@ -368,6 +413,8 @@ export default function ProgramsPage() {
 
     setFormError("");
     setEditingProgram(null);
+    setEditingProgramHotels([]);
+    setEditingProgramFlights([]);
     setIsCreateOpen(true);
   }
 
@@ -378,6 +425,8 @@ export default function ProgramsPage() {
 
     setFormError("");
     setEditingProgram(null);
+    setEditingProgramHotels([]);
+    setEditingProgramFlights([]);
     setIsCreateOpen(false);
 
     if (editProgramId) {
@@ -385,7 +434,7 @@ export default function ProgramsPage() {
     }
   }
 
-  function openEditDialog(
+  async function openEditDialog(
     program: Program,
   ) {
     if (!canUpdate) {
@@ -393,8 +442,116 @@ export default function ProgramsPage() {
     }
 
     setFormError("");
-    setEditingProgram(program);
-    setIsCreateOpen(true);
+    setIsEditingHotelsLoading(true);
+    setIsEditingFlightsLoading(true);
+
+    try {
+      const [
+        linkedHotels,
+        linkedFlights,
+      ] = await Promise.all([
+        getHotelsForProgram(
+          supabase,
+          program.id,
+        ),
+        getFlightsForProgram(
+          supabase,
+          program.id,
+        ),
+      ]);
+
+      setEditingProgramHotels(
+        linkedHotels.map((hotel) => ({
+          hotelId: hotel.hotelId,
+          nights: hotel.nights,
+          roomTypeAr: hotel.roomTypeAr,
+          roomTypeEn: hotel.roomTypeEn,
+          mealPlanAr: hotel.mealPlanAr,
+          mealPlanEn: hotel.mealPlanEn,
+          checkInDate:
+            hotel.checkInDate ?? "",
+          checkOutDate:
+            hotel.checkOutDate ?? "",
+          notesAr: hotel.notesAr,
+          notesEn: hotel.notesEn,
+          sortOrder: hotel.sortOrder,
+        })),
+      );
+
+      setEditingProgramFlights(
+        linkedFlights.map((flight) => ({
+          direction: flight.direction,
+          airlineNameAr:
+            flight.airlineNameAr,
+          airlineNameEn:
+            flight.airlineNameEn,
+          flightNumber:
+            flight.flightNumber,
+          departureAirportAr:
+            flight.departureAirportAr,
+          departureAirportEn:
+            flight.departureAirportEn,
+          arrivalAirportAr:
+            flight.arrivalAirportAr,
+          arrivalAirportEn:
+            flight.arrivalAirportEn,
+          departureAt:
+            flight.departureAt
+              ? flight.departureAt.slice(
+                  0,
+                  16,
+                )
+              : "",
+          arrivalAt:
+            flight.arrivalAt
+              ? flight.arrivalAt.slice(
+                  0,
+                  16,
+                )
+              : "",
+          flightType:
+            flight.flightType,
+          transitAirportAr:
+            flight.transitAirportAr,
+          transitAirportEn:
+            flight.transitAirportEn,
+          transitDurationMinutes:
+            flight.transitDurationMinutes,
+          cabinClassAr:
+            flight.cabinClassAr,
+          cabinClassEn:
+            flight.cabinClassEn,
+          baggageAllowanceKg:
+            flight.baggageAllowanceKg,
+          notesAr: flight.notesAr,
+          notesEn: flight.notesEn,
+          sortOrder: flight.sortOrder,
+        })),
+      );
+
+      setEditingProgram(program);
+      setIsCreateOpen(true);
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : isArabic
+            ? "تعذر تحميل بيانات الفنادق أو الرحلات للبرنامج."
+            : "Unable to load program hotel or flight data.";
+
+      setFormError(message);
+
+      showToast({
+        title: isArabic
+          ? "تعذر فتح البرنامج للتعديل"
+          : "Unable to open program for editing",
+        description: message,
+        variant: "error",
+      });
+    } finally {
+      setIsEditingHotelsLoading(false);
+      setIsEditingFlightsLoading(false);
+    }
   }
 
   async function handleCreateProgram(
@@ -437,6 +594,8 @@ export default function ProgramsPage() {
       await refetchPrograms();
 
       setEditingProgram(null);
+      setEditingProgramHotels([]);
+      setEditingProgramFlights([]);
       setIsCreateOpen(false);
 
       if (editProgramId) {
@@ -962,7 +1121,7 @@ export default function ProgramsPage() {
                           type="button"
                           className="nr-program-action nr-program-action-edit"
                           onClick={() => {
-                            openEditDialog(
+                            void openEditDialog(
                               program,
                             );
                           }}
@@ -1322,6 +1481,16 @@ export default function ProgramsPage() {
               </p>
             ) : null}
 
+            {isHotelsError ? (
+              <p className="nr-admin-login-error">
+                {hotelsError instanceof Error
+                  ? hotelsError.message
+                  : isArabic
+                    ? "تعذر تحميل الفنادق."
+                    : "Unable to load hotels."}
+              </p>
+            ) : null}
+
             {formError ? (
               <p className="nr-admin-login-error">
                 {formError}
@@ -1339,6 +1508,16 @@ export default function ProgramsPage() {
             ) : null}
 
             <ProgramForm
+              hotels={activeHotels.map(
+                (hotel) => ({
+                  id: hotel.id,
+                  nameAr: hotel.nameAr,
+                  nameEn: hotel.nameEn,
+                  cityAr: hotel.cityAr,
+                  cityEn: hotel.cityEn,
+                  stars: hotel.stars,
+                }),
+              )}
               countries={countries.map(
                 (country) => ({
                   id: country.id,
@@ -1376,6 +1555,12 @@ export default function ProgramsPage() {
                         editingProgram.basePrice,
                       currencyCode:
                         editingProgram.currencyCode,
+                      flightInclusion:
+                        editingProgram.flightInclusion,
+                      flightNotesAr:
+                        editingProgram.flightNotesAr,
+                      flightNotesEn:
+                        editingProgram.flightNotesEn,
                       status:
                         editingProgram.status,
                       isFeatured:
@@ -1384,6 +1569,10 @@ export default function ProgramsPage() {
                         editingProgram.isActive,
                       sortOrder:
                         editingProgram.sortOrder,
+                      hotels:
+                        editingProgramHotels,
+                      flights:
+                        editingProgramFlights,
                     }
                   : undefined
               }
@@ -1393,7 +1582,11 @@ export default function ProgramsPage() {
               isSubmitting={
                 isSubmitting ||
                 isCountriesLoading ||
-                isCountriesError
+                isCountriesError ||
+                isHotelsLoading ||
+                isHotelsError ||
+                isEditingHotelsLoading ||
+                isEditingFlightsLoading
               }
             />
           </section>

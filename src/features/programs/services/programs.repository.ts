@@ -24,15 +24,19 @@ type ProgramRow = {
   duration_nights: number;
   base_price: number | string;
   currency_code: string;
+
+  flight_inclusion: "included" | "excluded" | "dynamic";
+  flight_notes_ar: string | null;
+  flight_notes_en: string | null;
+
   cover_media_id: string | null;
-  cover_media:
-    | CoverMediaRow
-    | CoverMediaRow[]
-    | null;
+  cover_media: CoverMediaRow | CoverMediaRow[] | null;
+
   status: "draft" | "published" | "inactive";
   is_featured: boolean;
   is_active: boolean;
   sort_order: number;
+
   created_by: string | null;
   updated_by: string | null;
   created_at: string;
@@ -43,14 +47,8 @@ type ProgramRow = {
 function getCoverMedia(
   coverMedia: ProgramRow["cover_media"],
 ): CoverMediaRow | null {
-  if (!coverMedia) {
-    return null;
-  }
-
-  if (Array.isArray(coverMedia)) {
-    return coverMedia[0] ?? null;
-  }
-
+  if (!coverMedia) return null;
+  if (Array.isArray(coverMedia)) return coverMedia[0] ?? null;
   return coverMedia;
 }
 
@@ -72,9 +70,7 @@ function createPublicMediaUrl(
 }
 
 function mapProgram(row: ProgramRow): Program {
-  const coverMedia = getCoverMedia(
-    row.cover_media,
-  );
+  const coverMedia = getCoverMedia(row.cover_media);
 
   return {
     id: row.id,
@@ -90,10 +86,13 @@ function mapProgram(row: ProgramRow): Program {
     durationNights: row.duration_nights,
     basePrice: Number(row.base_price),
     currencyCode: row.currency_code,
+
+    flightInclusion: row.flight_inclusion ?? "dynamic",
+    flightNotesAr: row.flight_notes_ar ?? "",
+    flightNotesEn: row.flight_notes_en ?? "",
+
     coverMediaId: row.cover_media_id,
-    coverUrl: createPublicMediaUrl(
-      coverMedia,
-    ),
+    coverUrl: createPublicMediaUrl(coverMedia),
     status: row.status,
     isFeatured: row.is_featured,
     isActive: row.is_active,
@@ -120,6 +119,9 @@ const programSelect = `
   duration_nights,
   base_price,
   currency_code,
+  flight_inclusion,
+  flight_notes_ar,
+  flight_notes_en,
   cover_media_id,
   status,
   is_featured,
@@ -149,17 +151,18 @@ export async function createProgram(
       slug: values.slug.trim(),
       summary_ar: values.summaryAr.trim(),
       summary_en: values.summaryEn.trim(),
-      description_ar:
-        values.descriptionAr.trim(),
-      description_en:
-        values.descriptionEn.trim(),
+      description_ar: values.descriptionAr.trim(),
+      description_en: values.descriptionEn.trim(),
       country_id: values.countryId || null,
       duration_days: values.durationDays,
       duration_nights: values.durationNights,
       base_price: values.basePrice,
-      currency_code: values.currencyCode
-        .trim()
-        .toUpperCase(),
+      currency_code: values.currencyCode.trim().toUpperCase(),
+
+      flight_inclusion: values.flightInclusion,
+      flight_notes_ar: values.flightNotesAr.trim() || null,
+      flight_notes_en: values.flightNotesEn.trim() || null,
+
       cover_media_id: coverMediaId,
       status: values.status,
       is_featured: values.isFeatured,
@@ -170,9 +173,7 @@ export async function createProgram(
     .single();
 
   if (error) {
-    throw new Error(
-      `تعذر إنشاء البرنامج: ${error.message}`,
-    );
+    throw new Error(`تعذر إنشاء البرنامج: ${error.message}`);
   }
 
   return mapProgram(data as ProgramRow);
@@ -185,22 +186,14 @@ export async function getPrograms(
     .from("programs")
     .select(programSelect)
     .is("deleted_at", null)
-    .order("sort_order", {
-      ascending: true,
-    })
-    .order("created_at", {
-      ascending: false,
-    });
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: false });
 
   if (error) {
-    throw new Error(
-      `تعذر تحميل البرامج: ${error.message}`,
-    );
+    throw new Error(`تعذر تحميل البرامج: ${error.message}`);
   }
 
-  return (data as ProgramRow[]).map(
-    mapProgram,
-  );
+  return ((data ?? []) as ProgramRow[]).map(mapProgram);
 }
 
 export async function getProgramById(
@@ -215,9 +208,7 @@ export async function getProgramById(
     .single();
 
   if (error) {
-    throw new Error(
-      `تعذر تحميل تفاصيل البرنامج: ${error.message}`,
-    );
+    throw new Error(`تعذر تحميل تفاصيل البرنامج: ${error.message}`);
   }
 
   return mapProgram(data as ProgramRow);
@@ -237,17 +228,18 @@ export async function updateProgram(
       slug: values.slug.trim(),
       summary_ar: values.summaryAr.trim(),
       summary_en: values.summaryEn.trim(),
-      description_ar:
-        values.descriptionAr.trim(),
-      description_en:
-        values.descriptionEn.trim(),
+      description_ar: values.descriptionAr.trim(),
+      description_en: values.descriptionEn.trim(),
       country_id: values.countryId || null,
       duration_days: values.durationDays,
       duration_nights: values.durationNights,
       base_price: values.basePrice,
-      currency_code: values.currencyCode
-        .trim()
-        .toUpperCase(),
+      currency_code: values.currencyCode.trim().toUpperCase(),
+
+      flight_inclusion: values.flightInclusion,
+      flight_notes_ar: values.flightNotesAr.trim() || null,
+      flight_notes_en: values.flightNotesEn.trim() || null,
+
       cover_media_id: coverMediaId,
       status: values.status,
       is_featured: values.isFeatured,
@@ -260,9 +252,7 @@ export async function updateProgram(
     .maybeSingle();
 
   if (error) {
-    throw new Error(
-      `تعذر تحديث البرنامج: ${error.message}`,
-    );
+    throw new Error(`تعذر تحديث البرنامج: ${error.message}`);
   }
 
   if (!data) {
@@ -320,9 +310,7 @@ export async function getDeletedPrograms(
     );
   }
 
-  return ((data ?? []) as ProgramRow[]).map(
-    mapProgram,
-  );
+  return ((data ?? []) as ProgramRow[]).map(mapProgram);
 }
 
 export async function restoreProgram(

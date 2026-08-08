@@ -2,11 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
+
 import {
   BarChart3,
   CircleGauge,
   FolderOpen,
   Globe2,
+  Hotel,
   Images,
   Settings,
   Users,
@@ -46,6 +48,14 @@ export default function Sidebar() {
       icon: FolderOpen,
     },
     {
+      label:
+        language === "ar"
+          ? "الفنادق"
+          : "Hotels",
+      href: "/admin/hotels",
+      icon: Hotel,
+    },
+    {
       label: t.sidebar.media,
       href: "/admin/media",
       icon: Images,
@@ -76,15 +86,15 @@ export default function Sidebar() {
   return (
     <aside className="nr-admin-sidebar">
       <div className="nr-admin-sidebar-brand">
-        <span className="nr-admin-sidebar-logo">
+        <div className="nr-admin-sidebar-brand-logo">
           <Image
-            src="/images/nour-logo.jpg"
+            src="/images/site/v-logo.png"
             alt="NourApp"
-            width={34}
-            height={34}
+            width={42}
+            height={42}
             priority
           />
-        </span>
+        </div>
 
         <div className="nr-admin-sidebar-brand-text">
           <strong>NourApp Platform</strong>
@@ -147,7 +157,9 @@ export default function Sidebar() {
                 : "System Online"}
             </strong>
 
-            <small>Supabase Production</small>
+            <small>
+              Supabase Production
+            </small>
           </div>
         </div>
       </div>

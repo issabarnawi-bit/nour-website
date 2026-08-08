@@ -1,4 +1,6 @@
-export type CountryStatus = "active" | "inactive";
+export type CountryStatus =
+  | "active"
+  | "inactive";
 
 export type Country = {
   id: string;
@@ -16,6 +18,9 @@ export type Country = {
   currencyNameEn: string;
 
   timezone: string;
+
+  latitude: number | null;
+  longitude: number | null;
 
   flagMediaId: string | null;
   flagUrl?: string;

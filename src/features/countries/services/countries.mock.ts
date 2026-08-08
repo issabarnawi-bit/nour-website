@@ -18,6 +18,9 @@ export const countriesMock: Country[] = [
 
     timezone: "Asia/Riyadh",
 
+    latitude: 23.8859,
+    longitude: 45.0792,
+
     flagMediaId: null,
     flagUrl: undefined,
 

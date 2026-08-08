@@ -5,18 +5,29 @@ import type { Country } from "../types";
 
 type CountryRow = {
   id: string;
+
   name_ar: string;
   name_en: string;
+
   iso2: string;
   iso3: string;
+
   phone_code: string;
+
   currency_code: string;
   currency_name_ar: string;
   currency_name_en: string;
+
   timezone: string;
+
+  latitude: number | string | null;
+  longitude: number | string | null;
+
   flag_media_id: string | null;
+
   is_active: boolean;
   sort_order: number;
+
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
@@ -39,6 +50,8 @@ const countryColumns = `
   currency_name_ar,
   currency_name_en,
   timezone,
+  latitude,
+  longitude,
   flag_media_id,
   is_active,
   sort_order,
@@ -46,6 +59,24 @@ const countryColumns = `
   updated_at,
   deleted_at
 `;
+
+function normalizeCoordinate(
+  value: number | string | null,
+): number | null {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+    return null;
+  }
+
+  const parsedValue = Number(value);
+
+  return Number.isFinite(parsedValue)
+    ? parsedValue
+    : null;
+}
 
 function getPublicMediaUrl(
   supabase: SupabaseClient,
@@ -83,6 +114,14 @@ function mapCountry(
 
     timezone: row.timezone,
 
+    latitude: normalizeCoordinate(
+      row.latitude,
+    ),
+
+    longitude: normalizeCoordinate(
+      row.longitude,
+    ),
+
     flagMediaId: row.flag_media_id,
     flagUrl,
 
@@ -101,13 +140,16 @@ async function getMediaMap(
   supabase: SupabaseClient,
   mediaIds: string[],
 ) {
-  const mediaMap = new Map<string, MediaRow>();
+  const mediaMap =
+    new Map<string, MediaRow>();
 
   if (mediaIds.length === 0) {
     return mediaMap;
   }
 
-  const uniqueMediaIds = [...new Set(mediaIds)];
+  const uniqueMediaIds = [
+    ...new Set(mediaIds),
+  ];
 
   const { data, error } = await supabase
     .from("media")
@@ -121,7 +163,9 @@ async function getMediaMap(
     );
   }
 
-  (data as MediaRow[] | null)?.forEach((media) => {
+  (
+    data as MediaRow[] | null
+  )?.forEach((media) => {
     mediaMap.set(media.id, media);
   });
 
@@ -135,8 +179,12 @@ export async function getCountries(
     .from("countries")
     .select(countryColumns)
     .is("deleted_at", null)
-    .order("sort_order", { ascending: true })
-    .order("name_en", { ascending: true });
+    .order("sort_order", {
+      ascending: true,
+    })
+    .order("name_en", {
+      ascending: true,
+    });
 
   if (error) {
     throw new Error(
@@ -144,10 +192,14 @@ export async function getCountries(
     );
   }
 
-  const countryRows = (data ?? []) as CountryRow[];
+  const countryRows =
+    (data ?? []) as CountryRow[];
 
   const mediaIds = countryRows
-    .map((country) => country.flag_media_id)
+    .map(
+      (country) =>
+        country.flag_media_id,
+    )
     .filter(
       (mediaId): mediaId is string =>
         typeof mediaId === "string",
@@ -158,18 +210,27 @@ export async function getCountries(
     mediaIds,
   );
 
-  return countryRows.map((country) => {
-    const media = country.flag_media_id
-      ? mediaMap.get(country.flag_media_id)
-      : undefined;
+  return countryRows.map(
+    (country) => {
+      const media =
+        country.flag_media_id
+          ? mediaMap.get(
+              country.flag_media_id,
+            )
+          : undefined;
 
-    const flagUrl = getPublicMediaUrl(
-      supabase,
-      media,
-    );
+      const flagUrl =
+        getPublicMediaUrl(
+          supabase,
+          media,
+        );
 
-    return mapCountry(country, flagUrl);
-  });
+      return mapCountry(
+        country,
+        flagUrl,
+      );
+    },
+  );
 }
 
 export async function createCountry(
@@ -180,8 +241,11 @@ export async function createCountry(
   const { data, error } = await supabase
     .from("countries")
     .insert({
-      name_ar: values.nameAr.trim(),
-      name_en: values.nameEn.trim(),
+      name_ar:
+        values.nameAr.trim(),
+
+      name_en:
+        values.nameEn.trim(),
 
       iso2: values.iso2
         .trim()
@@ -191,11 +255,13 @@ export async function createCountry(
         .trim()
         .toUpperCase(),
 
-      phone_code: values.phoneCode.trim(),
+      phone_code:
+        values.phoneCode.trim(),
 
-      currency_code: values.currencyCode
-        .trim()
-        .toUpperCase(),
+      currency_code:
+        values.currencyCode
+          .trim()
+          .toUpperCase(),
 
       currency_name_ar:
         values.currencyNameAr.trim(),
@@ -203,7 +269,11 @@ export async function createCountry(
       currency_name_en:
         values.currencyNameEn.trim(),
 
-      timezone: values.timezone.trim(),
+      timezone:
+        values.timezone.trim(),
+
+      latitude: values.latitude,
+      longitude: values.longitude,
 
       flag_media_id: flagMediaId,
 
@@ -219,23 +289,34 @@ export async function createCountry(
     );
   }
 
-  const countryRow = data as CountryRow;
+  const countryRow =
+    data as CountryRow;
 
-  let flagUrl: string | undefined;
+  let flagUrl:
+    | string
+    | undefined;
 
   if (countryRow.flag_media_id) {
-    const mediaMap = await getMediaMap(
-      supabase,
-      [countryRow.flag_media_id],
-    );
+    const mediaMap =
+      await getMediaMap(
+        supabase,
+        [
+          countryRow.flag_media_id,
+        ],
+      );
 
     flagUrl = getPublicMediaUrl(
       supabase,
-      mediaMap.get(countryRow.flag_media_id),
+      mediaMap.get(
+        countryRow.flag_media_id,
+      ),
     );
   }
 
-  return mapCountry(countryRow, flagUrl);
+  return mapCountry(
+    countryRow,
+    flagUrl,
+  );
 }
 
 export async function updateCountry(
@@ -247,18 +328,42 @@ export async function updateCountry(
   const { data, error } = await supabase
     .from("countries")
     .update({
-      name_ar: values.nameAr.trim(),
-      name_en: values.nameEn.trim(),
-      iso2: values.iso2.trim().toUpperCase(),
-      iso3: values.iso3.trim().toUpperCase(),
-      phone_code: values.phoneCode.trim(),
-      currency_code: values.currencyCode
+      name_ar:
+        values.nameAr.trim(),
+
+      name_en:
+        values.nameEn.trim(),
+
+      iso2: values.iso2
         .trim()
         .toUpperCase(),
-      currency_name_ar: values.currencyNameAr.trim(),
-      currency_name_en: values.currencyNameEn.trim(),
-      timezone: values.timezone.trim(),
+
+      iso3: values.iso3
+        .trim()
+        .toUpperCase(),
+
+      phone_code:
+        values.phoneCode.trim(),
+
+      currency_code:
+        values.currencyCode
+          .trim()
+          .toUpperCase(),
+
+      currency_name_ar:
+        values.currencyNameAr.trim(),
+
+      currency_name_en:
+        values.currencyNameEn.trim(),
+
+      timezone:
+        values.timezone.trim(),
+
+      latitude: values.latitude,
+      longitude: values.longitude,
+
       flag_media_id: flagMediaId,
+
       is_active: values.isActive,
       sort_order: values.sortOrder,
     })
@@ -272,23 +377,34 @@ export async function updateCountry(
     );
   }
 
-  const countryRow = data as CountryRow;
+  const countryRow =
+    data as CountryRow;
 
-  let flagUrl: string | undefined;
+  let flagUrl:
+    | string
+    | undefined;
 
   if (countryRow.flag_media_id) {
-    const mediaMap = await getMediaMap(
-      supabase,
-      [countryRow.flag_media_id],
-    );
+    const mediaMap =
+      await getMediaMap(
+        supabase,
+        [
+          countryRow.flag_media_id,
+        ],
+      );
 
     flagUrl = getPublicMediaUrl(
       supabase,
-      mediaMap.get(countryRow.flag_media_id),
+      mediaMap.get(
+        countryRow.flag_media_id,
+      ),
     );
   }
 
-  return mapCountry(countryRow, flagUrl);
+  return mapCountry(
+    countryRow,
+    flagUrl,
+  );
 }
 
 export async function updateCountryStatus(
@@ -317,7 +433,9 @@ export async function softDeleteCountry(
   const { data, error } = await supabase
     .from("countries")
     .update({
-      deleted_at: new Date().toISOString(),
+      deleted_at:
+        new Date().toISOString(),
+
       is_active: false,
     })
     .eq("id", countryId)
@@ -355,6 +473,7 @@ export async function restoreCountry(
     );
   }
 }
+
 export async function getDeletedCountries(
   supabase: SupabaseClient,
 ): Promise<Country[]> {
@@ -362,7 +481,9 @@ export async function getDeletedCountries(
     .from("countries")
     .select(countryColumns)
     .not("deleted_at", "is", null)
-    .order("deleted_at", { ascending: false });
+    .order("deleted_at", {
+      ascending: false,
+    });
 
   if (error) {
     throw new Error(
@@ -370,10 +491,14 @@ export async function getDeletedCountries(
     );
   }
 
-  const countryRows = (data ?? []) as CountryRow[];
+  const countryRows =
+    (data ?? []) as CountryRow[];
 
   const mediaIds = countryRows
-    .map((country) => country.flag_media_id)
+    .map(
+      (country) =>
+        country.flag_media_id,
+    )
     .filter(
       (mediaId): mediaId is string =>
         typeof mediaId === "string",
@@ -384,16 +509,25 @@ export async function getDeletedCountries(
     mediaIds,
   );
 
-  return countryRows.map((country) => {
-    const media = country.flag_media_id
-      ? mediaMap.get(country.flag_media_id)
-      : undefined;
+  return countryRows.map(
+    (country) => {
+      const media =
+        country.flag_media_id
+          ? mediaMap.get(
+              country.flag_media_id,
+            )
+          : undefined;
 
-    const flagUrl = getPublicMediaUrl(
-      supabase,
-      media,
-    );
+      const flagUrl =
+        getPublicMediaUrl(
+          supabase,
+          media,
+        );
 
-    return mapCountry(country, flagUrl);
-  });
+      return mapCountry(
+        country,
+        flagUrl,
+      );
+    },
+  );
 }

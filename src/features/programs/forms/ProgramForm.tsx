@@ -7,9 +7,12 @@ import MediaUploader from "../../../components/ui/media/MediaUploader";
 import { useLanguage } from "../../../core/i18n";
 
 import type {
+    ProgramFlightFormValue,
   ProgramFormValues,
+  ProgramHotelFormValue,
   ProgramStatus,
 } from "../types";
+
 
 type CountryOption = {
   id: string;
@@ -17,9 +20,19 @@ type CountryOption = {
   nameEn: string;
 };
 
+type HotelOption = {
+  id: string;
+  nameAr: string;
+  nameEn: string;
+  cityAr?: string;
+  cityEn?: string;
+  stars?: number;
+};
+
 type ProgramFormProps = {
   initialValues?: Partial<ProgramFormValues>;
   countries?: CountryOption[];
+  hotels?: HotelOption[];
   onSubmit: (values: ProgramFormValues) => Promise<void>;
   isSubmitting?: boolean;
 };
@@ -42,11 +55,65 @@ const defaultValues: ProgramFormValues = {
   isActive: true,
   sortOrder: 0,
   coverFile: null,
+  hotels: [],
+  flightInclusion: "dynamic",
+  flightNotesAr: "",
+  flightNotesEn: "",
+  flights: [],
+};
+
+const emptyHotel: ProgramHotelFormValue = {
+  hotelId: "",
+  nights: 1,
+  roomTypeAr: "",
+  roomTypeEn: "",
+  mealPlanAr: "",
+  mealPlanEn: "",
+  checkInDate: "",
+  checkOutDate: "",
+  notesAr: "",
+  notesEn: "",
+  sortOrder: 0,
+};
+
+const emptyFlight: ProgramFlightFormValue = {
+  direction: "outbound",
+
+  airlineNameAr: "",
+  airlineNameEn: "",
+
+  flightNumber: "",
+
+  departureAirportAr: "",
+  departureAirportEn: "",
+
+  arrivalAirportAr: "",
+  arrivalAirportEn: "",
+
+  departureAt: "",
+  arrivalAt: "",
+
+  flightType: "direct",
+
+  transitAirportAr: "",
+  transitAirportEn: "",
+  transitDurationMinutes: 0,
+
+  cabinClassAr: "",
+  cabinClassEn: "",
+
+  baggageAllowanceKg: 0,
+
+  notesAr: "",
+  notesEn: "",
+
+  sortOrder: 0,
 };
 
 export default function ProgramForm({
   initialValues,
   countries = [],
+  hotels = [],
   onSubmit,
   isSubmitting = false,
 }: ProgramFormProps) {
@@ -54,11 +121,18 @@ export default function ProgramForm({
   const isArabic = language === "ar";
 
   const [values, setValues] =
-    useState<ProgramFormValues>({
-      ...defaultValues,
-      ...initialValues,
-      coverFile: null,
-    });
+  useState<ProgramFormValues>({
+    ...defaultValues,
+    ...initialValues,
+
+    coverFile: null,
+
+    hotels:
+      initialValues?.hotels ?? [],
+
+    flights:
+      initialValues?.flights ?? [],
+  });
 
   function updateValue<K extends keyof ProgramFormValues>(
     key: K,
@@ -70,10 +144,170 @@ export default function ProgramForm({
     }));
   }
 
+  function addHotel() {
+    setValues((currentValues) => ({
+      ...currentValues,
+      hotels: [
+        ...currentValues.hotels,
+        {
+          ...emptyHotel,
+          sortOrder: currentValues.hotels.length,
+        },
+      ],
+    }));
+  }
+
+  function removeHotel(index: number) {
+    setValues((currentValues) => ({
+      ...currentValues,
+      hotels: currentValues.hotels
+        .filter((_, currentIndex) => currentIndex !== index)
+        .map((hotel, currentIndex) => ({
+          ...hotel,
+          sortOrder: currentIndex,
+        })),
+    }));
+  }
+
+  function updateHotel<
+    K extends keyof ProgramHotelFormValue,
+  >(
+    index: number,
+    key: K,
+    value: ProgramHotelFormValue[K],
+  ) {
+    setValues((currentValues) => ({
+      ...currentValues,
+      hotels: currentValues.hotels.map(
+        (hotel, currentIndex) =>
+          currentIndex === index
+            ? {
+                ...hotel,
+                [key]: value,
+              }
+            : hotel,
+      ),
+    }));
+  }
+
+  function addFlight() {
+  setValues((currentValues) => ({
+    ...currentValues,
+
+    flights: [
+      ...currentValues.flights,
+
+      {
+        ...emptyFlight,
+        sortOrder:
+          currentValues.flights.length,
+      },
+    ],
+  }));
+}
+
+function removeFlight(index: number) {
+  setValues((currentValues) => ({
+    ...currentValues,
+
+    flights:
+      currentValues.flights
+        .filter(
+          (_, currentIndex) =>
+            currentIndex !== index,
+        )
+        .map(
+          (flight, currentIndex) => ({
+            ...flight,
+            sortOrder: currentIndex,
+          }),
+        ),
+  }));
+}
+
+function updateFlight<
+  K extends keyof ProgramFlightFormValue,
+>(
+  index: number,
+  key: K,
+  value: ProgramFlightFormValue[K],
+) {
+  setValues((currentValues) => ({
+    ...currentValues,
+
+    flights:
+      currentValues.flights.map(
+        (flight, currentIndex) =>
+          currentIndex === index
+            ? {
+                ...flight,
+                [key]: value,
+              }
+            : flight,
+      ),
+  }));
+}
+
   async function handleSubmit(
     event: React.FormEvent<HTMLFormElement>,
   ) {
     event.preventDefault();
+
+    const selectedHotelIds = values.hotels
+      .map((hotel) => hotel.hotelId)
+      .filter(Boolean);
+
+    if (
+      new Set(selectedHotelIds).size !==
+      selectedHotelIds.length
+    ) {
+      window.alert(
+        isArabic
+          ? "لا يمكن إضافة الفندق نفسه أكثر من مرة داخل البرنامج."
+          : "The same hotel cannot be added more than once.",
+      );
+      return;
+    }
+
+    const invalidHotel = values.hotels.find(
+      (hotel) =>
+        !hotel.hotelId ||
+        hotel.nights < 0 ||
+        (hotel.checkInDate &&
+          hotel.checkOutDate &&
+          hotel.checkOutDate < hotel.checkInDate),
+    );
+
+    if (invalidHotel) {
+      window.alert(
+        isArabic
+          ? "راجع بيانات الفنادق وتأكد من اختيار الفندق وعدد الليالي وتواريخ الدخول والخروج."
+          : "Please review the hotel, nights, and check-in/check-out dates.",
+      );
+      return;
+    }
+
+    const invalidFlight = values.flights.find(
+      (flight) =>
+        !flight.airlineNameAr.trim() ||
+        !flight.airlineNameEn.trim() ||
+        !flight.departureAirportAr.trim() ||
+        !flight.departureAirportEn.trim() ||
+        !flight.arrivalAirportAr.trim() ||
+        !flight.arrivalAirportEn.trim() ||
+        (flight.departureAt &&
+          flight.arrivalAt &&
+          flight.arrivalAt < flight.departureAt),
+    );
+
+    if (invalidFlight) {
+      window.alert(
+        isArabic
+          ? "راجع بيانات الرحلات وتأكد من شركة الطيران والمطارات ومواعيد الإقلاع والوصول."
+          : "Please review airline, airport, departure and arrival information.",
+      );
+      return;
+    }
 
     await onSubmit({
       ...values,
@@ -85,6 +319,35 @@ export default function ProgramForm({
       descriptionAr: values.descriptionAr.trim(),
       descriptionEn: values.descriptionEn.trim(),
       currencyCode: values.currencyCode.trim().toUpperCase(),
+      flightNotesAr: values.flightNotesAr.trim(),
+      flightNotesEn: values.flightNotesEn.trim(),
+      hotels: values.hotels.map((hotel, index) => ({
+        ...hotel,
+        roomTypeAr: hotel.roomTypeAr.trim(),
+        roomTypeEn: hotel.roomTypeEn.trim(),
+        mealPlanAr: hotel.mealPlanAr.trim(),
+        mealPlanEn: hotel.mealPlanEn.trim(),
+        notesAr: hotel.notesAr.trim(),
+        notesEn: hotel.notesEn.trim(),
+        sortOrder: index,
+      })),
+      flights: values.flights.map((flight, index) => ({
+        ...flight,
+        airlineNameAr: flight.airlineNameAr.trim(),
+        airlineNameEn: flight.airlineNameEn.trim(),
+        flightNumber: flight.flightNumber.trim(),
+        departureAirportAr: flight.departureAirportAr.trim(),
+        departureAirportEn: flight.departureAirportEn.trim(),
+        arrivalAirportAr: flight.arrivalAirportAr.trim(),
+        arrivalAirportEn: flight.arrivalAirportEn.trim(),
+        transitAirportAr: flight.transitAirportAr.trim(),
+        transitAirportEn: flight.transitAirportEn.trim(),
+        cabinClassAr: flight.cabinClassAr.trim(),
+        cabinClassEn: flight.cabinClassEn.trim(),
+        notesAr: flight.notesAr.trim(),
+        notesEn: flight.notesEn.trim(),
+        sortOrder: index,
+      })),
     });
   }
 
@@ -192,375 +455,1191 @@ export default function ProgramForm({
       </section>
 
       <section className="nr-country-form-section">
-  <div className="nr-country-form-section-heading">
-    <span>02</span>
+        <div className="nr-country-form-section-heading">
+          <span>02</span>
 
-    <div>
-      <h3>
-        {isArabic
-          ? "المحتوى والوصف"
-          : "Content and Description"}
-      </h3>
+          <div>
+            <h3>
+              {isArabic
+                ? "المحتوى والوصف"
+                : "Content and Description"}
+            </h3>
 
-      <p>
-        {isArabic
-          ? "أضف ملخصًا قصيرًا ووصفًا تفصيليًا للبرنامج."
-          : "Add a short summary and a detailed program description."}
-      </p>
-    </div>
-  </div>
+            <p>
+              {isArabic
+                ? "أضف ملخصًا قصيرًا ووصفًا تفصيليًا للبرنامج."
+                : "Add a short summary and a detailed program description."}
+            </p>
+          </div>
+        </div>
 
-  <div className="nr-country-form-grid">
-    <label>
-      <span>
-        {isArabic
-          ? "الملخص بالعربية"
-          : "Arabic Summary"}
-      </span>
+        <div className="nr-country-form-grid">
+          <label>
+            <span>
+              {isArabic
+                ? "الملخص بالعربية"
+                : "Arabic Summary"}
+            </span>
 
-      <textarea
-        className="nr-input"
-        rows={4}
-        value={values.summaryAr}
-        onChange={(event) =>
-          updateValue(
-            "summaryAr",
-            event.target.value,
-          )
-        }
-        required
-      />
-    </label>
+            <textarea
+              className="nr-input"
+              rows={4}
+              value={values.summaryAr}
+              onChange={(event) =>
+                updateValue(
+                  "summaryAr",
+                  event.target.value,
+                )
+              }
+              required
+            />
+          </label>
 
-    <label>
-      <span>
-        {isArabic
-          ? "الملخص بالإنجليزية"
-          : "English Summary"}
-      </span>
+          <label>
+            <span>
+              {isArabic
+                ? "الملخص بالإنجليزية"
+                : "English Summary"}
+            </span>
 
-      <textarea
-        className="nr-input"
-        rows={4}
-        value={values.summaryEn}
-        onChange={(event) =>
-          updateValue(
-            "summaryEn",
-            event.target.value,
-          )
-        }
-        required
-      />
-    </label>
+            <textarea
+              className="nr-input"
+              rows={4}
+              value={values.summaryEn}
+              onChange={(event) =>
+                updateValue(
+                  "summaryEn",
+                  event.target.value,
+                )
+              }
+              required
+            />
+          </label>
 
-    <label>
-      <span>
-        {isArabic
-          ? "الوصف بالعربية"
-          : "Arabic Description"}
-      </span>
+          <label>
+            <span>
+              {isArabic
+                ? "الوصف بالعربية"
+                : "Arabic Description"}
+            </span>
 
-      <textarea
-        className="nr-input"
-        rows={7}
-        value={values.descriptionAr}
-        onChange={(event) =>
-          updateValue(
-            "descriptionAr",
-            event.target.value,
-          )
-        }
-        required
-      />
-    </label>
+            <textarea
+              className="nr-input"
+              rows={7}
+              value={values.descriptionAr}
+              onChange={(event) =>
+                updateValue(
+                  "descriptionAr",
+                  event.target.value,
+                )
+              }
+              required
+            />
+          </label>
 
-    <label>
-      <span>
-        {isArabic
-          ? "الوصف بالإنجليزية"
-          : "English Description"}
-      </span>
+          <label>
+            <span>
+              {isArabic
+                ? "الوصف بالإنجليزية"
+                : "English Description"}
+            </span>
 
-      <textarea
-        className="nr-input"
-        rows={7}
-        value={values.descriptionEn}
-        onChange={(event) =>
-          updateValue(
-            "descriptionEn",
-            event.target.value,
-          )
-        }
-        required
-      />
-    </label>
-  </div>
-</section>
+            <textarea
+              className="nr-input"
+              rows={7}
+              value={values.descriptionEn}
+              onChange={(event) =>
+                updateValue(
+                  "descriptionEn",
+                  event.target.value,
+                )
+              }
+              required
+            />
+          </label>
+        </div>
+      </section>
 
-<section className="nr-country-form-section">
-  <div className="nr-country-form-section-heading">
-    <span>03</span>
+      <section className="nr-country-form-section">
+        <div className="nr-country-form-section-heading">
+          <span>03</span>
 
-    <div>
-      <h3>
-        {isArabic
-          ? "تفاصيل البرنامج"
-          : "Program Details"}
-      </h3>
+          <div>
+            <h3>
+              {isArabic
+                ? "تفاصيل البرنامج"
+                : "Program Details"}
+            </h3>
 
-      <p>
-        {isArabic
-          ? "حدد الدولة والمدة والسعر الأساسي."
-          : "Select the country, duration and base price."}
-      </p>
-    </div>
-  </div>
+            <p>
+              {isArabic
+                ? "حدد الدولة والمدة والسعر الأساسي."
+                : "Select the country, duration and base price."}
+            </p>
+          </div>
+        </div>
 
-  <div className="nr-country-form-grid">
-    <label>
-      <span>
-        {isArabic ? "الدولة" : "Country"}
-      </span>
+        <div className="nr-country-form-grid">
+          <label>
+            <span>
+              {isArabic ? "الدولة" : "Country"}
+            </span>
 
-      <select
-        className="nr-input"
-        value={values.countryId}
-        onChange={(event) =>
-          updateValue(
-            "countryId",
-            event.target.value,
-          )
-        }
-        required
-      >
-        <option value="">
-          {isArabic
-            ? "اختر الدولة"
-            : "Select a country"}
-        </option>
+            <select
+              className="nr-input"
+              value={values.countryId}
+              onChange={(event) =>
+                updateValue(
+                  "countryId",
+                  event.target.value,
+                )
+              }
+              required
+            >
+              <option value="">
+                {isArabic
+                  ? "اختر الدولة"
+                  : "Select a country"}
+              </option>
 
-        {countries.map((country) => (
-          <option
-            key={country.id}
-            value={country.id}
+              {countries.map((country) => (
+                <option
+                  key={country.id}
+                  value={country.id}
+                >
+                  {isArabic
+                    ? country.nameAr
+                    : country.nameEn}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label>
+            <span>
+              {isArabic
+                ? "عدد الأيام"
+                : "Duration in Days"}
+            </span>
+
+            <input
+              className="nr-input"
+              type="number"
+              min={1}
+              value={values.durationDays}
+              onChange={(event) =>
+                updateValue(
+                  "durationDays",
+                  Number(event.target.value),
+                )
+              }
+              required
+            />
+          </label>
+
+          <label>
+            <span>
+              {isArabic
+                ? "عدد الليالي"
+                : "Duration in Nights"}
+            </span>
+
+            <input
+              className="nr-input"
+              type="number"
+              min={0}
+              value={values.durationNights}
+              onChange={(event) =>
+                updateValue(
+                  "durationNights",
+                  Number(event.target.value),
+                )
+              }
+              required
+            />
+          </label>
+
+          <label>
+            <span>
+              {isArabic
+                ? "السعر الأساسي"
+                : "Base Price"}
+            </span>
+
+            <input
+              className="nr-input"
+              type="number"
+              min={0}
+              step="0.01"
+              value={values.basePrice}
+              onChange={(event) =>
+                updateValue(
+                  "basePrice",
+                  Number(event.target.value),
+                )
+              }
+              required
+            />
+          </label>
+
+          <label>
+            <span>
+              {isArabic
+                ? "رمز العملة"
+                : "Currency Code"}
+            </span>
+
+            <input
+              className="nr-input"
+              maxLength={3}
+              value={values.currencyCode}
+              onChange={(event) =>
+                updateValue(
+                  "currencyCode",
+                  event.target.value
+                    .toUpperCase()
+                    .replace(/[^A-Z]/g, "")
+                    .slice(0, 3),
+                )
+              }
+              placeholder="SAR"
+              required
+            />
+          </label>
+        </div>
+      </section>
+
+      <section className="nr-country-form-section">
+        <div className="nr-country-form-section-heading nr-program-hotel-heading">
+          <span>04</span>
+
+          <div>
+            <h3>
+              {isArabic
+                ? "الإقامة والفنادق"
+                : "Hotels & Accommodation"}
+            </h3>
+
+            <p>
+              {isArabic
+                ? "أضف فندقًا أو أكثر وحدد تفاصيل الإقامة."
+                : "Add one or more hotels and accommodation details."}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            className="nr-program-add-hotel"
+            onClick={addHotel}
           >
             {isArabic
-              ? country.nameAr
-              : country.nameEn}
-          </option>
-        ))}
-      </select>
-    </label>
+              ? "+ إضافة فندق"
+              : "+ Add Hotel"}
+          </button>
+        </div>
 
-    <label>
-      <span>
-        {isArabic
-          ? "عدد الأيام"
-          : "Duration in Days"}
-      </span>
+        {values.hotels.length === 0 ? (
+          <div className="nr-program-hotels-empty">
+            {isArabic
+              ? "لا توجد فنادق مرتبطة بالبرنامج."
+              : "No hotels linked to this program."}
+          </div>
+        ) : (
+          <div className="nr-program-hotels-list">
+            {values.hotels.map(
+              (hotel, index) => (
+                <article
+                  key={`${hotel.hotelId || "new"}-${index}`}
+                  className="nr-program-hotel-card"
+                >
+                  <div className="nr-program-hotel-card-header">
+                    <strong>
+                      {isArabic
+                        ? `الإقامة ${index + 1}`
+                        : `Accommodation ${index + 1}`}
+                    </strong>
 
-      <input
-        className="nr-input"
-        type="number"
-        min={1}
-        value={values.durationDays}
-        onChange={(event) =>
-          updateValue(
-            "durationDays",
-            Number(event.target.value),
-          )
-        }
-        required
-      />
-    </label>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        removeHotel(index)
+                      }
+                    >
+                      {isArabic
+                        ? "إزالة"
+                        : "Remove"}
+                    </button>
+                  </div>
 
-    <label>
-      <span>
-        {isArabic
-          ? "عدد الليالي"
-          : "Duration in Nights"}
-      </span>
+                  <div className="nr-country-form-grid">
+                    <label>
+                      <span>
+                        {isArabic
+                          ? "الفندق"
+                          : "Hotel"}
+                      </span>
 
-      <input
-        className="nr-input"
-        type="number"
-        min={0}
-        value={values.durationNights}
-        onChange={(event) =>
-          updateValue(
-            "durationNights",
-            Number(event.target.value),
-          )
-        }
-        required
-      />
-    </label>
+                      <select
+                        className="nr-input"
+                        value={hotel.hotelId}
+                        onChange={(event) =>
+                          updateHotel(
+                            index,
+                            "hotelId",
+                            event.target.value,
+                          )
+                        }
+                        required
+                      >
+                        <option value="">
+                          {isArabic
+                            ? "اختر الفندق"
+                            : "Select Hotel"}
+                        </option>
 
-    <label>
-      <span>
-        {isArabic
-          ? "السعر الأساسي"
-          : "Base Price"}
-      </span>
+                        {hotels.map((option) => {
+                          const usedElsewhere =
+                            values.hotels.some(
+                              (entry, entryIndex) =>
+                                entryIndex !== index &&
+                                entry.hotelId === option.id,
+                            );
 
-      <input
-        className="nr-input"
-        type="number"
-        min={0}
-        step="0.01"
-        value={values.basePrice}
-        onChange={(event) =>
-          updateValue(
-            "basePrice",
-            Number(event.target.value),
-          )
-        }
-        required
-      />
-    </label>
+                          const displayName =
+                            isArabic
+                              ? `${option.nameAr}${
+                                  option.cityAr
+                                    ? ` — ${option.cityAr}`
+                                    : ""
+                                }`
+                              : `${option.nameEn}${
+                                  option.cityEn
+                                    ? ` — ${option.cityEn}`
+                                    : ""
+                                }`;
 
-    <label>
-      <span>
-        {isArabic
-          ? "رمز العملة"
-          : "Currency Code"}
-      </span>
+                          return (
+                            <option
+                              key={option.id}
+                              value={option.id}
+                              disabled={usedElsewhere}
+                            >
+                              {displayName}
+                            </option>
+                          );
+                        })}
+                      </select>
+                    </label>
 
-      <input
-        className="nr-input"
-        maxLength={3}
-        value={values.currencyCode}
-        onChange={(event) =>
-          updateValue(
-            "currencyCode",
-            event.target.value
-              .toUpperCase()
-              .replace(/[^A-Z]/g, "")
-              .slice(0, 3),
-          )
-        }
-        placeholder="SAR"
-        required
-      />
-    </label>
-  </div>
-</section>
+                    <label>
+                      <span>
+                        {isArabic
+                          ? "عدد الليالي"
+                          : "Nights"}
+                      </span>
 
-<section className="nr-country-form-section">
-  <div className="nr-country-form-section-heading">
-    <span>04</span>
+                      <input
+                        className="nr-input"
+                        type="number"
+                        min={0}
+                        value={hotel.nights}
+                        onChange={(event) =>
+                          updateHotel(
+                            index,
+                            "nights",
+                            Math.max(
+                              0,
+                              Number(event.target.value) || 0,
+                            ),
+                          )
+                        }
+                        required
+                      />
+                    </label>
 
-    <div>
-      <h3>
-        {isArabic
-          ? "إعدادات النشر"
-          : "Publishing Settings"}
-      </h3>
+                    <label>
+                      <span>
+                        {isArabic
+                          ? "نوع الغرفة بالعربية"
+                          : "Room Type Arabic"}
+                      </span>
 
-      <p>
-        {isArabic
-          ? "حدد حالة البرنامج وظهوره داخل المنصة."
-          : "Control the program status and visibility."}
-      </p>
-    </div>
-  </div>
+                      <input
+                        className="nr-input"
+                        value={hotel.roomTypeAr}
+                        onChange={(event) =>
+                          updateHotel(
+                            index,
+                            "roomTypeAr",
+                            event.target.value,
+                          )
+                        }
+                        placeholder="غرفة مزدوجة"
+                      />
+                    </label>
 
-  <div className="nr-country-form-grid">
-    <label>
-      <span>
-        {isArabic
-          ? "حالة البرنامج"
-          : "Program Status"}
-      </span>
+                    <label>
+                      <span>
+                        {isArabic
+                          ? "نوع الغرفة بالإنجليزية"
+                          : "Room Type English"}
+                      </span>
 
-      <select
-        className="nr-input"
-        value={values.status}
-        onChange={(event) =>
-          updateValue(
-            "status",
-            event.target.value as ProgramStatus,
-          )
-        }
-        required
-      >
-        <option value="draft">
-          {isArabic ? "مسودة" : "Draft"}
-        </option>
+                      <input
+                        className="nr-input"
+                        value={hotel.roomTypeEn}
+                        onChange={(event) =>
+                          updateHotel(
+                            index,
+                            "roomTypeEn",
+                            event.target.value,
+                          )
+                        }
+                        placeholder="Double Room"
+                      />
+                    </label>
 
-        <option value="published">
-          {isArabic ? "منشور" : "Published"}
-        </option>
+                    <label>
+                      <span>
+                        {isArabic
+                          ? "الوجبات بالعربية"
+                          : "Meal Plan Arabic"}
+                      </span>
 
-        <option value="inactive">
-          {isArabic ? "غير نشط" : "Inactive"}
-        </option>
-      </select>
-    </label>
+                      <input
+                        className="nr-input"
+                        value={hotel.mealPlanAr}
+                        onChange={(event) =>
+                          updateHotel(
+                            index,
+                            "mealPlanAr",
+                            event.target.value,
+                          )
+                        }
+                        placeholder="إفطار شامل"
+                      />
+                    </label>
 
-    <label>
-      <span>
-        {isArabic
-          ? "ترتيب الظهور"
-          : "Display Order"}
-      </span>
+                    <label>
+                      <span>
+                        {isArabic
+                          ? "الوجبات بالإنجليزية"
+                          : "Meal Plan English"}
+                      </span>
 
-      <input
-        className="nr-input"
-        type="number"
-        min={0}
-        value={values.sortOrder}
-        onChange={(event) =>
-          updateValue(
-            "sortOrder",
-            Number(event.target.value),
-          )
-        }
-        required
-      />
-    </label>
-  </div>
+                      <input
+                        className="nr-input"
+                        value={hotel.mealPlanEn}
+                        onChange={(event) =>
+                          updateHotel(
+                            index,
+                            "mealPlanEn",
+                            event.target.value,
+                          )
+                        }
+                        placeholder="Breakfast Included"
+                      />
+                    </label>
 
-  <div className="nr-program-form-options">
-    <label className="nr-country-form-checkbox">
-      <input
-        type="checkbox"
-        checked={values.isActive}
-        onChange={(event) =>
-          updateValue(
-            "isActive",
-            event.target.checked,
-          )
-        }
-      />
+                    <label>
+                      <span>
+                        {isArabic
+                          ? "تاريخ الدخول"
+                          : "Check-in"}
+                      </span>
 
-      <span>
-        {isArabic
-          ? "البرنامج نشط ومتاح للعرض"
-          : "Program is active and visible"}
-      </span>
-    </label>
+                      <input
+                        className="nr-input"
+                        type="date"
+                        value={hotel.checkInDate}
+                        onChange={(event) =>
+                          updateHotel(
+                            index,
+                            "checkInDate",
+                            event.target.value,
+                          )
+                        }
+                      />
+                    </label>
 
-    <label className="nr-country-form-checkbox">
-      <input
-        type="checkbox"
-        checked={values.isFeatured}
-        onChange={(event) =>
-          updateValue(
-            "isFeatured",
-            event.target.checked,
-          )
-        }
-      />
+                    <label>
+                      <span>
+                        {isArabic
+                          ? "تاريخ الخروج"
+                          : "Check-out"}
+                      </span>
 
-      <span>
-        {isArabic
-          ? "برنامج مميز"
-          : "Featured Program"}
-      </span>
-    </label>
-  </div>
-</section>
+                      <input
+                        className="nr-input"
+                        type="date"
+                        min={hotel.checkInDate || undefined}
+                        value={hotel.checkOutDate}
+                        onChange={(event) =>
+                          updateHotel(
+                            index,
+                            "checkOutDate",
+                            event.target.value,
+                          )
+                        }
+                      />
+                    </label>
+
+                    <label>
+                      <span>
+                        {isArabic
+                          ? "ملاحظات بالعربية"
+                          : "Arabic Notes"}
+                      </span>
+
+                      <textarea
+                        className="nr-input"
+                        rows={3}
+                        value={hotel.notesAr}
+                        onChange={(event) =>
+                          updateHotel(
+                            index,
+                            "notesAr",
+                            event.target.value,
+                          )
+                        }
+                      />
+                    </label>
+
+                    <label>
+                      <span>
+                        {isArabic
+                          ? "ملاحظات بالإنجليزية"
+                          : "English Notes"}
+                      </span>
+
+                      <textarea
+                        className="nr-input"
+                        rows={3}
+                        value={hotel.notesEn}
+                        onChange={(event) =>
+                          updateHotel(
+                            index,
+                            "notesEn",
+                            event.target.value,
+                          )
+                        }
+                      />
+                    </label>
+                  </div>
+                </article>
+              ),
+            )}
+          </div>
+        )}
+
+        {hotels.length === 0 ? (
+          <p className="nr-program-hotels-warning">
+            {isArabic
+              ? "لا توجد فنادق متاحة في القائمة. تأكد من إضافة فندق مفعّل في وحدة الفنادق وربط القائمة من صفحة البرامج."
+              : "No hotels are available. Add an active hotel and pass the hotels list from the programs page."}
+          </p>
+        ) : null}
+      </section>
+
+      <section className="nr-country-form-section">
+        <div className="nr-country-form-section-heading">
+          <span>05</span>
+
+          <div>
+            <h3>
+              {isArabic
+                ? "إعدادات الطيران"
+                : "Flight Settings"}
+            </h3>
+
+            <p>
+              {isArabic
+                ? "حدد ما إذا كان الطيران مشمولًا أو غير مشمول أو يتم تسعيره حسب السعر المتاح وقت الحجز."
+                : "Choose whether flights are included, excluded, or dynamically priced at booking time."}
+            </p>
+          </div>
+        </div>
+
+        <div className="nr-flight-inclusion-grid">
+          {[
+            {
+              value: "included" as const,
+              titleAr: "الطيران مشمول",
+              titleEn: "Flight Included",
+              textAr: "تكلفة الطيران داخلة ضمن سعر البرنامج الأساسي.",
+              textEn: "Flight cost is included in the program base price.",
+            },
+            {
+              value: "excluded" as const,
+              titleAr: "الطيران غير مشمول",
+              titleEn: "Flight Not Included",
+              textAr: "سعر البرنامج لا يتضمن تذاكر الطيران.",
+              textEn: "The program price does not include flight tickets.",
+            },
+            {
+              value: "dynamic" as const,
+              titleAr: "السعر حسب وقت الحجز",
+              titleEn: "Dynamic at Booking",
+              textAr: "يتم تحديد سعر الطيران حسب السعر والتوفر وقت الحجز.",
+              textEn: "Flight price is determined by price and availability at booking time.",
+            },
+          ].map((option) => (
+            <label
+              key={option.value}
+              className={`nr-flight-inclusion-option ${
+                values.flightInclusion === option.value
+                  ? "is-selected"
+                  : ""
+              }`}
+            >
+              <input
+                type="radio"
+                name="flightInclusion"
+                value={option.value}
+                checked={values.flightInclusion === option.value}
+                onChange={() =>
+                  updateValue(
+                    "flightInclusion",
+                    option.value,
+                  )
+                }
+              />
+
+              <strong>
+                {isArabic
+                  ? option.titleAr
+                  : option.titleEn}
+              </strong>
+
+              <span>
+                {isArabic
+                  ? option.textAr
+                  : option.textEn}
+              </span>
+            </label>
+          ))}
+        </div>
+
+        {values.flightInclusion === "dynamic" ? (
+          <div className="nr-flight-dynamic-note">
+            <strong>
+              {isArabic
+                ? "التسعير الديناميكي"
+                : "Dynamic Pricing"}
+            </strong>
+
+            <span>
+              {isArabic
+                ? "لا يتم حفظ سعر ثابت للطيران، ويحدد السعر النهائي وقت الحجز."
+                : "No fixed flight price is stored; the final price is determined at booking time."}
+            </span>
+          </div>
+        ) : null}
+
+        <div className="nr-country-form-grid">
+          <label>
+            <span>
+              {isArabic
+                ? "ملاحظة الطيران بالعربية"
+                : "Arabic Flight Note"}
+            </span>
+
+            <textarea
+              className="nr-input"
+              rows={4}
+              value={values.flightNotesAr}
+              onChange={(event) =>
+                updateValue(
+                  "flightNotesAr",
+                  event.target.value,
+                )
+              }
+              placeholder="سعر الطيران يحدد حسب السعر المتاح وقت الحجز."
+            />
+          </label>
+
+          <label>
+            <span>
+              {isArabic
+                ? "ملاحظة الطيران بالإنجليزية"
+                : "English Flight Note"}
+            </span>
+
+            <textarea
+              className="nr-input"
+              rows={4}
+              value={values.flightNotesEn}
+              onChange={(event) =>
+                updateValue(
+                  "flightNotesEn",
+                  event.target.value,
+                )
+              }
+              placeholder="Flight price is determined by availability at booking time."
+            />
+          </label>
+        </div>
+      </section>
+
+      <section className="nr-country-form-section">
+        <div className="nr-country-form-section-heading nr-program-flight-heading">
+          <span>06</span>
+
+          <div>
+            <h3>
+              {isArabic ? "تفاصيل الرحلات" : "Flight Details"}
+            </h3>
+
+            <p>
+              {isArabic
+                ? "أضف رحلة ذهاب أو عودة وحدد شركة الطيران والمطارات والمواعيد والترانزيت والأمتعة."
+                : "Add outbound or return flights with airline, airports, timing, transit and baggage details."}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            className="nr-program-add-flight"
+            onClick={addFlight}
+          >
+            {isArabic ? "+ إضافة رحلة" : "+ Add Flight"}
+          </button>
+        </div>
+
+        {values.flights.length === 0 ? (
+          <div className="nr-program-flights-empty">
+            {isArabic
+              ? "لا توجد رحلات مرتبطة بالبرنامج."
+              : "No flights linked to this program."}
+          </div>
+        ) : (
+          <div className="nr-program-flights-list">
+            {values.flights.map((flight, index) => (
+              <article
+                key={`${flight.direction}-${flight.flightNumber || "new"}-${index}`}
+                className="nr-program-flight-card"
+              >
+                <div className="nr-program-flight-card-header">
+                  <div>
+                    <strong>
+                      {isArabic ? `الرحلة ${index + 1}` : `Flight ${index + 1}`}
+                    </strong>
+
+                    <span
+                      className={`nr-program-flight-direction ${
+                        flight.direction === "outbound"
+                          ? "is-outbound"
+                          : "is-return"
+                      }`}
+                    >
+                      {flight.direction === "outbound"
+                        ? isArabic ? "ذهاب" : "Outbound"
+                        : isArabic ? "عودة" : "Return"}
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => removeFlight(index)}
+                  >
+                    {isArabic ? "إزالة" : "Remove"}
+                  </button>
+                </div>
+
+                <div className="nr-country-form-grid">
+                  <label>
+                    <span>{isArabic ? "اتجاه الرحلة" : "Flight Direction"}</span>
+                    <select
+                      className="nr-input"
+                      value={flight.direction}
+                      onChange={(event) =>
+                        updateFlight(
+                          index,
+                          "direction",
+                          event.target.value as ProgramFlightFormValue["direction"],
+                        )
+                      }
+                    >
+                      <option value="outbound">{isArabic ? "ذهاب" : "Outbound"}</option>
+                      <option value="return">{isArabic ? "عودة" : "Return"}</option>
+                    </select>
+                  </label>
+
+                  <label>
+                    <span>{isArabic ? "نوع الرحلة" : "Flight Type"}</span>
+                    <select
+                      className="nr-input"
+                      value={flight.flightType}
+                      onChange={(event) =>
+                        updateFlight(
+                          index,
+                          "flightType",
+                          event.target.value as ProgramFlightFormValue["flightType"],
+                        )
+                      }
+                    >
+                      <option value="direct">{isArabic ? "مباشر" : "Direct"}</option>
+                      <option value="transit">{isArabic ? "ترانزيت" : "Transit"}</option>
+                    </select>
+                  </label>
+
+                  <label>
+                    <span>{isArabic ? "شركة الطيران بالعربية" : "Airline Arabic"}</span>
+                    <input
+                      className="nr-input"
+                      value={flight.airlineNameAr}
+                      onChange={(event) =>
+                        updateFlight(index, "airlineNameAr", event.target.value)
+                      }
+                      placeholder="الخطوط السعودية"
+                      required
+                    />
+                  </label>
+
+                  <label>
+                    <span>{isArabic ? "شركة الطيران بالإنجليزية" : "Airline English"}</span>
+                    <input
+                      className="nr-input"
+                      value={flight.airlineNameEn}
+                      onChange={(event) =>
+                        updateFlight(index, "airlineNameEn", event.target.value)
+                      }
+                      placeholder="Saudia"
+                      required
+                    />
+                  </label>
+
+                  <label>
+                    <span>{isArabic ? "رقم الرحلة" : "Flight Number"}</span>
+                    <input
+                      className="nr-input"
+                      value={flight.flightNumber}
+                      onChange={(event) =>
+                        updateFlight(
+                          index,
+                          "flightNumber",
+                          event.target.value.toUpperCase(),
+                        )
+                      }
+                      placeholder="SV123"
+                    />
+                  </label>
+
+                  <label>
+                    <span>{isArabic ? "مطار المغادرة بالعربية" : "Departure Airport Arabic"}</span>
+                    <input
+                      className="nr-input"
+                      value={flight.departureAirportAr}
+                      onChange={(event) =>
+                        updateFlight(index, "departureAirportAr", event.target.value)
+                      }
+                      required
+                    />
+                  </label>
+
+                  <label>
+                    <span>{isArabic ? "مطار المغادرة بالإنجليزية" : "Departure Airport English"}</span>
+                    <input
+                      className="nr-input"
+                      value={flight.departureAirportEn}
+                      onChange={(event) =>
+                        updateFlight(index, "departureAirportEn", event.target.value)
+                      }
+                      required
+                    />
+                  </label>
+
+                  <label>
+                    <span>{isArabic ? "مطار الوصول بالعربية" : "Arrival Airport Arabic"}</span>
+                    <input
+                      className="nr-input"
+                      value={flight.arrivalAirportAr}
+                      onChange={(event) =>
+                        updateFlight(index, "arrivalAirportAr", event.target.value)
+                      }
+                      required
+                    />
+                  </label>
+
+                  <label>
+                    <span>{isArabic ? "مطار الوصول بالإنجليزية" : "Arrival Airport English"}</span>
+                    <input
+                      className="nr-input"
+                      value={flight.arrivalAirportEn}
+                      onChange={(event) =>
+                        updateFlight(index, "arrivalAirportEn", event.target.value)
+                      }
+                      required
+                    />
+                  </label>
+
+                  <label>
+                    <span>{isArabic ? "موعد الإقلاع" : "Departure Date & Time"}</span>
+                    <input
+                      className="nr-input"
+                      type="datetime-local"
+                      value={flight.departureAt}
+                      onChange={(event) =>
+                        updateFlight(index, "departureAt", event.target.value)
+                      }
+                    />
+                  </label>
+
+                  <label>
+                    <span>{isArabic ? "موعد الوصول" : "Arrival Date & Time"}</span>
+                    <input
+                      className="nr-input"
+                      type="datetime-local"
+                      min={flight.departureAt || undefined}
+                      value={flight.arrivalAt}
+                      onChange={(event) =>
+                        updateFlight(index, "arrivalAt", event.target.value)
+                      }
+                    />
+                  </label>
+
+                  <label>
+                    <span>{isArabic ? "الدرجة بالعربية" : "Cabin Class Arabic"}</span>
+                    <input
+                      className="nr-input"
+                      value={flight.cabinClassAr}
+                      onChange={(event) =>
+                        updateFlight(index, "cabinClassAr", event.target.value)
+                      }
+                      placeholder="اقتصادية"
+                    />
+                  </label>
+
+                  <label>
+                    <span>{isArabic ? "الدرجة بالإنجليزية" : "Cabin Class English"}</span>
+                    <input
+                      className="nr-input"
+                      value={flight.cabinClassEn}
+                      onChange={(event) =>
+                        updateFlight(index, "cabinClassEn", event.target.value)
+                      }
+                      placeholder="Economy"
+                    />
+                  </label>
+
+                  <label>
+                    <span>{isArabic ? "وزن الأمتعة (كجم)" : "Baggage Allowance (kg)"}</span>
+                    <input
+                      className="nr-input"
+                      type="number"
+                      min={0}
+                      value={flight.baggageAllowanceKg}
+                      onChange={(event) =>
+                        updateFlight(
+                          index,
+                          "baggageAllowanceKg",
+                          Math.max(0, Number(event.target.value) || 0),
+                        )
+                      }
+                    />
+                  </label>
+                </div>
+
+                {flight.flightType === "transit" ? (
+                  <div className="nr-program-transit-box">
+                    <strong>{isArabic ? "تفاصيل الترانزيت" : "Transit Details"}</strong>
+
+                    <div className="nr-country-form-grid">
+                      <label>
+                        <span>{isArabic ? "مطار الترانزيت بالعربية" : "Transit Airport Arabic"}</span>
+                        <input
+                          className="nr-input"
+                          value={flight.transitAirportAr}
+                          onChange={(event) =>
+                            updateFlight(index, "transitAirportAr", event.target.value)
+                          }
+                        />
+                      </label>
+
+                      <label>
+                        <span>{isArabic ? "مطار الترانزيت بالإنجليزية" : "Transit Airport English"}</span>
+                        <input
+                          className="nr-input"
+                          value={flight.transitAirportEn}
+                          onChange={(event) =>
+                            updateFlight(index, "transitAirportEn", event.target.value)
+                          }
+                        />
+                      </label>
+
+                      <label>
+                        <span>{isArabic ? "مدة الترانزيت بالدقائق" : "Transit Duration (minutes)"}</span>
+                        <input
+                          className="nr-input"
+                          type="number"
+                          min={0}
+                          value={flight.transitDurationMinutes}
+                          onChange={(event) =>
+                            updateFlight(
+                              index,
+                              "transitDurationMinutes",
+                              Math.max(0, Number(event.target.value) || 0),
+                            )
+                          }
+                        />
+                      </label>
+                    </div>
+                  </div>
+                ) : null}
+
+                <div className="nr-country-form-grid nr-program-flight-notes">
+                  <label>
+                    <span>{isArabic ? "ملاحظات الرحلة بالعربية" : "Arabic Flight Notes"}</span>
+                    <textarea
+                      className="nr-input"
+                      rows={3}
+                      value={flight.notesAr}
+                      onChange={(event) =>
+                        updateFlight(index, "notesAr", event.target.value)
+                      }
+                    />
+                  </label>
+
+                  <label>
+                    <span>{isArabic ? "ملاحظات الرحلة بالإنجليزية" : "English Flight Notes"}</span>
+                    <textarea
+                      className="nr-input"
+                      rows={3}
+                      value={flight.notesEn}
+                      onChange={(event) =>
+                        updateFlight(index, "notesEn", event.target.value)
+                      }
+                    />
+                  </label>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="nr-country-form-section">
+        <div className="nr-country-form-section-heading">
+          <span>07</span>
+
+          <div>
+            <h3>
+              {isArabic
+                ? "إعدادات النشر"
+                : "Publishing Settings"}
+            </h3>
+
+            <p>
+              {isArabic
+                ? "حدد حالة البرنامج وظهوره داخل المنصة."
+                : "Control the program status and visibility."}
+            </p>
+          </div>
+        </div>
+
+        <div className="nr-country-form-grid">
+          <label>
+            <span>
+              {isArabic
+                ? "حالة البرنامج"
+                : "Program Status"}
+            </span>
+
+            <select
+              className="nr-input"
+              value={values.status}
+              onChange={(event) =>
+                updateValue(
+                  "status",
+                  event.target.value as ProgramStatus,
+                )
+              }
+              required
+            >
+              <option value="draft">
+                {isArabic ? "مسودة" : "Draft"}
+              </option>
+
+              <option value="published">
+                {isArabic
+                  ? "منشور"
+                  : "Published"}
+              </option>
+
+              <option value="inactive">
+                {isArabic
+                  ? "غير نشط"
+                  : "Inactive"}
+              </option>
+            </select>
+          </label>
+
+          <label>
+            <span>
+              {isArabic
+                ? "ترتيب الظهور"
+                : "Display Order"}
+            </span>
+
+            <input
+              className="nr-input"
+              type="number"
+              min={0}
+              value={values.sortOrder}
+              onChange={(event) =>
+                updateValue(
+                  "sortOrder",
+                  Math.max(
+                    0,
+                    Number(event.target.value) || 0,
+                  ),
+                )
+              }
+              required
+            />
+          </label>
+        </div>
+
+        <div className="nr-program-form-options">
+          <label className="nr-country-form-checkbox">
+            <input
+              type="checkbox"
+              checked={values.isActive}
+              onChange={(event) =>
+                updateValue(
+                  "isActive",
+                  event.target.checked,
+                )
+              }
+            />
+
+            <span>
+              {isArabic
+                ? "البرنامج نشط ومتاح للعرض"
+                : "Program is active and visible"}
+            </span>
+          </label>
+
+          <label className="nr-country-form-checkbox">
+            <input
+              type="checkbox"
+              checked={values.isFeatured}
+              onChange={(event) =>
+                updateValue(
+                  "isFeatured",
+                  event.target.checked,
+                )
+              }
+            />
+
+            <span>
+              {isArabic
+                ? "برنامج مميز"
+                : "Featured Program"}
+            </span>
+          </label>
+        </div>
+      </section>
 
       <div className="nr-country-form-actions">
         <Button
@@ -576,6 +1655,274 @@ export default function ProgramForm({
               : "Save Program"}
         </Button>
       </div>
+
+      <style jsx>{`
+        .nr-program-hotel-heading {
+          align-items: flex-start;
+        }
+
+        .nr-program-hotel-heading > div {
+          flex: 1;
+        }
+
+        .nr-program-add-hotel {
+          flex: 0 0 auto;
+          min-height: 40px;
+          padding-inline: 15px;
+          border: 0;
+          border-radius: 11px;
+          color: #fff;
+          background: var(--nour-primary);
+          font: inherit;
+          font-size: 11px;
+          font-weight: 900;
+          cursor: pointer;
+        }
+
+        .nr-program-hotels-list {
+          display: grid;
+          gap: 15px;
+        }
+
+        .nr-program-hotels-empty {
+          padding: 22px;
+          border: 1px dashed var(--nour-border);
+          border-radius: 14px;
+          color: #7c899c;
+          text-align: center;
+        }
+
+        .nr-program-hotel-card {
+          padding: 17px;
+          border: 1px solid var(--nour-border);
+          border-radius: 16px;
+          background: var(--nour-background);
+        }
+
+        .nr-program-hotel-card-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          margin-bottom: 15px;
+        }
+
+        .nr-program-hotel-card-header strong {
+          color: var(--nour-text-primary);
+        }
+
+        .nr-program-hotel-card-header button {
+          min-height: 32px;
+          padding-inline: 10px;
+          border: 1px solid rgba(220, 38, 38, 0.2);
+          border-radius: 8px;
+          color: #dc2626;
+          background: rgba(220, 38, 38, 0.05);
+          font: inherit;
+          font-size: 10px;
+          font-weight: 800;
+          cursor: pointer;
+        }
+
+        .nr-program-hotels-warning {
+          margin: 12px 0 0;
+          color: #d97706;
+          font-size: 11px;
+          line-height: 1.7;
+        }
+
+        .nr-flight-inclusion-grid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 12px;
+          margin-bottom: 18px;
+        }
+
+        .nr-flight-inclusion-option {
+          display: flex;
+          min-height: 128px;
+          flex-direction: column;
+          gap: 8px;
+          padding: 16px;
+          border: 1px solid var(--nour-border);
+          border-radius: 14px;
+          background: var(--nour-background);
+          cursor: pointer;
+        }
+
+        .nr-flight-inclusion-option.is-selected {
+          border-color: var(--nour-primary);
+          box-shadow: 0 0 0 3px rgba(23, 111, 232, 0.08);
+        }
+
+        .nr-flight-inclusion-option input {
+          width: 17px;
+          height: 17px;
+          accent-color: var(--nour-primary);
+        }
+
+        .nr-flight-inclusion-option strong {
+          color: var(--nour-text-primary);
+          font-size: 13px;
+        }
+
+        .nr-flight-inclusion-option span {
+          color: #7c899c;
+          font-size: 11px;
+          line-height: 1.7;
+        }
+
+        .nr-flight-dynamic-note {
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+          margin-bottom: 18px;
+          padding: 13px 15px;
+          border: 1px solid rgba(23, 111, 232, 0.16);
+          border-radius: 12px;
+          background: rgba(23, 111, 232, 0.05);
+        }
+
+        .nr-flight-dynamic-note strong {
+          color: var(--nour-primary);
+          font-size: 11px;
+        }
+
+        .nr-flight-dynamic-note span {
+          color: #6f7e92;
+          font-size: 11px;
+          line-height: 1.7;
+        }
+
+        .nr-program-flight-heading {
+          align-items: flex-start;
+        }
+
+        .nr-program-flight-heading > div {
+          flex: 1;
+        }
+
+        .nr-program-add-flight {
+          flex: 0 0 auto;
+          min-height: 40px;
+          padding-inline: 15px;
+          border: 0;
+          border-radius: 11px;
+          color: #fff;
+          background: var(--nour-primary);
+          font: inherit;
+          font-size: 11px;
+          font-weight: 900;
+          cursor: pointer;
+        }
+
+        .nr-program-flights-empty {
+          padding: 22px;
+          border: 1px dashed var(--nour-border);
+          border-radius: 14px;
+          color: #7c899c;
+          text-align: center;
+        }
+
+        .nr-program-flights-list {
+          display: grid;
+          gap: 15px;
+        }
+
+        .nr-program-flight-card {
+          padding: 17px;
+          border: 1px solid var(--nour-border);
+          border-radius: 16px;
+          background: var(--nour-background);
+        }
+
+        .nr-program-flight-card-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          margin-bottom: 15px;
+        }
+
+        .nr-program-flight-card-header > div {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .nr-program-flight-card-header button {
+          min-height: 32px;
+          padding-inline: 10px;
+          border: 1px solid rgba(220, 38, 38, 0.2);
+          border-radius: 8px;
+          color: #dc2626;
+          background: rgba(220, 38, 38, 0.05);
+          font: inherit;
+          font-size: 10px;
+          font-weight: 800;
+          cursor: pointer;
+        }
+
+        .nr-program-flight-direction {
+          display: inline-flex;
+          min-height: 26px;
+          align-items: center;
+          padding-inline: 9px;
+          border-radius: 999px;
+          font-size: 10px;
+          font-weight: 900;
+        }
+
+        .nr-program-flight-direction.is-outbound {
+          color: #176fe8;
+          background: rgba(23, 111, 232, 0.08);
+        }
+
+        .nr-program-flight-direction.is-return {
+          color: #7c3aed;
+          background: rgba(124, 58, 237, 0.08);
+        }
+
+        .nr-program-transit-box {
+          margin-top: 16px;
+          padding: 15px;
+          border: 1px dashed rgba(217, 119, 6, 0.28);
+          border-radius: 13px;
+          background: rgba(245, 158, 11, 0.05);
+        }
+
+        .nr-program-transit-box > strong {
+          display: block;
+          margin-bottom: 12px;
+          color: #b45309;
+          font-size: 11px;
+        }
+
+        .nr-program-flight-notes {
+          margin-top: 16px;
+        }
+
+        @media (max-width: 760px) {
+          .nr-program-hotel-heading {
+            flex-direction: column;
+            align-items: stretch;
+          }
+
+          .nr-program-add-hotel,
+          .nr-program-add-flight {
+            width: 100%;
+          }
+
+          .nr-program-flight-heading {
+            flex-direction: column;
+            align-items: stretch;
+          }
+
+          .nr-flight-inclusion-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
     </form>
   );
 }

@@ -98,20 +98,46 @@ export async function uploadMedia(
 ): Promise<UploadMediaResult> {
   validateMediaFile(input.file);
 
-  const {
-    data: { session },
-    error: sessionError,
-  } = await supabase.auth.getSession();
+  let session;
 
-  if (sessionError) {
-    throw new Error(
-      `تعذر التحقق من جلسة الدخول: ${sessionError.message}`,
-    );
+  try {
+    const {
+      data,
+      error: sessionError,
+    } = await supabase.auth.getSession();
+
+    if (sessionError) {
+      throw new Error(
+        `تعذر التحقق من جلسة الدخول: ${sessionError.message}`,
+      );
+    }
+
+    session = data.session;
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "";
+
+    const normalizedMessage =
+      message.toLowerCase();
+
+    if (
+      normalizedMessage.includes("failed to fetch") ||
+      normalizedMessage.includes("networkerror") ||
+      normalizedMessage.includes("network request failed")
+    ) {
+      throw new Error(
+        "تعذر الاتصال بـ Supabase للتحقق من جلسة الدخول. تحقق من اتصال الإنترنت وإعدادات Supabase ثم حاول مجددًا.",
+      );
+    }
+
+    throw error;
   }
 
   if (!session) {
     throw new Error(
-      "جلسة تسجيل الدخول غير موجودة. سجل الخروج ثم سجل الدخول من جديد.",
+      "جلسة تسجيل الدخول غير موجودة أو انتهت. سجل الخروج ثم سجل الدخول من جديد.",
     );
   }
 
@@ -122,43 +148,83 @@ export async function uploadMedia(
     input.file,
   );
 
-  const { error: uploadError } =
-    await supabase.storage
+  try {
+    const {
+      data: uploadedFile,
+      error: uploadError,
+    } = await supabase.storage
       .from(bucket)
       .upload(path, input.file, {
         cacheControl: "3600",
-        contentType: input.file.type,
+        contentType:
+          input.file.type ||
+          "application/octet-stream",
         upsert: false,
       });
 
-  if (uploadError) {
-    throw new Error(
-      `تعذر رفع الملف: ${uploadError.message}`,
-    );
+    if (uploadError) {
+      throw new Error(
+        `تعذر رفع الملف إلى التخزين: ${uploadError.message}`,
+      );
+    }
+
+    if (!uploadedFile?.path) {
+      throw new Error(
+        "لم يُرجع Supabase مسار الملف بعد الرفع.",
+      );
+    }
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "";
+
+    const normalizedMessage =
+      message.toLowerCase();
+
+    if (
+      normalizedMessage.includes("failed to fetch") ||
+      normalizedMessage.includes("networkerror") ||
+      normalizedMessage.includes("network request failed")
+    ) {
+      throw new Error(
+        "تعذر الاتصال بخدمة Supabase Storage. تحقق من اتصال Supabase ومن متغير NEXT_PUBLIC_SUPABASE_URL ثم حاول مجددًا.",
+      );
+    }
+
+    throw error;
   }
 
-  const { data, error: mediaError } =
-    await supabase
-      .from("media")
-      .insert({
-        bucket,
-        path,
-        file_name: input.file.name,
-        mime_type: input.file.type,
-        size_bytes: input.file.size,
-        alt_ar:
-          input.altAr?.trim() || null,
-        alt_en:
-          input.altEn?.trim() || null,
-        uploaded_by: session.user.id,
-      })
-      .select(mediaSelect)
-      .single();
+  const {
+    data,
+    error: mediaError,
+  } = await supabase
+    .from("media")
+    .insert({
+      bucket,
+      path,
+      file_name: input.file.name,
+      mime_type:
+        input.file.type ||
+        "application/octet-stream",
+      size_bytes: input.file.size,
+      alt_ar:
+        input.altAr?.trim() || null,
+      alt_en:
+        input.altEn?.trim() || null,
+      uploaded_by: session.user.id,
+    })
+    .select(mediaSelect)
+    .single();
 
   if (mediaError) {
-    await supabase.storage
-      .from(bucket)
-      .remove([path]);
+    try {
+      await supabase.storage
+        .from(bucket)
+        .remove([path]);
+    } catch {
+      // لا نستبدل خطأ قاعدة البيانات بخطأ تنظيف الملف.
+    }
 
     throw new Error(
       `تعذر حفظ سجل الوسائط: ${mediaError.message}`,

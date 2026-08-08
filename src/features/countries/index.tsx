@@ -60,39 +60,11 @@ export default function CountriesPage() {
   const isArabic = language === "ar";
 
   const {
-    data: currentUser,
-    isLoading: isCurrentUserLoading,
-    isError: isCurrentUserError,
-  } = useQuery({
-    queryKey: ["auth", "current-user"],
-    queryFn: async () => {
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.getUser();
-
-      if (error) {
-        throw error;
-      }
-
-      return user;
-    },
-    staleTime: 0,
-    refetchOnMount: "always",
-    refetchOnWindowFocus: true,
-  });
-
-  const {
     data: permissions,
     isLoading: isPermissionsLoading,
     isError: isPermissionsError,
   } = useQuery({
-    queryKey: [
-      "countries",
-      "permissions",
-      currentUser?.id ?? "anonymous",
-    ],
-    enabled: Boolean(currentUser?.id),
+    queryKey: ["countries", "permissions"],
     queryFn: async () => {
       const permissionKeys = [
         "countries.create",
@@ -124,9 +96,7 @@ export default function CountriesPage() {
         boolean
       >;
     },
-    staleTime: 0,
-    refetchOnMount: "always",
-    refetchOnWindowFocus: true,
+    staleTime: 5 * 60 * 1000,
   });
 
   const canCreate =
@@ -458,16 +428,14 @@ export default function CountriesPage() {
         <p className="nr-admin-login-error">{formError}</p>
       ) : null}
 
-      {isCurrentUserLoading ||
-      isPermissionsLoading ||
-      isLoading ? (
+      {isPermissionsLoading || isLoading ? (
         <TableSkeleton
           rows={6}
           columns={
             canUpdate || canPublish || canDelete ? 7 : 6
           }
         />
-      ) : isCurrentUserError || isPermissionsError ? (
+      ) : isPermissionsError ? (
         <ErrorState
           title={
             isArabic
@@ -480,14 +448,9 @@ export default function CountriesPage() {
               : "Your account permissions could not be verified. Reload the page."
           }
           onRetry={() => {
-            void Promise.all([
-              queryClient.invalidateQueries({
-                queryKey: ["auth", "current-user"],
-              }),
-              queryClient.invalidateQueries({
-                queryKey: ["countries", "permissions"],
-              }),
-            ]);
+            void queryClient.invalidateQueries({
+              queryKey: ["countries", "permissions"],
+            });
           }}
         />
       ) : isError ? (
@@ -632,30 +595,37 @@ export default function CountriesPage() {
             {formError ? (
               <p className="nr-admin-login-error">{formError}</p>
             ) : null}
+          
+          <CountryForm
+  key={`${editingCountry.id}-${editingCountry.updatedAt}`}
+  initialValues={{
+    nameAr: editingCountry.nameAr,
+    nameEn: editingCountry.nameEn,
+    iso2: editingCountry.iso2,
+    iso3: editingCountry.iso3,
+    phoneCode: editingCountry.phoneCode,
+    currencyCode: editingCountry.currencyCode,
+    currencyNameAr: editingCountry.currencyNameAr,
+    currencyNameEn: editingCountry.currencyNameEn,
+    timezone: editingCountry.timezone,
 
-            <CountryForm
-              initialValues={{
-                nameAr: editingCountry.nameAr,
-                nameEn: editingCountry.nameEn,
-                iso2: editingCountry.iso2,
-                iso3: editingCountry.iso3,
-                phoneCode: editingCountry.phoneCode,
-                currencyCode: editingCountry.currencyCode,
-                currencyNameAr: editingCountry.currencyNameAr,
-                currencyNameEn: editingCountry.currencyNameEn,
-                timezone: editingCountry.timezone,
-                sortOrder: editingCountry.sortOrder,
-                isActive: editingCountry.status === "active",
-              }}
-              isSubmitting={updateMutation.isPending}
-              onSubmit={async (values) => {
-                setFormError("");
-                await updateMutation.mutateAsync({
-                  country: editingCountry,
-                  values,
-                });
-              }}
-            />
+    latitude: editingCountry.latitude,
+    longitude: editingCountry.longitude,
+
+    sortOrder: editingCountry.sortOrder,
+    isActive:
+      editingCountry.status === "active",
+  }}
+  isSubmitting={updateMutation.isPending}
+  onSubmit={async (values) => {
+    setFormError("");
+
+    await updateMutation.mutateAsync({
+      country: editingCountry,
+      values,
+    });
+  }}
+/>
           </section>
         </div>
       ) : null}

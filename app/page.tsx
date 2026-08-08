@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
+import { useLanguage } from "../src/core/i18n";
+
 import SiteEnhancements from "./components/SiteEnhancements";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
@@ -16,97 +23,140 @@ import Journey from "./components/home/Journey";
 import Showcase from "./components/home/Showcase";
 import Payments from "./components/home/Payments";
 import CTA from "./components/home/CTA";
+
 import {
   appScreens,
   copy,
   sectionIds,
-  type Language,
   type SectionId,
   type Theme,
 } from "./data/home";
 
 export default function Home() {
-  const [language, setLanguage] = useState<Language>("ar");
-  const [theme, setTheme] = useState<Theme>("light");
-  const [menuOpen, setMenuOpen] = useState(false);
+  const {
+    language,
+    toggleLanguage,
+  } = useLanguage();
+
+  const [theme, setTheme] =
+    useState<Theme>("light");
+
+  const [menuOpen, setMenuOpen] =
+    useState(false);
+
   const [activeSection, setActiveSection] =
     useState<SectionId>("home");
-  const [activeScreen, setActiveScreen] = useState(0);
+
+  const [activeScreen, setActiveScreen] =
+    useState(0);
 
   const t = copy[language];
 
   const navItems = useMemo(
     () =>
-      sectionIds.map((id, index) => ({
-        id,
-        label: t.nav[index],
-      })),
+      sectionIds.map(
+        (id, index) => ({
+          id,
+          label: t.nav[index],
+        }),
+      ),
     [t],
   );
 
   useEffect(() => {
-    const timer = window.setInterval(() => {
-      setActiveScreen(
-        (current) => (current + 1) % appScreens.length,
-      );
-    }, 3500);
+    const timer =
+      window.setInterval(() => {
+        setActiveScreen(
+          (current) =>
+            (current + 1) %
+            appScreens.length,
+        );
+      }, 3500);
 
-    return () => window.clearInterval(timer);
+    return () =>
+      window.clearInterval(timer);
   }, []);
 
   useEffect(() => {
-    const savedLanguage =
-      localStorage.getItem("NourApp-language");
-    const savedTheme = localStorage.getItem("NourApp-theme");
+    const savedTheme =
+      localStorage.getItem(
+        "nour-theme",
+      );
 
-    setLanguage(savedLanguage === "en" ? "en" : "ar");
-    setTheme(savedTheme === "dark" ? "dark" : "light");
+    setTheme(
+      savedTheme === "dark"
+        ? "dark"
+        : "light",
+    );
   }, []);
 
   useEffect(() => {
-    document.documentElement.lang = language;
-    document.documentElement.dir =
-      language === "ar" ? "rtl" : "ltr";
-    document.documentElement.dataset.theme = theme;
+    document.documentElement.dataset.theme =
+      theme;
 
-    localStorage.setItem("NourApp-language", language);
-    localStorage.setItem("NourApp-theme", theme);
-  }, [language, theme]);
+    localStorage.setItem(
+      "nour-theme",
+      theme,
+    );
+  }, [theme]);
 
   useEffect(() => {
-    const sections = sectionIds
-      .map((id) => document.getElementById(id))
-      .filter(
-        (section): section is HTMLElement =>
-          Boolean(section),
+    const sections =
+      sectionIds
+        .map((id) =>
+          document.getElementById(id),
+        )
+        .filter(
+          (
+            section,
+          ): section is HTMLElement =>
+            Boolean(section),
+        );
+
+    if (!sections.length) {
+      return;
+    }
+
+    const observer =
+      new IntersectionObserver(
+        (entries) => {
+          const current =
+            entries
+              .filter(
+                (entry) =>
+                  entry.isIntersecting,
+              )
+              .sort(
+                (a, b) =>
+                  b.intersectionRatio -
+                  a.intersectionRatio,
+              )[0]?.target.id as
+              | SectionId
+              | undefined;
+
+          if (current) {
+            setActiveSection(current);
+          }
+        },
+        {
+          rootMargin:
+            "-25% 0px -60% 0px",
+          threshold: [
+            0.05,
+            0.2,
+            0.45,
+            0.7,
+          ],
+        },
       );
 
-    if (!sections.length) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const current = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort(
-            (a, b) =>
-              b.intersectionRatio - a.intersectionRatio,
-          )[0]?.target.id as SectionId | undefined;
-
-        if (current) {
-          setActiveSection(current);
-        }
-      },
-      {
-        rootMargin: "-25% 0px -60% 0px",
-        threshold: [0.05, 0.2, 0.45, 0.7],
-      },
+    sections.forEach(
+      (section) =>
+        observer.observe(section),
     );
 
-    sections.forEach((section) =>
-      observer.observe(section),
-    );
-
-    return () => observer.disconnect();
+    return () =>
+      observer.disconnect();
   }, []);
 
   return (
@@ -120,47 +170,57 @@ export default function Home() {
         menuOpen={menuOpen}
         activeSection={activeSection}
         navItems={navItems}
-        onLanguageChange={() =>
-          setLanguage((current) =>
-            current === "ar" ? "en" : "ar",
-          )
+        onLanguageChange={
+          toggleLanguage
         }
         onThemeChange={() =>
           setTheme((current) =>
-            current === "light" ? "dark" : "light",
+            current === "light"
+              ? "dark"
+              : "light",
           )
         }
         onMenuToggle={() =>
-          setMenuOpen((current) => !current)
+          setMenuOpen(
+            (current) => !current,
+          )
         }
-        onMenuClose={() => setMenuOpen(false)}
+        onMenuClose={() =>
+          setMenuOpen(false)
+        }
       />
 
       <Hero t={t} />
       <Statistics language={language} />
       <WhyNour language={language} />
-
-      {/* يظهر قسم الأهداف مرة واحدة فقط */}
       <Goals t={t} />
-
-      {/* يحتوي هذا القسم على صورة الهاتف والبطاقات العائمة */}
       <About t={t} />
-
       <Services language={language} />
       <ProgramsPreview language={language} />
       <TrustMetrics language={language} />
-      <Journey t={t} language={language} />
+      <Journey
+        t={t}
+        language={language}
+      />
 
       <Showcase
         t={t}
         language={language}
         activeScreen={activeScreen}
-        onScreenChange={setActiveScreen}
+        onScreenChange={
+          setActiveScreen
+        }
       />
 
       <Payments language={language} />
-      <CTA t={t} language={language} />
-      <Footer t={t} language={language} />
+      <CTA
+        t={t}
+        language={language}
+      />
+      <Footer
+        t={t}
+        language={language}
+      />
     </main>
   );
 }

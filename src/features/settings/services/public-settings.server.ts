@@ -1,5 +1,4 @@
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { createClient } from "@supabase/supabase-js";
 
 type PublicSettingRow = {
   setting_key: string;
@@ -35,63 +34,64 @@ export async function getPublicServerSettings(): Promise<PublicServerSettingsMap
     getSupabaseEnvironment();
 
   /*
-   * لا نوقف تشغيل الموقع عند غياب المتغيرات.
-   * ستستخدم generateMetadata القيم الاحتياطية.
+   * لا نوقف الموقع إذا كانت متغيرات Supabase
+   * غير متاحة لأي سبب.
+   *
+   * generateMetadata سيستخدم القيم الاحتياطية.
    */
   if (!environment) {
-    console.error(
-      "Supabase environment variables are missing. Expected NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.",
-    );
-
     return {};
   }
 
-  const cookieStore = await cookies();
-
-  const supabase = createServerClient(
-    environment.supabaseUrl,
-    environment.supabaseKey,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-
-        setAll() {
-          /*
-           * هذه الخدمة مخصصة للقراءة داخل generateMetadata،
-           * لذلك لا نعدّل ملفات الارتباط هنا.
-           */
+  try {
+    const supabase = createClient(
+      environment.supabaseUrl,
+      environment.supabaseKey,
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+          detectSessionInUrl: false,
         },
       },
-    },
-  );
-
-  const { data, error } = await supabase.rpc(
-    "get_public_platform_settings",
-  );
-
-  if (error) {
-    console.error(
-      "Failed to load public platform settings:",
-      error.message,
     );
 
+    const { data, error } =
+      await supabase.rpc(
+        "get_public_platform_settings",
+      );
+
+    /*
+     * لا نستخدم console.error هنا.
+     *
+     * في وضع التطوير Next.js قد يعرض
+     * console.error كـ Runtime Overlay.
+     */
+    if (error) {
+      return {};
+    }
+
+    const rows =
+      (data ?? []) as PublicSettingRow[];
+
+    return rows.reduce<PublicServerSettingsMap>(
+      (result, setting) => {
+        result[setting.setting_key] =
+          setting.value_json;
+
+        return result;
+      },
+      {},
+    );
+  } catch {
+    /*
+     * أخطاء الشبكة مثل:
+     * TypeError: fetch failed
+     *
+     * لا يجب أن تمنع تحميل الموقع.
+     */
     return {};
   }
-
-  const rows =
-    (data ?? []) as PublicSettingRow[];
-
-  return rows.reduce<PublicServerSettingsMap>(
-    (result, setting) => {
-      result[setting.setting_key] =
-        setting.value_json;
-
-      return result;
-    },
-    {},
-  );
 }
 
 export function getServerTextSetting(

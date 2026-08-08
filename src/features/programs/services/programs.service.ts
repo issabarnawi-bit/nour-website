@@ -1,7 +1,11 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { uploadMedia } from "../../media/repositories/media.repository";
-import type { ProgramFormValues } from "../types";import type { Program } from "../types";
+
+import type {
+  Program,
+  ProgramFormValues,
+} from "../types";
 
 import {
   createProgram as createProgramRecord,
@@ -13,6 +17,20 @@ import {
   restoreProgram as restoreProgramRecord,
   updateProgram as updateProgramRecord,
 } from "./programs.repository";
+
+import {
+  getProgramHotels,
+  replaceProgramHotels,
+} from "./program-hotels.repository";
+
+import {
+  getProgramFlights,
+  replaceProgramFlights,
+} from "./program-flights.repository";
+
+/* =========================================================
+   CREATE
+========================================================= */
 
 export async function createProgram(
   supabase: SupabaseClient,
@@ -31,21 +49,47 @@ export async function createProgram(
       },
     );
 
-    coverMediaId = uploadResult.media.id;
+    coverMediaId =
+      uploadResult.media.id;
   }
 
-  return createProgramRecord(
+  const program =
+    await createProgramRecord(
+      supabase,
+      values,
+      coverMediaId,
+    );
+
+  await replaceProgramHotels(
     supabase,
-    values,
-    coverMediaId,
+    program.id,
+    values.hotels ?? [],
   );
+
+  await replaceProgramFlights(
+    supabase,
+    program.id,
+    values.flights ?? [],
+  );
+
+  return program;
 }
+
+/* =========================================================
+   LIST
+========================================================= */
 
 export async function getPrograms(
   supabase: SupabaseClient,
 ): Promise<Program[]> {
-  return getProgramRecords(supabase);
+  return getProgramRecords(
+    supabase,
+  );
 }
+
+/* =========================================================
+   GET ONE
+========================================================= */
 
 export async function getProgramById(
   supabase: SupabaseClient,
@@ -57,13 +101,46 @@ export async function getProgramById(
   );
 }
 
+/* =========================================================
+   PROGRAM HOTELS
+========================================================= */
+
+export async function getHotelsForProgram(
+  supabase: SupabaseClient,
+  programId: string,
+) {
+  return getProgramHotels(
+    supabase,
+    programId,
+  );
+}
+
+/* =========================================================
+   PROGRAM FLIGHTS
+========================================================= */
+
+export async function getFlightsForProgram(
+  supabase: SupabaseClient,
+  programId: string,
+) {
+  return getProgramFlights(
+    supabase,
+    programId,
+  );
+}
+
+/* =========================================================
+   UPDATE
+========================================================= */
+
 export async function updateProgram(
   supabase: SupabaseClient,
   programId: string,
   values: ProgramFormValues,
   currentCoverMediaId: string | null = null,
 ): Promise<Program> {
-  let coverMediaId = currentCoverMediaId;
+  let coverMediaId =
+    currentCoverMediaId;
 
   if (values.coverFile) {
     const uploadResult = await uploadMedia(
@@ -76,26 +153,50 @@ export async function updateProgram(
       },
     );
 
-    coverMediaId = uploadResult.media.id;
+    coverMediaId =
+      uploadResult.media.id;
   }
 
-  return updateProgramRecord(
+  const program =
+    await updateProgramRecord(
+      supabase,
+      programId,
+      values,
+      coverMediaId,
+    );
+
+  await replaceProgramHotels(
     supabase,
     programId,
-    values,
-    coverMediaId,
+    values.hotels ?? [],
   );
+
+  await replaceProgramFlights(
+    supabase,
+    programId,
+    values.flights ?? [],
+  );
+
+  return program;
 }
+
+/* =========================================================
+   SOFT DELETE
+========================================================= */
 
 export async function deleteProgram(
   supabase: SupabaseClient,
   programId: string,
 ): Promise<void> {
-  return deleteProgramRecord(
+  await deleteProgramRecord(
     supabase,
     programId,
   );
 }
+
+/* =========================================================
+   DELETED PROGRAMS
+========================================================= */
 
 export async function getDeletedPrograms(
   supabase: SupabaseClient,
@@ -105,21 +206,29 @@ export async function getDeletedPrograms(
   );
 }
 
+/* =========================================================
+   RESTORE
+========================================================= */
+
 export async function restoreProgram(
   supabase: SupabaseClient,
   programId: string,
 ): Promise<void> {
-  return restoreProgramRecord(
+  await restoreProgramRecord(
     supabase,
     programId,
   );
 }
 
+/* =========================================================
+   PERMANENT DELETE
+========================================================= */
+
 export async function permanentlyDeleteProgram(
   supabase: SupabaseClient,
   programId: string,
 ): Promise<void> {
-  return permanentlyDeleteProgramRecord(
+  await permanentlyDeleteProgramRecord(
     supabase,
     programId,
   );

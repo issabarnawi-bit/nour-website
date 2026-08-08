@@ -21,7 +21,19 @@ export function countriesQuery(
 ) {
   return queryOptions<Country[]>({
     queryKey: countriesQueryKey,
-    queryFn: () => listCountries(supabase),
+
+    queryFn: () =>
+      listCountries(supabase),
+
+    staleTime: 0,
+
+    gcTime: 5 * 60 * 1000,
+
+    refetchOnMount: "always",
+
+    refetchOnWindowFocus: true,
+
+    refetchOnReconnect: true,
   });
 }
 
@@ -29,7 +41,20 @@ export function deletedCountriesQuery(
   supabase: SupabaseClient,
 ) {
   return queryOptions<Country[]>({
-    queryKey: deletedCountriesQueryKey,
-    queryFn: () => listDeletedCountries(supabase),
+    queryKey:
+      deletedCountriesQueryKey,
+
+    queryFn: () =>
+      listDeletedCountries(supabase),
+
+    staleTime: 0,
+
+    gcTime: 5 * 60 * 1000,
+
+    refetchOnMount: "always",
+
+    refetchOnWindowFocus: true,
+
+    refetchOnReconnect: true,
   });
 }

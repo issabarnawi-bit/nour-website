@@ -2,11 +2,65 @@
 
 import Image from "next/image";
 import { motion, type Variants } from "framer-motion";
+import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+
 import type { Language } from "../../data/home";
-import { programs } from "../../data/programs";
+import { createClient } from "../../../src/lib/supabase/client";
 
 type Props = {
   language: Language;
+};
+
+type ProgramRow = {
+  id: string;
+  title_ar: string;
+  title_en: string;
+  slug: string;
+  summary_ar: string | null;
+  summary_en: string | null;
+  country_id: string | null;
+  duration_days: number;
+  duration_nights: number;
+  base_price: number | string;
+  currency_code: string;
+  is_featured: boolean;
+  sort_order: number;
+  created_at: string;
+  cover_media:
+    | {
+        bucket: string;
+        path: string;
+      }
+    | {
+        bucket: string;
+        path: string;
+      }[]
+    | null;
+};
+
+type CountryRow = {
+  id: string;
+  name_ar: string;
+  name_en: string;
+};
+
+type PublicProgram = {
+  id: string;
+  titleAr: string;
+  titleEn: string;
+  slug: string;
+  summaryAr: string;
+  summaryEn: string;
+  countryId: string | null;
+  countryNameAr: string;
+  countryNameEn: string;
+  durationDays: number;
+  durationNights: number;
+  basePrice: number;
+  currencyCode: string;
+  isFeatured: boolean;
+  coverUrl: string | null;
 };
 
 const containerVariants: Variants = {
@@ -33,245 +87,608 @@ const cardVariants: Variants = {
   },
 };
 
-function formatPrice(value: number, language: Language) {
-  return new Intl.NumberFormat(language === "ar" ? "ar-SA" : "en-US").format(
-    value,
-  );
+function getCoverMedia(
+  media: ProgramRow["cover_media"],
+) {
+  if (!media) {
+    return null;
+  }
+
+  if (Array.isArray(media)) {
+    return media[0] ?? null;
+  }
+
+  return media;
 }
 
-function getProgramCopy(
-  program: (typeof programs)[number],
+function createPublicMediaUrl(
+  supabaseUrl: string,
+  bucket: string,
+  path: string,
+) {
+  return `${supabaseUrl}/storage/v1/object/public/${bucket}/${path}`;
+}
+
+function formatPrice(
+  value: number,
+  language: Language,
+) {
+  return new Intl.NumberFormat(
+    language === "ar" ? "ar-SA" : "en-US",
+    {
+      maximumFractionDigits: 0,
+    },
+  ).format(value);
+}
+
+function formatDuration(
+  days: number,
   language: Language,
 ) {
   if (language === "ar") {
-    return {
-      title: program.titleAr,
-      description: program.shortDescriptionAr,
-      badge: program.badgeAr,
-      duration:
-        program.duration === "7 Days"
-          ? "7 أيام"
-          : program.duration === "10 Days"
-            ? "10 أيام"
-            : program.duration === "12 Days"
-              ? "12 يومًا"
-              : program.duration,
-      hotel:
-        program.hotel === "4★ Hotel"
-          ? "فندق 4 نجوم"
-          : program.hotel === "5★ Hotel"
-            ? "فندق 5 نجوم"
-            : program.hotel === "Luxury Suite"
-              ? "جناح فاخر"
-              : program.hotel,
-      transport:
-        program.transport === "Included"
-          ? "النقل مشمول"
-          : program.transport === "VIP Transport"
-            ? "نقل مميز"
-            : program.transport === "Private Transfer"
-              ? "نقل خاص"
-              : program.transport,
-    };
+    if (days === 1) return "يوم واحد";
+    if (days === 2) return "يومان";
+    if (days >= 3 && days <= 10) {
+      return `${days} أيام`;
+    }
+
+    return `${days} يومًا`;
   }
 
-  return {
-    title: program.titleEn,
-    description: program.shortDescriptionEn,
-    badge: program.badgeEn,
-    duration: program.duration,
-    hotel: program.hotel,
-    transport: program.transport,
-  };
+  return days === 1
+    ? "1 day"
+    : `${days} days`;
 }
 
-export default function ProgramsPreview({ language }: Props) {
-  const featuredPrograms = programs.filter((program) => program.featured);
+function formatNights(
+  nights: number,
+  language: Language,
+) {
+  if (language === "ar") {
+    if (nights === 0) return "بدون ليالٍ";
+    if (nights === 1) return "ليلة واحدة";
+    if (nights === 2) return "ليلتان";
+    if (nights >= 3 && nights <= 10) {
+      return `${nights} ليالٍ`;
+    }
+
+    return `${nights} ليلة`;
+  }
+
+  if (nights === 0) {
+    return "No nights";
+  }
+
+  return nights === 1
+    ? "1 night"
+    : `${nights} nights`;
+}
+
+async function loadPublicPrograms(
+  supabase: ReturnType<typeof createClient>,
+): Promise<PublicProgram[]> {
+  const { data, error } = await supabase
+    .from("programs")
+    .select(`
+      id,
+      title_ar,
+      title_en,
+      slug,
+      summary_ar,
+      summary_en,
+      country_id,
+      duration_days,
+      duration_nights,
+      base_price,
+      currency_code,
+      is_featured,
+      sort_order,
+      created_at,
+      cover_media:media!programs_cover_media_id_fkey (
+        bucket,
+        path
+      )
+    `)
+    .eq("status", "published")
+    .eq("is_active", true)
+    .is("deleted_at", null)
+    .order("is_featured", {
+      ascending: false,
+    })
+    .order("sort_order", {
+      ascending: true,
+    })
+    .order("created_at", {
+      ascending: false,
+    })
+    .limit(6);
+
+  if (error) {
+    throw new Error(
+      `Failed to load public programs: ${error.message}`,
+    );
+  }
+
+  const rows = (data ?? []) as ProgramRow[];
+
+  const countryIds = [
+    ...new Set(
+      rows
+        .map((program) => program.country_id)
+        .filter(
+          (countryId): countryId is string =>
+            typeof countryId === "string",
+        ),
+    ),
+  ];
+
+  const countryMap = new Map<
+    string,
+    CountryRow
+  >();
+
+  if (countryIds.length > 0) {
+    const {
+      data: countriesData,
+      error: countriesError,
+    } = await supabase
+      .from("countries")
+      .select("id,name_ar,name_en")
+      .in("id", countryIds)
+      .eq("is_active", true)
+      .is("deleted_at", null);
+
+    if (countriesError) {
+      throw new Error(
+        `Failed to load program countries: ${countriesError.message}`,
+      );
+    }
+
+    (
+      (countriesData ?? []) as CountryRow[]
+    ).forEach((country) => {
+      countryMap.set(country.id, country);
+    });
+  }
+
+  const supabaseUrl =
+    process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+
+  return rows.map((program) => {
+    const country = program.country_id
+      ? countryMap.get(program.country_id)
+      : undefined;
+
+    const coverMedia = getCoverMedia(
+      program.cover_media,
+    );
+
+    return {
+      id: program.id,
+      titleAr: program.title_ar,
+      titleEn: program.title_en,
+      slug: program.slug,
+      summaryAr: program.summary_ar ?? "",
+      summaryEn: program.summary_en ?? "",
+      countryId: program.country_id,
+      countryNameAr:
+        country?.name_ar ?? "",
+      countryNameEn:
+        country?.name_en ?? "",
+      durationDays:
+        program.duration_days,
+      durationNights:
+        program.duration_nights,
+      basePrice:
+        Number(program.base_price) || 0,
+      currencyCode:
+        program.currency_code,
+      isFeatured:
+        program.is_featured,
+      coverUrl:
+        coverMedia && supabaseUrl
+          ? createPublicMediaUrl(
+              supabaseUrl,
+              coverMedia.bucket,
+              coverMedia.path,
+            )
+          : null,
+    };
+  });
+}
+
+export default function ProgramsPreview({
+  language,
+}: Props) {
+  const isArabic =
+    language === "ar";
+
+  const supabase = useMemo(
+    () => createClient(),
+    [],
+  );
+
+  const {
+    data: programs = [],
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: [
+      "public",
+      "programs-preview",
+    ],
+    queryFn: () =>
+      loadPublicPrograms(supabase),
+    staleTime: 2 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
+  const visiblePrograms =
+    programs.slice(0, 3);
 
   return (
     <section
       className="nr-programs-preview"
       id="programs"
-      dir={language === "ar" ? "rtl" : "ltr"}
+      dir={isArabic ? "rtl" : "ltr"}
       aria-labelledby="nr-programs-title"
     >
-      <div className="nr-programs-orb nr-programs-orb-one" aria-hidden="true" />
-      <div className="nr-programs-orb nr-programs-orb-two" aria-hidden="true" />
+      <div
+        className="nr-programs-orb nr-programs-orb-one"
+        aria-hidden="true"
+      />
+
+      <div
+        className="nr-programs-orb nr-programs-orb-two"
+        aria-hidden="true"
+      />
 
       <div className="nr-container">
         <motion.div
           className="nr-programs-heading"
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          initial={{
+            opacity: 0,
+            y: 24,
+          }}
+          whileInView={{
+            opacity: 1,
+            y: 0,
+          }}
+          viewport={{
+            once: true,
+            amount: 0.3,
+          }}
+          transition={{
+            duration: 0.6,
+            ease: [
+              0.22,
+              1,
+              0.36,
+              1,
+            ],
+          }}
         >
           <span className="nr-programs-kicker">
-            {language === "ar" ? "برامج مختارة" : "Featured Programs"}
+            {isArabic
+              ? "برامج مختارة"
+              : "Featured Programs"}
           </span>
 
           <div className="nr-programs-heading-row">
             <div>
-              <h2 id="nr-programs-title" lang={language === "ar" ? "ar" : "en"}>
-                {language === "ar"
+              <h2 id="nr-programs-title">
+                {isArabic
                   ? "اختر البرنامج المناسب لرحلتك"
                   : "Choose the right program for your journey"}
               </h2>
 
               <p>
-                {language === "ar"
-                  ? "برامج متنوعة تجمع السكن والنقل والخدمات المساندة، مع خيارات تناسب الاحتياجات والميزانيات المختلفة."
-                  : "Explore Umrah programs that combine accommodation, transport, and supporting services for different needs and budgets."}
+                {isArabic
+                  ? "تصفح برامج العمرة المنشورة في نور آب، واختر البرنامج المناسب ثم استعرض تفاصيله قبل المتابعة عبر التطبيق."
+                  : "Browse published Umrah programs on NourApp, choose the right option, and review its details before continuing in the app."}
               </p>
             </div>
 
-            <a className="nr-programs-all-link" href="/programs">
+            <a
+              className="nr-programs-all-link"
+              href="/programs"
+            >
               <span>
-                {language === "ar"
+                {isArabic
                   ? "عرض جميع البرامج"
                   : "View all programs"}
               </span>
-              <ArrowIcon language={language} />
+
+              <ArrowIcon
+                language={language}
+              />
             </a>
           </div>
         </motion.div>
 
-        <motion.div
-          className="nr-programs-grid"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.12 }}
-        >
-          {featuredPrograms.map((program, index) => {
-            const copy = getProgramCopy(program, language);
+        {isLoading ? (
+          <div className="nr-programs-state">
+            {isArabic
+              ? "جارٍ تحميل البرامج..."
+              : "Loading programs..."}
+          </div>
+        ) : null}
 
-            return (
-              <motion.article
-                key={program.id}
-                className={`nr-program-card nr-program-card-${program.category}`}
-                variants={cardVariants}
-                whileHover={{ y: -10 }}
-              >
-                <div className="nr-program-media">
-                  <Image
-                    src={program.image}
-                    alt={copy.title}
-                    fill
-                    sizes="(max-width: 760px) 88vw, (max-width: 1100px) 46vw, 370px"
-                    className="nr-program-image"
-                  />
+        {isError ? (
+          <div
+            className="nr-programs-state"
+            role="alert"
+          >
+            {isArabic
+              ? "تعذر تحميل البرامج حاليًا."
+              : "Unable to load programs right now."}
+          </div>
+        ) : null}
 
-                  <div className="nr-program-overlay" aria-hidden="true" />
+        {!isLoading &&
+        !isError &&
+        visiblePrograms.length === 0 ? (
+          <div className="nr-programs-state">
+            {isArabic
+              ? "لا توجد برامج منشورة حاليًا."
+              : "There are no published programs right now."}
+          </div>
+        ) : null}
 
-                  {copy.badge && (
-                    <span className="nr-program-badge">{copy.badge}</span>
-                  )}
+        {visiblePrograms.length > 0 ? (
+          <motion.div
+            className="nr-programs-grid"
+            variants={
+              containerVariants
+            }
+            initial="hidden"
+            whileInView="visible"
+            viewport={{
+              once: true,
+              amount: 0.12,
+            }}
+          >
+            {visiblePrograms.map(
+              (program, index) => {
+                const title =
+                  isArabic
+                    ? program.titleAr
+                    : program.titleEn;
 
-                  <span className="nr-program-index">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                </div>
+                const description =
+                  isArabic
+                    ? program.summaryAr
+                    : program.summaryEn;
 
-                <div className="nr-program-body">
-                  <div className="nr-program-title-row">
-                    <div>
-                      <span className="nr-program-category">
-                        {language === "ar"
-                          ? program.category === "economy"
-                            ? "اقتصادي"
-                            : program.category === "premium"
+                const countryName =
+                  isArabic
+                    ? program.countryNameAr
+                    : program.countryNameEn;
+
+                const detailsUrl =
+                  `/programs/${encodeURIComponent(
+                    program.slug,
+                  )}`;
+
+                return (
+                  <motion.article
+                    key={program.id}
+                    className="nr-program-card"
+                    variants={
+                      cardVariants
+                    }
+                    whileHover={{
+                      y: -10,
+                    }}
+                  >
+                    <a
+                      className="nr-program-card-link"
+                      href={detailsUrl}
+                      aria-label={
+                        isArabic
+                          ? `عرض تفاصيل ${title}`
+                          : `View details for ${title}`
+                      }
+                    >
+                      <div className="nr-program-media">
+                        {program.coverUrl ? (
+                          <Image
+                            src={
+                              program.coverUrl
+                            }
+                            alt={title}
+                            fill
+                            unoptimized
+                            sizes="(max-width: 760px) 88vw, (max-width: 1100px) 46vw, 370px"
+                            className="nr-program-image"
+                          />
+                        ) : (
+                          <div className="nr-program-image-placeholder">
+                            <ProgramPlaceholderIcon />
+
+                            <span>
+                              {isArabic
+                                ? "صورة البرنامج"
+                                : "Program image"}
+                            </span>
+                          </div>
+                        )}
+
+                        <div
+                          className="nr-program-overlay"
+                          aria-hidden="true"
+                        />
+
+                        {program.isFeatured ? (
+                          <span className="nr-program-badge">
+                            {isArabic
                               ? "مميز"
-                              : "كبار الشخصيات"
-                          : program.category === "economy"
-                            ? "Economy"
-                            : program.category === "premium"
-                              ? "Premium"
-                              : "VIP"}
-                      </span>
+                              : "Featured"}
+                          </span>
+                        ) : null}
 
-                      <h3>{copy.title}</h3>
-                    </div>
-
-                    <span className="nr-program-rating" aria-label="5 stars">
-                      ★ 5.0
-                    </span>
-                  </div>
-
-                  <p className="nr-program-description">{copy.description}</p>
-
-                  <div className="nr-program-features">
-                    <span>
-                      <CalendarIcon />
-                      {copy.duration}
-                    </span>
-
-                    <span>
-                      <HotelIcon />
-                      {copy.hotel}
-                    </span>
-
-                    <span>
-                      <TransportIcon />
-                      {copy.transport}
-                    </span>
-                  </div>
-
-                  <div className="nr-program-divider" />
-
-                  <div className="nr-program-footer">
-                    <div className="nr-program-price">
-                      <small>
-                        {language === "ar" ? "يبدأ من" : "Starting from"}
-                      </small>
-
-                      <strong>
-                        {formatPrice(program.priceFrom, language)}
-                        <span>
-                          {language === "ar" ? " ر.س" : " SAR"}
+                        <span className="nr-program-index">
+                          {String(
+                            index + 1,
+                          ).padStart(
+                            2,
+                            "0",
+                          )}
                         </span>
-                      </strong>
-                    </div>
+                      </div>
+                    </a>
 
-                    <div className="nr-program-actions">
-                      <a
-                        className="nr-program-details"
-                        href={`/programs/${program.slug}`}
-                      >
-                        {language === "ar" ? "التفاصيل" : "Details"}
-                      </a>
+                    <div className="nr-program-body">
+                      <div className="nr-program-title-row">
+                        <div>
+                          <span className="nr-program-category">
+                            {countryName ||
+                              (isArabic
+                                ? "برنامج عمرة"
+                                : "Umrah Program")}
+                          </span>
 
-                      <a
-                        className="nr-program-primary"
-                        href="#contact"
-                      >
+                          <h3>
+                            <a
+                              href={
+                                detailsUrl
+                              }
+                            >
+                              {title}
+                            </a>
+                          </h3>
+                        </div>
+
+                        {program.isFeatured ? (
+                          <span className="nr-program-rating">
+                            ★
+                          </span>
+                        ) : null}
+                      </div>
+
+                      <p className="nr-program-description">
+                        {description ||
+                          (isArabic
+                            ? "استعرض تفاصيل البرنامج والخدمات المتاحة."
+                            : "Review the program details and available services.")}
+                      </p>
+
+                      <div className="nr-program-features">
                         <span>
-                          {language === "ar"
-                            ? "ابدأ عبر  نور آب"
-                            : "Start with NourApp"}
+                          <CalendarIcon />
+
+                          {formatDuration(
+                            program.durationDays,
+                            language,
+                          )}
                         </span>
-                        <ArrowIcon language={language} />
-                      </a>
+
+                        <span>
+                          <NightIcon />
+
+                          {formatNights(
+                            program.durationNights,
+                            language,
+                          )}
+                        </span>
+
+                        <span>
+                          <LocationIcon />
+
+                          {countryName ||
+                            (isArabic
+                              ? "غير محدد"
+                              : "Not specified")}
+                        </span>
+                      </div>
+
+                      <div className="nr-program-divider" />
+
+                      <div className="nr-program-footer">
+                        <div className="nr-program-price">
+                          <small>
+                            {isArabic
+                              ? "يبدأ من"
+                              : "Starting from"}
+                          </small>
+
+                          <strong>
+                            {formatPrice(
+                              program.basePrice,
+                              language,
+                            )}
+
+                            <span>
+                              {" "}
+                              {
+                                program.currencyCode
+                              }
+                            </span>
+                          </strong>
+                        </div>
+
+                        <div className="nr-program-actions">
+                          <a
+                            className="nr-program-details"
+                            href={
+                              detailsUrl
+                            }
+                          >
+                            {isArabic
+                              ? "التفاصيل"
+                              : "Details"}
+                          </a>
+
+                          <a
+                            className="nr-program-primary"
+                            href={
+                              detailsUrl
+                            }
+                          >
+                            <span>
+                              {isArabic
+                                ? "عرض البرنامج"
+                                : "View Program"}
+                            </span>
+
+                            <ArrowIcon
+                              language={
+                                language
+                              }
+                            />
+                          </a>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </motion.article>
-            );
-          })}
-        </motion.div>
+                  </motion.article>
+                );
+              },
+            )}
+          </motion.div>
+        ) : null}
 
         <motion.div
           className="nr-programs-note"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+          initial={{
+            opacity: 0,
+          }}
+          whileInView={{
+            opacity: 1,
+          }}
+          viewport={{
+            once: true,
+          }}
+          transition={{
+            duration: 0.5,
+            delay: 0.2,
+          }}
         >
           <InfoIcon />
+
           <p>
-            {language === "ar"
-              ? "الأسعار والبرامج المعروضة حاليًا تجريبية، وسيتم تحديثها وربطها بالنظام الرسمي لاحقًا."
-              : "The programs and prices shown are currently illustrative and will later be connected to the official system."}
+            {isArabic
+              ? "الحجز يتم عبر تطبيق نور آب. يمكنك من الموقع استعراض البرنامج وتفاصيله قبل الانتقال إلى التطبيق."
+              : "Booking is completed through the NourApp application. The website lets you review the program and its details first."}
           </p>
         </motion.div>
       </div>
@@ -284,7 +701,11 @@ export default function ProgramsPreview({ language }: Props) {
           background:
             linear-gradient(
               180deg,
-              color-mix(in srgb, var(--nr-soft) 65%, transparent),
+              color-mix(
+                in srgb,
+                var(--nr-soft) 65%,
+                transparent
+              ),
               var(--nr-bg)
             );
           scroll-margin-top: 108px;
@@ -298,27 +719,55 @@ export default function ProgramsPreview({ language }: Props) {
           opacity: 0.33;
           background-image:
             linear-gradient(
-              rgba(23, 111, 232, 0.055) 1px,
+              rgba(
+                  23,
+                  111,
+                  232,
+                  0.055
+                )
+                1px,
               transparent 1px
             ),
             linear-gradient(
               90deg,
-              rgba(23, 111, 232, 0.055) 1px,
+              rgba(
+                  23,
+                  111,
+                  232,
+                  0.055
+                )
+                1px,
               transparent 1px
             );
-          background-size: 52px 52px;
-          mask-image: linear-gradient(
-            to bottom,
-            transparent,
-            #000 18%,
-            #000 78%,
-            transparent
-          );
+          background-size:
+            52px 52px;
+          mask-image:
+            linear-gradient(
+              to bottom,
+              transparent,
+              #000 18%,
+              #000 78%,
+              transparent
+            );
         }
 
-        .nr-programs-preview .nr-container {
+        .nr-programs-preview
+          .nr-container {
           position: relative;
           z-index: 2;
+        }
+
+        .nr-programs-state {
+          display: grid;
+          min-height: 190px;
+          place-items: center;
+          padding: 30px;
+          border: 1px solid
+            var(--nr-border);
+          border-radius: 24px;
+          color: var(--nr-muted);
+          background: var(--nr-card);
+          text-align: center;
         }
 
         .nr-programs-orb {
@@ -333,7 +782,13 @@ export default function ProgramsPreview({ language }: Props) {
           height: 380px;
           top: -210px;
           inset-inline-start: -180px;
-          background: rgba(23, 111, 232, 0.12);
+          background:
+            rgba(
+              23,
+              111,
+              232,
+              0.12
+            );
         }
 
         .nr-programs-orb-two {
@@ -341,7 +796,13 @@ export default function ProgramsPreview({ language }: Props) {
           height: 330px;
           right: -170px;
           bottom: -180px;
-          background: rgba(255, 195, 19, 0.12);
+          background:
+            rgba(
+              255,
+              195,
+              19,
+              0.12
+            );
         }
 
         .nr-programs-heading {
@@ -353,10 +814,21 @@ export default function ProgramsPreview({ language }: Props) {
           align-items: center;
           min-height: 34px;
           padding-inline: 14px;
-          border: 1px solid rgba(23, 111, 232, 0.14);
+          border: 1px solid
+            rgba(
+              23,
+              111,
+              232,
+              0.14
+            );
           border-radius: 999px;
           color: var(--nr-blue);
-          background: color-mix(in srgb, var(--nr-blue) 8%, var(--nr-card));
+          background:
+            color-mix(
+              in srgb,
+              var(--nr-blue) 8%,
+              var(--nr-card)
+            );
           font-size: 12px;
           font-weight: 900;
         }
@@ -369,14 +841,20 @@ export default function ProgramsPreview({ language }: Props) {
           margin-top: 16px;
         }
 
-        .nr-programs-heading-row > div {
+        .nr-programs-heading-row
+          > div {
           max-width: 760px;
         }
 
         .nr-programs-heading h2 {
           margin: 0;
           color: var(--nr-text);
-          font-size: clamp(34px, 4vw, 54px);
+          font-size:
+            clamp(
+              34px,
+              4vw,
+              54px
+            );
           line-height: 1.25;
         }
 
@@ -396,13 +874,21 @@ export default function ProgramsPreview({ language }: Props) {
           justify-content: center;
           gap: 8px;
           padding-inline: 17px;
-          border: 1px solid var(--nr-border);
+          border: 1px solid
+            var(--nr-border);
           border-radius: 14px;
           color: var(--nr-text);
           background: var(--nr-card);
           font-size: 13px;
           font-weight: 900;
-          box-shadow: 0 12px 28px rgba(18, 67, 130, 0.06);
+          box-shadow:
+            0 12px 28px
+            rgba(
+              18,
+              67,
+              130,
+              0.06
+            );
           transition:
             transform 0.2s ease,
             border-color 0.2s ease,
@@ -412,26 +898,30 @@ export default function ProgramsPreview({ language }: Props) {
         .nr-programs-all-link svg {
           width: 17px;
           height: 17px;
-          transition: transform 0.2s ease;
+          transition:
+            transform 0.2s ease;
         }
 
         .nr-programs-all-link:hover {
           color: var(--nr-blue);
-          border-color: rgba(23, 111, 232, 0.28);
-          transform: translateY(-2px);
-        }
-
-        html[dir="rtl"] .nr-programs-all-link:hover svg {
-          transform: translateX(-3px);
-        }
-
-        html[dir="ltr"] .nr-programs-all-link:hover svg {
-          transform: translateX(3px);
+          border-color:
+            rgba(
+              23,
+              111,
+              232,
+              0.28
+            );
+          transform:
+            translateY(-2px);
         }
 
         .nr-programs-grid {
           display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
+          grid-template-columns:
+            repeat(
+              3,
+              minmax(0, 1fr)
+            );
           gap: 22px;
         }
 
@@ -439,55 +929,150 @@ export default function ProgramsPreview({ language }: Props) {
           position: relative;
           z-index: 2;
           min-width: 0;
-          opacity: 1;
-          visibility: visible;
           overflow: hidden;
-          border: 1px solid var(--nr-border);
+          border: 1px solid
+            var(--nr-border);
           border-radius: 27px;
-          background: var(--nr-card);
-          box-shadow: 0 20px 58px rgba(18, 67, 130, 0.09);
+          background:
+            var(--nr-card);
+          box-shadow:
+            0 20px 58px
+            rgba(
+              18,
+              67,
+              130,
+              0.09
+            );
           transition:
-            border-color 0.25s ease,
-            box-shadow 0.25s ease;
+            border-color
+              0.25s ease,
+            box-shadow
+              0.25s ease;
         }
 
         .nr-program-card:hover {
-         border-color: rgba(23, 111, 232, 0.34);
-         box-shadow: 0 35px 90px rgba(18, 67, 130, 0.18);
+          border-color:
+            rgba(
+              23,
+              111,
+              232,
+              0.34
+            );
+          box-shadow:
+            0 35px 90px
+            rgba(
+              18,
+              67,
+              130,
+              0.18
+            );
+        }
+
+        .nr-program-card-link {
+          display: block;
+          color: inherit;
+          text-decoration: none;
         }
 
         .nr-program-media {
-         position: relative;
-         height: 310px;
-         overflow: hidden;
-         background: #dbe8f8;
-        }
-        .nr-program-image {
-          object-fit: cover;
-          transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+          position: relative;
+          height: 310px;
+          overflow: hidden;
+          background: #dbe8f8;
         }
 
-        .nr-program-card:hover .nr-program-image {
+        .nr-program-image {
+          object-fit: cover;
+          transition:
+            transform
+              0.8s
+              cubic-bezier(
+                0.22,
+                1,
+                0.36,
+                1
+              );
+        }
+
+        .nr-program-card:hover
+          .nr-program-image {
           transform: scale(1.12);
+        }
+
+        .nr-program-image-placeholder {
+          position: absolute;
+          inset: 0;
+          display: grid;
+          place-items: center;
+          align-content: center;
+          gap: 10px;
+          color: #7c94ad;
+          background:
+            linear-gradient(
+              145deg,
+              #dceafa,
+              #edf4fb
+            );
+        }
+
+        .nr-program-image-placeholder
+          svg {
+          width: 42px;
+          height: 42px;
+        }
+
+        .nr-program-image-placeholder
+          span {
+          font-size: 12px;
+          font-weight: 800;
         }
 
         .nr-program-overlay {
           position: absolute;
           inset: 0;
           background:
-          linear-gradient(
-          180deg,
-          rgba(4, 20, 43, 0.02) 0%,
-          rgba(4, 20, 43, 0.08) 25%,
-          rgba(4, 20, 43, 0.48) 62%,
-          rgba(4, 20, 43, 0.92) 100%
-         ),
-          linear-gradient(
-          135deg,
-         rgba(23, 111, 232, 0.18),
-         transparent 45%
-        );
-    }  
+            linear-gradient(
+              180deg,
+              rgba(
+                4,
+                20,
+                43,
+                0.02
+              )
+                0%,
+              rgba(
+                4,
+                20,
+                43,
+                0.08
+              )
+                25%,
+              rgba(
+                4,
+                20,
+                43,
+                0.48
+              )
+                62%,
+              rgba(
+                4,
+                20,
+                43,
+                0.92
+              )
+                100%
+            ),
+            linear-gradient(
+              135deg,
+              rgba(
+                23,
+                111,
+                232,
+                0.18
+              ),
+              transparent 45%
+            );
+        }
 
         .nr-program-badge {
           position: absolute;
@@ -502,7 +1087,14 @@ export default function ProgramsPreview({ language }: Props) {
           border-radius: 999px;
           color: #14335c;
           background: #ffc313;
-          box-shadow: 0 10px 25px rgba(255, 195, 19, 0.25);
+          box-shadow:
+            0 10px 25px
+            rgba(
+              255,
+              195,
+              19,
+              0.25
+            );
           font-size: 11px;
           font-weight: 900;
         }
@@ -512,7 +1104,13 @@ export default function ProgramsPreview({ language }: Props) {
           inset-inline-end: 17px;
           bottom: 13px;
           z-index: 2;
-          color: rgba(255, 255, 255, 0.82);
+          color:
+            rgba(
+              255,
+              255,
+              255,
+              0.82
+            );
           font-size: 31px;
           font-weight: 900;
           letter-spacing: 0.04em;
@@ -544,18 +1142,29 @@ export default function ProgramsPreview({ language }: Props) {
           line-height: 1.4;
         }
 
+        .nr-program-title-row h3 a {
+          color: inherit;
+          text-decoration: none;
+        }
+
         .nr-program-rating {
           flex: 0 0 auto;
+          min-width: 29px;
           min-height: 29px;
           display: inline-flex;
           align-items: center;
-          padding-inline: 9px;
+          justify-content: center;
           border-radius: 999px;
           color: #735800;
-          background: rgba(255, 195, 19, 0.15);
-          font-size: 11px;
+          background:
+            rgba(
+              255,
+              195,
+              19,
+              0.15
+            );
+          font-size: 12px;
           font-weight: 900;
-          white-space: nowrap;
         }
 
         .nr-program-description {
@@ -568,7 +1177,11 @@ export default function ProgramsPreview({ language }: Props) {
 
         .nr-program-features {
           display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
+          grid-template-columns:
+            repeat(
+              3,
+              minmax(0, 1fr)
+            );
           gap: 7px;
         }
 
@@ -581,10 +1194,12 @@ export default function ProgramsPreview({ language }: Props) {
           justify-content: center;
           gap: 6px;
           padding: 8px 5px;
-          border: 1px solid var(--nr-border);
+          border: 1px solid
+            var(--nr-border);
           border-radius: 13px;
           color: var(--nr-muted);
-          background: var(--nr-soft);
+          background:
+            var(--nr-soft);
           font-size: 10px;
           font-weight: 800;
           text-align: center;
@@ -599,38 +1214,41 @@ export default function ProgramsPreview({ language }: Props) {
         .nr-program-divider {
           height: 1px;
           margin: 20px 0;
-          background: var(--nr-border);
+          background:
+            var(--nr-border);
         }
 
         .nr-program-footer {
           display: flex;
           align-items: flex-end;
-          justify-content: space-between;
+          justify-content:
+            space-between;
           gap: 12px;
         }
 
         .nr-program-price small {
-         display: block;
-         margin-bottom: 7px;
-         color: var(--nr-muted);
-         font-size: 12px;
-         font-weight: 800;
-         letter-spacing: 0.03em;
+          display: block;
+          margin-bottom: 7px;
+          color: var(--nr-muted);
+          font-size: 12px;
+          font-weight: 800;
         }
 
         .nr-program-price strong {
           display: block;
-         color: var(--nr-text);
-         font-size: 38px;
-         font-weight: 900;
-         line-height: 0.95;
-         } 
+          color: var(--nr-text);
+          font-size: 34px;
+          font-weight: 900;
+          line-height: 1;
+        }
 
-        .nr-program-price strong span {
-         margin-inline-start: 4px;
-         color: var(--nr-muted);
-         font-size: 12px;
-         font-weight: 800;
+        .nr-program-price
+          strong
+          span {
+          margin-inline-start: 4px;
+          color: var(--nr-muted);
+          font-size: 12px;
+          font-weight: 800;
         }
 
         .nr-program-actions {
@@ -649,25 +1267,38 @@ export default function ProgramsPreview({ language }: Props) {
           font-size: 11px;
           font-weight: 900;
           white-space: nowrap;
+          text-decoration: none;
           transition:
             transform 0.2s ease,
-            border-color 0.2s ease,
-            box-shadow 0.2s ease;
+            border-color
+              0.2s ease,
+            box-shadow
+              0.2s ease;
         }
 
         .nr-program-details {
           padding-inline: 12px;
-          border: 1px solid var(--nr-border);
+          border: 1px solid
+            var(--nr-border);
           color: var(--nr-text);
-          background: var(--nr-card);
+          background:
+            var(--nr-card);
         }
 
         .nr-program-primary {
           gap: 6px;
           padding-inline: 13px;
-          color: #ffffff;
-          background: var(--nr-blue);
-          box-shadow: 0 11px 25px rgba(23, 111, 232, 0.2);
+          color: #fff;
+          background:
+            var(--nr-blue);
+          box-shadow:
+            0 11px 25px
+            rgba(
+              23,
+              111,
+              232,
+              0.2
+            );
         }
 
         .nr-program-primary svg {
@@ -677,20 +1308,8 @@ export default function ProgramsPreview({ language }: Props) {
 
         .nr-program-details:hover,
         .nr-program-primary:hover {
-          transform: translateY(-2px);
-        }
-
-        .nr-program-details:hover {
-          border-color: rgba(23, 111, 232, 0.3);
-        }
-
-        .nr-program-primary:hover {
-          box-shadow: 0 15px 31px rgba(23, 111, 232, 0.28);
-        }
-
-        .nr-programs-preview a:focus-visible {
-          outline: 3px solid rgba(23, 111, 232, 0.28);
-          outline-offset: 4px;
+          transform:
+            translateY(-2px);
         }
 
         .nr-programs-note {
@@ -718,42 +1337,13 @@ export default function ProgramsPreview({ language }: Props) {
           line-height: 1.7;
         }
 
-
-        html[data-theme="dark"] .nr-programs-preview {
-          background:
-            radial-gradient(
-              circle at 10% 14%,
-              rgba(23, 111, 232, 0.14),
-              transparent 24%
-            ),
-            radial-gradient(
-              circle at 90% 86%,
-              rgba(255, 195, 19, 0.09),
-              transparent 24%
-            ),
-            linear-gradient(180deg, #07182c, #0a213d);
-        }
-
-        html[data-theme="dark"] .nr-program-card {
-          border-color: rgba(255, 255, 255, 0.1);
-          background: rgba(255, 255, 255, 0.055);
-          box-shadow: 0 24px 64px rgba(0, 0, 0, 0.24);
-        }
-
-        html[data-theme="dark"] .nr-program-features span {
-          border-color: rgba(255, 255, 255, 0.08);
-          background: rgba(255, 255, 255, 0.045);
-        }
-
         @media (max-width: 1080px) {
           .nr-programs-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-          }
-
-          .nr-program-card:last-child {
-            grid-column: 1 / -1;
-            width: min(100%, 520px);
-            justify-self: center;
+            grid-template-columns:
+              repeat(
+                2,
+                minmax(0, 1fr)
+              );
           }
         }
 
@@ -763,7 +1353,8 @@ export default function ProgramsPreview({ language }: Props) {
           }
 
           .nr-programs-heading-row {
-            align-items: flex-start;
+            align-items:
+              flex-start;
             flex-direction: column;
             gap: 22px;
           }
@@ -776,10 +1367,22 @@ export default function ProgramsPreview({ language }: Props) {
             display: flex;
             gap: 14px;
             overflow-x: auto;
-            margin-inline: calc((100vw - 100%) / -2);
-            padding-inline: max(13px, calc((100vw - 100%) / 2));
+            margin-inline:
+              calc(
+                (100vw - 100%) /
+                  -2
+              );
+            padding-inline:
+              max(
+                13px,
+                calc(
+                  (100vw - 100%) /
+                    2
+                )
+              );
             padding-bottom: 18px;
-            scroll-snap-type: x mandatory;
+            scroll-snap-type:
+              x mandatory;
             scrollbar-width: none;
           }
 
@@ -787,12 +1390,12 @@ export default function ProgramsPreview({ language }: Props) {
             display: none;
           }
 
-          .nr-program-card,
-          .nr-program-card:last-child {
-            flex: 0 0 min(87vw, 390px);
+          .nr-program-card {
+            flex: 0 0
+              min(87vw, 390px);
             width: auto;
-            grid-column: auto;
-            scroll-snap-align: center;
+            scroll-snap-align:
+              center;
           }
 
           .nr-program-media {
@@ -816,7 +1419,8 @@ export default function ProgramsPreview({ language }: Props) {
 
           .nr-program-actions {
             display: grid;
-            grid-template-columns: 0.8fr 1.2fr;
+            grid-template-columns:
+              0.8fr 1.2fr;
           }
 
           .nr-program-details,
@@ -825,7 +1429,10 @@ export default function ProgramsPreview({ language }: Props) {
           }
         }
 
-        @media (prefers-reduced-motion: reduce) {
+        @media (
+          prefers-reduced-motion:
+            reduce
+        ) {
           .nr-program-card,
           .nr-program-image,
           .nr-programs-preview a,
@@ -840,49 +1447,147 @@ export default function ProgramsPreview({ language }: Props) {
 
 function CalendarIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-      <rect x="3" y="5" width="18" height="16" rx="3" />
-      <path d="M8 3v4M16 3v4M3 10h18" strokeLinecap="round" />
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      aria-hidden="true"
+    >
+      <rect
+        x="3"
+        y="5"
+        width="18"
+        height="16"
+        rx="3"
+      />
+
+      <path
+        d="M8 3v4M16 3v4M3 10h18"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
 
-function HotelIcon() {
+function NightIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-      <path d="M4 21V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16" />
-      <path d="M2 21h20M8 7h2M14 7h2M8 11h2M14 11h2M10 21v-5h4v5" strokeLinecap="round" />
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      aria-hidden="true"
+    >
+      <path
+        d="M20 15.5A8.5 8.5 0 0 1 8.5 4a8.5 8.5 0 1 0 11.5 11.5Z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
 
-function TransportIcon() {
+function LocationIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-      <rect x="4" y="3" width="16" height="16" rx="3" />
-      <path d="M7 19v2M17 19v2M4 11h16M8 7h8" strokeLinecap="round" />
-      <circle cx="8" cy="15" r="1" fill="currentColor" stroke="none" />
-      <circle cx="16" cy="15" r="1" fill="currentColor" stroke="none" />
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      aria-hidden="true"
+    >
+      <path d="M12 21s7-4.3 7-11a7 7 0 1 0-14 0c0 6.7 7 11 7 11Z" />
+
+      <circle
+        cx="12"
+        cy="10"
+        r="2.5"
+      />
+    </svg>
+  );
+}
+
+function ProgramPlaceholderIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      aria-hidden="true"
+    >
+      <rect
+        x="3"
+        y="4"
+        width="18"
+        height="16"
+        rx="3"
+      />
+
+      <circle
+        cx="9"
+        cy="10"
+        r="2"
+      />
+
+      <path
+        d="m5 18 4.5-4.5 3 3 2-2L19 18"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
 
 function InfoIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">
-      <circle cx="12" cy="12" r="9" />
-      <path d="M12 11v5M12 8h.01" strokeLinecap="round" />
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      aria-hidden="true"
+    >
+      <circle
+        cx="12"
+        cy="12"
+        r="9"
+      />
+
+      <path
+        d="M12 11v5M12 8h.01"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
 
-function ArrowIcon({ language }: { language: Language }) {
+function ArrowIcon({
+  language,
+}: {
+  language: Language;
+}) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      aria-hidden="true"
+    >
       {language === "ar" ? (
-        <path d="M19 12H5m6 6-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+        <path
+          d="M19 12H5m6 6-6-6 6-6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
       ) : (
-        <path d="M5 12h14m-6-6 6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+        <path
+          d="M5 12h14m-6-6 6 6-6 6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
       )}
     </svg>
   );

@@ -1,8 +1,18 @@
+import type { ProgramHotelFormValue } from "./program-hotel";
+import type {
+  ProgramFlightFormValue,
+} from "./program-flight";
+
 export type ProgramStatus =
   | "draft"
   | "published"
   | "inactive";
 
+  export type ProgramFlightInclusion =
+  | "included"
+  | "excluded"
+  | "dynamic";
+  
 export type Program = {
   id: string;
 
@@ -24,6 +34,10 @@ export type Program = {
 
   basePrice: number;
   currencyCode: string;
+
+  flightInclusion: ProgramFlightInclusion;
+flightNotesAr: string;
+flightNotesEn: string;
 
   coverMediaId: string | null;
   coverUrl: string | null;
@@ -69,4 +83,12 @@ export type ProgramFormValues = {
   sortOrder: number;
 
   coverFile: File | null;
+
+  hotels: ProgramHotelFormValue[];
+
+  flightInclusion: ProgramFlightInclusion;
+flightNotesAr: string;
+flightNotesEn: string;
+
+flights: ProgramFlightFormValue[];
 };

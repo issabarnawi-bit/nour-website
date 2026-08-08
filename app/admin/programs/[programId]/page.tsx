@@ -2,18 +2,18 @@ import ProgramDetailsPage from "../../../../src/features/programs/ProgramDetails
 
 type PageProps = {
   params: Promise<{
-    programId: string;
+    id: string;
   }>;
 };
 
 export default async function Page({
   params,
 }: PageProps) {
-  const { programId } = await params;
+  const { id } = await params;
 
   return (
     <ProgramDetailsPage
-      programId={programId}
+      programId={id}
     />
   );
 }
