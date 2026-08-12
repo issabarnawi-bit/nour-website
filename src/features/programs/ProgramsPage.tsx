@@ -18,6 +18,22 @@ import { useToast } from "../../core/notifications";
 import { createClient } from "../../lib/supabase/client";
 import { countriesQuery } from "../countries/services";
 import { listHotels } from "../hotels/services";
+import {
+  getTransportsForProgram,
+  listTransports,
+  saveProgramTransports,
+} from "../transports/services";
+import type {
+  ProgramTransportFormValue,
+} from "../transports/types/transport";
+import {
+  getVisasForProgram,
+  listVisas,
+  saveProgramVisas,
+} from "../visas/services";
+import type {
+  ProgramVisaFormValue,
+} from "../visas/types/visa";
 
 import ProgramForm from "./forms/ProgramForm";
 import {
@@ -37,6 +53,57 @@ import type {
   ProgramFormValues,
   ProgramHotelFormValue,
 } from "./types";
+
+type ProgramFormSubmitValues =
+  ProgramFormValues & {
+    transports: ProgramTransportFormValue[];
+    visas: ProgramVisaFormValue[];
+  };
+
+type ProgramCountryOption = {
+  id: string;
+  nameAr: string;
+  nameEn: string;
+};
+
+type ProgramHotelOption = {
+  id: string;
+  nameAr: string;
+  nameEn: string;
+  cityAr?: string;
+  cityEn?: string;
+  stars?: number;
+  status: string;
+};
+
+type ProgramTransportOption = {
+  id: string;
+  nameAr: string;
+  nameEn: string;
+  providerNameAr?: string | null;
+  providerNameEn?: string | null;
+  serviceType: import("../transports/types/transport").TransportServiceType;
+  mode: import("../transports/types/transport").TransportMode;
+  vehicleType: import("../transports/types/transport").TransportVehicleType;
+  vehicleNameAr?: string | null;
+  vehicleNameEn?: string | null;
+  capacity: number;
+  isActive: boolean;
+};
+
+type ProgramVisaOption = {
+  id: string;
+  nameAr: string;
+  nameEn: string;
+  visaType: import("../visas/types/visa").VisaType;
+  processingType: import("../visas/types/visa").VisaProcessingType;
+  processingTimeDays: number | null;
+  validityDays: number | null;
+  maxStayDays: number | null;
+  basePrice: number | null;
+  currencyCode: string | null;
+  isActive: boolean;
+};
 
 type ProgramStatusFilter =
   | "all"
@@ -103,6 +170,16 @@ export default function ProgramsPage() {
   ] = useState<ProgramFlightFormValue[]>([]);
 
   const [
+    editingProgramTransports,
+    setEditingProgramTransports,
+  ] = useState<ProgramTransportFormValue[]>([]);
+
+  const [
+    editingProgramVisas,
+    setEditingProgramVisas,
+  ] = useState<ProgramVisaFormValue[]>([]);
+
+  const [
     isEditingHotelsLoading,
     setIsEditingHotelsLoading,
   ] = useState(false);
@@ -110,6 +187,16 @@ export default function ProgramsPage() {
   const [
     isEditingFlightsLoading,
     setIsEditingFlightsLoading,
+  ] = useState(false);
+
+  const [
+    isEditingTransportsLoading,
+    setIsEditingTransportsLoading,
+  ] = useState(false);
+
+  const [
+    isEditingVisasLoading,
+    setIsEditingVisasLoading,
   ] = useState(false);
 
   const [formError, setFormError] =
@@ -209,14 +296,17 @@ export default function ProgramsPage() {
     permissions?.["programs.delete"] ?? false;
 
   const {
-    data: countries = [],
+    data: countriesData = [],
     isLoading: isCountriesLoading,
     isError: isCountriesError,
     error: countriesError,
   } = useQuery(countriesQuery(supabase));
 
+  const countries =
+    countriesData as ProgramCountryOption[];
+
   const {
-    data: hotels = [],
+    data: hotelsData = [],
     isLoading: isHotelsLoading,
     isError: isHotelsError,
     error: hotelsError,
@@ -232,8 +322,62 @@ export default function ProgramsPage() {
     refetchOnMount: "always",
   });
 
+  const hotels =
+    hotelsData as ProgramHotelOption[];
+
   const activeHotels = hotels.filter(
-    (hotel) => hotel.status === "active",
+    (hotel: ProgramHotelOption) =>
+      hotel.status === "active",
+  );
+
+  const {
+    data: transportsData = [],
+    isLoading: isTransportsLoading,
+    isError: isTransportsError,
+    error: transportsError,
+  } = useQuery({
+    queryKey: [
+      "transports",
+      "program-options",
+      currentUser?.id ?? "anonymous",
+    ],
+    queryFn: () => listTransports(supabase),
+    enabled: Boolean(currentUser?.id),
+    staleTime: 0,
+    refetchOnMount: "always",
+  });
+
+  const transports =
+    transportsData as ProgramTransportOption[];
+
+  const activeTransports = transports.filter(
+    (transport: ProgramTransportOption) =>
+      transport.isActive,
+  );
+
+  const {
+    data: visasData = [],
+    isLoading: isVisasLoading,
+    isError: isVisasError,
+    error: visasError,
+  } = useQuery({
+    queryKey: [
+      "visas",
+      "program-options",
+      currentUser?.id ?? "anonymous",
+    ],
+    queryFn: () => listVisas(supabase),
+    enabled: Boolean(currentUser?.id),
+    staleTime: 0,
+    refetchOnMount: "always",
+  });
+
+  const visas =
+    visasData as ProgramVisaOption[];
+
+  const activeVisas = visas.filter(
+    (visa: ProgramVisaOption) =>
+      visa.isActive,
   );
 
   const {
@@ -415,6 +559,8 @@ export default function ProgramsPage() {
     setEditingProgram(null);
     setEditingProgramHotels([]);
     setEditingProgramFlights([]);
+    setEditingProgramTransports([]);
+    setEditingProgramVisas([]);
     setIsCreateOpen(true);
   }
 
@@ -427,6 +573,8 @@ export default function ProgramsPage() {
     setEditingProgram(null);
     setEditingProgramHotels([]);
     setEditingProgramFlights([]);
+    setEditingProgramTransports([]);
+    setEditingProgramVisas([]);
     setIsCreateOpen(false);
 
     if (editProgramId) {
@@ -444,17 +592,29 @@ export default function ProgramsPage() {
     setFormError("");
     setIsEditingHotelsLoading(true);
     setIsEditingFlightsLoading(true);
+    setIsEditingTransportsLoading(true);
+    setIsEditingVisasLoading(true);
 
     try {
       const [
         linkedHotels,
         linkedFlights,
+        linkedTransports,
+        linkedVisas,
       ] = await Promise.all([
         getHotelsForProgram(
           supabase,
           program.id,
         ),
         getFlightsForProgram(
+          supabase,
+          program.id,
+        ),
+        getTransportsForProgram(
+          supabase,
+          program.id,
+        ),
+        getVisasForProgram(
           supabase,
           program.id,
         ),
@@ -529,6 +689,38 @@ export default function ProgramsPage() {
         })),
       );
 
+      setEditingProgramTransports(
+        linkedTransports.map((transport) => ({
+          id: transport.id,
+          transportId: transport.transportId,
+          dayNumber: transport.dayNumber,
+          pickupNameAr: transport.pickupNameAr ?? "",
+          pickupNameEn: transport.pickupNameEn ?? "",
+          dropoffNameAr: transport.dropoffNameAr ?? "",
+          dropoffNameEn: transport.dropoffNameEn ?? "",
+          pickupDatetime: transport.pickupDatetime
+            ? transport.pickupDatetime.slice(0, 16)
+            : "",
+          estimatedDurationMinutes:
+            transport.estimatedDurationMinutes,
+          notesAr: transport.notesAr ?? "",
+          notesEn: transport.notesEn ?? "",
+          isIncluded: transport.isIncluded,
+          sortOrder: transport.sortOrder,
+        })),
+      );
+
+      setEditingProgramVisas(
+        linkedVisas.map((visa) => ({
+          id: visa.id,
+          visaId: visa.visaId,
+          isIncluded: visa.isIncluded,
+          notesAr: visa.notesAr ?? "",
+          notesEn: visa.notesEn ?? "",
+          sortOrder: visa.sortOrder,
+        })),
+      );
+
       setEditingProgram(program);
       setIsCreateOpen(true);
     } catch (error) {
@@ -536,8 +728,8 @@ export default function ProgramsPage() {
         error instanceof Error
           ? error.message
           : isArabic
-            ? "تعذر تحميل بيانات الفنادق أو الرحلات للبرنامج."
-            : "Unable to load program hotel or flight data.";
+            ? "تعذر تحميل بيانات الفنادق أو الرحلات أو النقل أو التأشيرات للبرنامج."
+            : "Unable to load program hotel, flight, transport, or visa data.";
 
       setFormError(message);
 
@@ -551,11 +743,13 @@ export default function ProgramsPage() {
     } finally {
       setIsEditingHotelsLoading(false);
       setIsEditingFlightsLoading(false);
+      setIsEditingTransportsLoading(false);
+      setIsEditingVisasLoading(false);
     }
   }
 
   async function handleCreateProgram(
-    values: ProgramFormValues,
+    values: ProgramFormSubmitValues,
   ) {
     const hasRequiredPermission =
       editingProgram ? canUpdate : canCreate;
@@ -577,25 +771,57 @@ export default function ProgramsPage() {
       editingProgram !== null;
 
     try {
+      const {
+        transports: programTransports,
+        visas: programVisas,
+        ...programValues
+      } = values;
+
+      let savedProgramId: string;
+
       if (editingProgram) {
-        await updateProgram(
-          supabase,
-          editingProgram.id,
-          values,
-          editingProgram.coverMediaId,
-        );
+        const updatedProgram =
+          await updateProgram(
+            supabase,
+            editingProgram.id,
+            programValues,
+            editingProgram.coverMediaId,
+          );
+
+        savedProgramId =
+          updatedProgram?.id ??
+          editingProgram.id;
       } else {
-        await createProgram(
-          supabase,
-          values,
-        );
+        const createdProgram =
+          await createProgram(
+            supabase,
+            programValues,
+          );
+
+        savedProgramId =
+          createdProgram.id;
       }
+
+      await Promise.all([
+        saveProgramTransports(
+          supabase,
+          savedProgramId,
+          programTransports,
+        ),
+        saveProgramVisas(
+          supabase,
+          savedProgramId,
+          programVisas,
+        ),
+      ]);
 
       await refetchPrograms();
 
       setEditingProgram(null);
       setEditingProgramHotels([]);
       setEditingProgramFlights([]);
+      setEditingProgramTransports([]);
+      setEditingProgramVisas([]);
       setIsCreateOpen(false);
 
       if (editProgramId) {
@@ -897,7 +1123,7 @@ export default function ProgramsPage() {
               : "All countries"}
           </option>
 
-          {countries.map((country) => (
+          {countries.map((country: ProgramCountryOption) => (
             <option
               key={country.id}
               value={country.id}
@@ -1491,6 +1717,26 @@ export default function ProgramsPage() {
               </p>
             ) : null}
 
+            {isTransportsError ? (
+              <p className="nr-admin-login-error">
+                {transportsError instanceof Error
+                  ? transportsError.message
+                  : isArabic
+                    ? "تعذر تحميل خدمات النقل."
+                    : "Unable to load transport services."}
+              </p>
+            ) : null}
+
+            {isVisasError ? (
+              <p className="nr-admin-login-error">
+                {visasError instanceof Error
+                  ? visasError.message
+                  : isArabic
+                    ? "تعذر تحميل خدمات التأشيرات."
+                    : "Unable to load visa services."}
+              </p>
+            ) : null}
+
             {formError ? (
               <p className="nr-admin-login-error">
                 {formError}
@@ -1508,8 +1754,37 @@ export default function ProgramsPage() {
             ) : null}
 
             <ProgramForm
+              visas={activeVisas.map(
+                (visa: ProgramVisaOption) => ({
+                  id: visa.id,
+                  nameAr: visa.nameAr,
+                  nameEn: visa.nameEn,
+                  visaType: visa.visaType,
+                  processingType: visa.processingType,
+                  processingTimeDays: visa.processingTimeDays,
+                  validityDays: visa.validityDays,
+                  maxStayDays: visa.maxStayDays,
+                  basePrice: visa.basePrice,
+                  currencyCode: visa.currencyCode,
+                }),
+              )}
+              transports={activeTransports.map(
+                (transport: ProgramTransportOption) => ({
+                  id: transport.id,
+                  nameAr: transport.nameAr,
+                  nameEn: transport.nameEn,
+                  providerNameAr: transport.providerNameAr,
+                  providerNameEn: transport.providerNameEn,
+                  serviceType: transport.serviceType,
+                  mode: transport.mode,
+                  vehicleType: transport.vehicleType,
+                  vehicleNameAr: transport.vehicleNameAr,
+                  vehicleNameEn: transport.vehicleNameEn,
+                  capacity: transport.capacity,
+                }),
+              )}
               hotels={activeHotels.map(
-                (hotel) => ({
+                (hotel: ProgramHotelOption) => ({
                   id: hotel.id,
                   nameAr: hotel.nameAr,
                   nameEn: hotel.nameEn,
@@ -1519,7 +1794,7 @@ export default function ProgramsPage() {
                 }),
               )}
               countries={countries.map(
-                (country) => ({
+                (country: ProgramCountryOption) => ({
                   id: country.id,
                   nameAr:
                     country.nameAr,
@@ -1573,6 +1848,10 @@ export default function ProgramsPage() {
                         editingProgramHotels,
                       flights:
                         editingProgramFlights,
+                      transports:
+                        editingProgramTransports,
+                      visas:
+                        editingProgramVisas,
                     }
                   : undefined
               }
@@ -1585,8 +1864,14 @@ export default function ProgramsPage() {
                 isCountriesError ||
                 isHotelsLoading ||
                 isHotelsError ||
+                isTransportsLoading ||
+                isTransportsError ||
+                isVisasLoading ||
+                isVisasError ||
                 isEditingHotelsLoading ||
-                isEditingFlightsLoading
+                isEditingFlightsLoading ||
+                isEditingTransportsLoading ||
+                isEditingVisasLoading
               }
             />
           </section>

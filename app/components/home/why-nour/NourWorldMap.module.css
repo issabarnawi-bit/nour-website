@@ -871,3 +871,329 @@
     transition: none;
   }
 }
+
+/* =========================================================
+   MAP ZOOM CONTROLS
+========================================================= */
+
+.mapStage {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+
+  width: 100%;
+  height: 100%;
+
+  transform-origin: 50% 50%;
+  transition: transform 0.28s ease;
+
+  will-change: transform;
+}
+
+.zoomControls {
+  position: absolute;
+
+  z-index: 20;
+
+  inset-inline-end: 14px;
+  bottom: 14px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 7px;
+
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+
+  background: rgba(4, 20, 39, 0.82);
+
+  box-shadow:
+    0 14px 36px rgba(0, 0, 0, 0.2);
+
+  backdrop-filter: blur(14px);
+}
+
+.zoomButton,
+.zoomReset {
+  display: inline-grid;
+  place-items: center;
+
+  height: 36px;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+
+  color: #fff;
+  background: rgba(255, 255, 255, 0.07);
+
+  font: inherit;
+  font-weight: 900;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease,
+    opacity 0.18s ease;
+}
+
+.zoomButton {
+  width: 36px;
+
+  font-size: 20px;
+  line-height: 1;
+}
+
+.zoomReset {
+  min-width: 56px;
+
+  padding-inline: 9px;
+
+  color: #ffc313;
+
+  font-size: 9px;
+}
+
+.zoomButton:hover:not(:disabled),
+.zoomReset:hover:not(:disabled) {
+  transform: translateY(-1px);
+
+  border-color: rgba(71, 158, 255, 0.45);
+
+  background: rgba(71, 158, 255, 0.16);
+}
+
+.zoomButton:focus-visible,
+.zoomReset:focus-visible {
+  outline: 2px solid #79b8ff;
+  outline-offset: 2px;
+}
+
+.zoomButton:disabled,
+.zoomReset:disabled {
+  opacity: 0.36;
+  cursor: default;
+}
+
+@media (max-width: 650px) {
+  .zoomControls {
+    inset-inline-end: 8px;
+    bottom: 8px;
+
+    gap: 5px;
+    padding: 5px;
+
+    border-radius: 11px;
+  }
+
+  .zoomButton,
+  .zoomReset {
+    height: 32px;
+
+    border-radius: 8px;
+  }
+
+  .zoomButton {
+    width: 32px;
+    font-size: 18px;
+  }
+
+  .zoomReset {
+    min-width: 48px;
+    padding-inline: 7px;
+    font-size: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mapStage {
+    transition: none;
+  }
+}
+
+/* =========================================================
+   MAP ZOOM — MOUSE WHEEL + FINAL VISUAL TUNING
+========================================================= */
+
+.map {
+  overscroll-behavior: contain;
+}
+
+.mapStage {
+  transform-origin: 50% 50%;
+}
+
+.realisticMap {
+  filter:
+    contrast(1.06)
+    brightness(1.02);
+}
+
+.zoomHint {
+  position: absolute;
+
+  z-index: 19;
+
+  inset-inline-end: 14px;
+  bottom: 68px;
+
+  max-width: 190px;
+
+  padding: 7px 10px;
+
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 10px;
+
+  color: rgba(255, 255, 255, 0.76);
+  background: rgba(4, 20, 39, 0.66);
+
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.5;
+
+  pointer-events: none;
+
+  backdrop-filter: blur(10px);
+}
+
+@media (max-width: 650px) {
+  .zoomHint {
+    display: none;
+  }
+}
+
+/* =========================================================
+   COUNTRY CARD — COMPACT / NO OVERLAP
+========================================================= */
+
+.clickCard {
+  position: absolute;
+  z-index: 18;
+
+  top: 18px;
+  inset-inline-end: 18px;
+  bottom: auto;
+  left: auto;
+  right: auto;
+
+  width: min(330px, calc(100% - 36px));
+  max-width: 330px;
+  min-width: 0;
+
+  translate: none;
+
+  padding: 13px 14px 12px;
+
+  border-radius: 16px;
+
+  box-shadow:
+    0 16px 42px rgba(0, 0, 0, 0.18);
+
+  overflow: hidden;
+}
+
+.clickCard .cardTop {
+  gap: 10px;
+  padding-inline-end: 30px;
+}
+
+.clickCard .pin {
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+}
+
+.clickCard .pin svg {
+  width: 22px;
+  height: 22px;
+}
+
+.clickCard .cardTop small {
+  font-size: 10px;
+}
+
+.clickCard .cardTop strong {
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.clickCard p {
+  margin: 8px 0 0;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.cardClose {
+  position: absolute;
+  z-index: 2;
+
+  top: 9px;
+  inset-inline-end: 9px;
+
+  display: grid;
+  place-items: center;
+
+  width: 26px;
+  height: 26px;
+
+  padding: 0;
+
+  border: 1px solid rgba(21, 35, 59, 0.10);
+  border-radius: 999px;
+
+  color: #6d7b91;
+  background: rgba(255, 255, 255, 0.80);
+
+  font: inherit;
+  font-size: 16px;
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+.cardClose:hover {
+  color: #15233b;
+  background: #ffffff;
+}
+
+.cardClose:focus-visible {
+  outline: 2px solid #79b8ff;
+  outline-offset: 2px;
+}
+
+/* Zoom controls stay isolated at the opposite lower corner */
+.zoomControls {
+  inset-inline-end: 14px;
+  bottom: 14px;
+}
+
+.zoomHint {
+  inset-inline-end: 14px;
+  bottom: 68px;
+}
+
+@media (max-width: 760px) {
+  .clickCard {
+    top: 10px;
+    inset-inline: 10px;
+
+    width: auto;
+    max-width: none;
+
+    padding: 12px 13px 11px;
+
+    border-radius: 14px;
+  }
+
+  .clickCard .cardTop strong {
+    font-size: 14px;
+  }
+
+  .clickCard p {
+    font-size: 9px;
+  }
+}

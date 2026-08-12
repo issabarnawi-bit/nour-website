@@ -9,6 +9,7 @@ import {
   ArrowLeft,
   BedDouble,
   BriefcaseBusiness,
+  BusFront,
   CalendarDays,
   CheckCircle2,
   Clock3,
@@ -20,6 +21,7 @@ import {
   ShieldCheck,
   Smartphone,
   Sparkles,
+  Stamp,
   Star,
   Utensils,
 } from "lucide-react";
@@ -27,6 +29,8 @@ import {
 import { useLanguage } from "../../../src/core/i18n";
 import { createClient } from "../../../src/lib/supabase/client";
 import { getPublicProgramBySlug } from "../../../src/features/programs/services/public-program-details.service";
+import { getTransportsForProgram } from "../../../src/features/transports/services";
+import { getVisasForProgram } from "../../../src/features/visas/services";
 
 function formatNumber(
   value: number,
@@ -129,9 +133,9 @@ export default function PublicProgramDetailsPage() {
 
   const {
     data: program,
-    isLoading,
-    isError,
-    error,
+    isLoading: isProgramLoading,
+    isError: isProgramError,
+    error: programError,
   } = useQuery({
     queryKey: [
       "public",
@@ -145,6 +149,62 @@ export default function PublicProgramDetailsPage() {
       ),
     enabled: Boolean(slug),
   });
+
+  const {
+    data: transports = [],
+    isLoading: isTransportsLoading,
+    isError: isTransportsError,
+    error: transportsError,
+  } = useQuery({
+    queryKey: [
+      "public",
+      "program-details",
+      program?.id ?? "",
+      "transports",
+    ],
+    queryFn: () =>
+      getTransportsForProgram(
+        supabase,
+        program!.id,
+      ),
+    enabled: Boolean(program?.id),
+  });
+
+  const {
+    data: visas = [],
+    isLoading: isVisasLoading,
+    isError: isVisasError,
+    error: visasError,
+  } = useQuery({
+    queryKey: [
+      "public",
+      "program-details",
+      program?.id ?? "",
+      "visas",
+    ],
+    queryFn: () =>
+      getVisasForProgram(
+        supabase,
+        program!.id,
+      ),
+    enabled: Boolean(program?.id),
+  });
+
+  const isLoading =
+    isProgramLoading ||
+    (Boolean(program?.id) &&
+      (isTransportsLoading ||
+        isVisasLoading));
+
+  const isError =
+    isProgramError ||
+    isTransportsError ||
+    isVisasError;
+
+  const error =
+    programError ??
+    transportsError ??
+    visasError;
 
   if (isLoading) {
     return (
@@ -599,6 +659,403 @@ export default function PublicProgramDetailsPage() {
                     );
                   },
                 )}
+              </div>
+            )}
+          </section>
+
+          <section className="nr-program-details-section">
+            <span className="nr-program-details-kicker">
+              {isArabic
+                ? "النقل"
+                : "Transport"}
+            </span>
+
+            <h2>
+              {isArabic
+                ? "النقل والمواصلات"
+                : "Transport & Transfers"}
+            </h2>
+
+            {transports.length === 0 ? (
+              <div className="nr-program-details-empty">
+                {isArabic
+                  ? "لم تتم إضافة تفاصيل النقل لهذا البرنامج بعد."
+                  : "Transport details have not been added to this program yet."}
+              </div>
+            ) : (
+              <div className="nr-program-transports-public">
+                {transports.map((transport) => {
+                  const service =
+                    transport.transport;
+
+                  const serviceName =
+                    service
+                      ? isArabic
+                        ? service.nameAr
+                        : service.nameEn
+                      : isArabic
+                        ? "خدمة نقل"
+                        : "Transport Service";
+
+                  const vehicleName =
+                    service
+                      ? isArabic
+                        ? service.vehicleNameAr ||
+                          service.vehicleType
+                        : service.vehicleNameEn ||
+                          service.vehicleType
+                      : "";
+
+                  const pickupName =
+                    isArabic
+                      ? transport.pickupNameAr
+                      : transport.pickupNameEn;
+
+                  const dropoffName =
+                    isArabic
+                      ? transport.dropoffNameAr
+                      : transport.dropoffNameEn;
+
+                  const notes =
+                    isArabic
+                      ? transport.notesAr
+                      : transport.notesEn;
+
+                  return (
+                    <article
+                      key={transport.id}
+                      className="nr-program-transport-public-card"
+                    >
+                      <div className="nr-program-transport-public-header">
+                        <div>
+                          <span className="nr-program-transport-day">
+                            {transport.dayNumber
+                              ? isArabic
+                                ? `اليوم ${transport.dayNumber}`
+                                : `Day ${transport.dayNumber}`
+                              : isArabic
+                                ? "خدمة نقل"
+                                : "Transport"}
+                          </span>
+
+                          <h3>
+                            <BusFront size={20} />
+                            {serviceName}
+                          </h3>
+                        </div>
+
+                        <span
+                          className={`nr-program-transport-inclusion ${
+                            transport.isIncluded
+                              ? "is-included"
+                              : "is-excluded"
+                          }`}
+                        >
+                          {transport.isIncluded
+                            ? isArabic
+                              ? "مشمول"
+                              : "Included"
+                            : isArabic
+                              ? "غير مشمول"
+                              : "Not Included"}
+                        </span>
+                      </div>
+
+                      <div className="nr-program-transport-route">
+                        <div>
+                          <MapPin />
+                          <span>
+                            {isArabic
+                              ? "الاستلام"
+                              : "Pickup"}
+                          </span>
+                          <strong>
+                            {pickupName || "—"}
+                          </strong>
+                        </div>
+
+                        <div className="nr-program-transport-route-line">
+                          <span />
+                          <BusFront size={18} />
+                          <span />
+                        </div>
+
+                        <div>
+                          <MapPin />
+                          <span>
+                            {isArabic
+                              ? "الوصول"
+                              : "Drop-off"}
+                          </span>
+                          <strong>
+                            {dropoffName || "—"}
+                          </strong>
+                        </div>
+                      </div>
+
+                      <div className="nr-program-transport-meta">
+                        {service ? (
+                          <>
+                            <span>
+                              <BusFront />
+                              {service.mode === "private"
+                                ? isArabic
+                                  ? "نقل خاص"
+                                  : "Private"
+                                : isArabic
+                                  ? "نقل مشترك"
+                                  : "Shared"}
+                            </span>
+
+                            {vehicleName ? (
+                              <span>
+                                <BusFront />
+                                {vehicleName}
+                              </span>
+                            ) : null}
+
+                            <span>
+                              <BriefcaseBusiness />
+                              {isArabic
+                                ? `${service.capacity} راكب`
+                                : `${service.capacity} passengers`}
+                            </span>
+                          </>
+                        ) : null}
+
+                        {transport.pickupDatetime ? (
+                          <span>
+                            <CalendarDays />
+                            {formatDateTime(
+                              transport.pickupDatetime,
+                              language,
+                            )}
+                          </span>
+                        ) : null}
+
+                        {transport.estimatedDurationMinutes !==
+                        null ? (
+                          <span>
+                            <Clock3 />
+                            {formatTransitDuration(
+                              transport.estimatedDurationMinutes,
+                              isArabic,
+                            )}
+                          </span>
+                        ) : null}
+                      </div>
+
+                      {notes ? (
+                        <p className="nr-program-transport-notes">
+                          {notes}
+                        </p>
+                      ) : null}
+                    </article>
+                  );
+                })}
+              </div>
+            )}
+          </section>
+
+          <section className="nr-program-details-section">
+            <span className="nr-program-details-kicker">
+              {isArabic
+                ? "التأشيرة"
+                : "Visa"}
+            </span>
+
+            <h2>
+              {isArabic
+                ? "التأشيرات والمتطلبات"
+                : "Visas & Requirements"}
+            </h2>
+
+            {visas.length === 0 ? (
+              <div className="nr-program-details-empty">
+                {isArabic
+                  ? "لم تتم إضافة تفاصيل التأشيرة لهذا البرنامج بعد."
+                  : "Visa details have not been added to this program yet."}
+              </div>
+            ) : (
+              <div className="nr-program-visas-public">
+                {visas.map((programVisa) => {
+                  const visa = programVisa.visa;
+
+                  const visaName =
+                    visa
+                      ? isArabic
+                        ? visa.nameAr
+                        : visa.nameEn
+                      : isArabic
+                        ? "تأشيرة"
+                        : "Visa";
+
+                  const visaDescription =
+                    visa
+                      ? isArabic
+                        ? visa.descriptionAr
+                        : visa.descriptionEn
+                      : "";
+
+                  const requirements =
+                    visa
+                      ? isArabic
+                        ? visa.requirementsAr
+                        : visa.requirementsEn
+                      : [];
+
+                  const notes =
+                    isArabic
+                      ? programVisa.notesAr
+                      : programVisa.notesEn;
+
+                  const visaTypeLabel =
+                    visa?.visaType === "umrah"
+                      ? isArabic
+                        ? "تأشيرة عمرة"
+                        : "Umrah Visa"
+                      : visa?.visaType === "tourist"
+                        ? isArabic
+                          ? "تأشيرة سياحية"
+                          : "Tourist Visa"
+                        : visa?.visaType === "visit"
+                          ? isArabic
+                            ? "تأشيرة زيارة"
+                            : "Visit Visa"
+                          : visa?.visaType === "transit"
+                            ? isArabic
+                              ? "تأشيرة ترانزيت"
+                              : "Transit Visa"
+                            : isArabic
+                              ? "تأشيرة أخرى"
+                              : "Other Visa";
+
+                  const processingLabel =
+                    visa?.processingType === "express"
+                      ? isArabic
+                        ? "معالجة سريعة"
+                        : "Express Processing"
+                      : visa?.processingType === "manual"
+                        ? isArabic
+                          ? "معالجة يدوية"
+                          : "Manual Processing"
+                        : isArabic
+                          ? "معالجة عادية"
+                          : "Standard Processing";
+
+                  return (
+                    <article
+                      key={programVisa.id}
+                      className="nr-program-visa-public-card"
+                    >
+                      <div className="nr-program-visa-public-header">
+                        <div>
+                          <span className="nr-program-visa-type">
+                            {visaTypeLabel}
+                          </span>
+
+                          <h3>
+                            <Stamp size={20} />
+                            {visaName}
+                          </h3>
+                        </div>
+
+                        <span
+                          className={`nr-program-visa-inclusion ${
+                            programVisa.isIncluded
+                              ? "is-included"
+                              : "is-excluded"
+                          }`}
+                        >
+                          {programVisa.isIncluded
+                            ? isArabic
+                              ? "مشمولة في البرنامج"
+                              : "Included"
+                            : isArabic
+                              ? "غير مشمولة"
+                              : "Not Included"}
+                        </span>
+                      </div>
+
+                      {visaDescription ? (
+                        <p className="nr-program-visa-description">
+                          {visaDescription}
+                        </p>
+                      ) : null}
+
+                      <div className="nr-program-visa-meta">
+                        <span>
+                          <Clock3 />
+                          {processingLabel}
+                        </span>
+
+                        {visa?.processingTimeDays !== null &&
+                        visa?.processingTimeDays !== undefined ? (
+                          <span>
+                            <CalendarDays />
+                            {isArabic
+                              ? `المعالجة خلال ${visa.processingTimeDays} يوم`
+                              : `${visa.processingTimeDays} processing days`}
+                          </span>
+                        ) : null}
+
+                        {visa?.validityDays !== null &&
+                        visa?.validityDays !== undefined ? (
+                          <span>
+                            <ShieldCheck />
+                            {isArabic
+                              ? `الصلاحية ${visa.validityDays} يوم`
+                              : `${visa.validityDays} days validity`}
+                          </span>
+                        ) : null}
+
+                        {visa?.maxStayDays !== null &&
+                        visa?.maxStayDays !== undefined ? (
+                          <span>
+                            <Moon />
+                            {isArabic
+                              ? `أقصى إقامة ${visa.maxStayDays} يوم`
+                              : `Max stay ${visa.maxStayDays} days`}
+                          </span>
+                        ) : null}
+                      </div>
+
+                      {requirements.length > 0 ? (
+                        <div className="nr-program-visa-requirements">
+                          <div className="nr-program-visa-requirements-heading">
+                            <CheckCircle2 />
+                            <strong>
+                              {isArabic
+                                ? "المتطلبات"
+                                : "Requirements"}
+                            </strong>
+                          </div>
+
+                          <ul>
+                            {requirements.map(
+                              (requirement: string, index: number) => (
+                                <li
+                                  key={`${requirement}-${index}`}
+                                >
+                                  <CheckCircle2 />
+                                  <span>
+                                    {requirement}
+                                  </span>
+                                </li>
+                              ),
+                            )}
+                          </ul>
+                        </div>
+                      ) : null}
+
+                      {notes ? (
+                        <p className="nr-program-visa-notes">
+                          {notes}
+                        </p>
+                      ) : null}
+                    </article>
+                  );
+                })}
               </div>
             )}
           </section>
@@ -1538,6 +1995,325 @@ export default function PublicProgramDetailsPage() {
           line-height: 1.8;
         }
 
+
+        .nr-program-transports-public {
+          display: grid;
+          gap: 16px;
+        }
+
+        .nr-program-transport-public-card {
+          padding: 17px;
+          border: 1px solid #dce5f0;
+          border-radius: 18px;
+          background: #fff;
+          transition:
+            transform 180ms ease,
+            box-shadow 180ms ease;
+        }
+
+        .nr-program-transport-public-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 14px 36px rgba(20, 59, 102, 0.08);
+        }
+
+        .nr-program-transport-public-header {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 14px;
+          margin-bottom: 16px;
+        }
+
+        .nr-program-transport-public-header h3 {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin: 7px 0 0;
+          color: #17304f;
+          font-size: 19px;
+        }
+
+        .nr-program-transport-public-header h3 svg {
+          color: #176fe8;
+        }
+
+        .nr-program-transport-day {
+          display: inline-flex;
+          min-height: 25px;
+          align-items: center;
+          padding-inline: 9px;
+          border-radius: 999px;
+          color: #176fe8;
+          background: rgba(23, 111, 232, 0.08);
+          font-size: 10px;
+          font-weight: 900;
+        }
+
+        .nr-program-transport-inclusion {
+          display: inline-flex;
+          min-height: 29px;
+          align-items: center;
+          padding-inline: 10px;
+          border-radius: 999px;
+          font-size: 10px;
+          font-weight: 900;
+          white-space: nowrap;
+        }
+
+        .nr-program-transport-inclusion.is-included {
+          color: #047857;
+          background: rgba(16, 185, 129, 0.1);
+        }
+
+        .nr-program-transport-inclusion.is-excluded {
+          color: #b45309;
+          background: rgba(245, 158, 11, 0.11);
+        }
+
+        .nr-program-transport-route {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) 110px minmax(0, 1fr);
+          align-items: center;
+          gap: 12px;
+          padding: 18px;
+          border-radius: 15px;
+          background: #f8fafd;
+        }
+
+        .nr-program-transport-route > div:not(.nr-program-transport-route-line) {
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+        }
+
+        .nr-program-transport-route svg {
+          width: 18px;
+          color: #176fe8;
+        }
+
+        .nr-program-transport-route span {
+          color: #8a98aa;
+          font-size: 10px;
+          font-weight: 800;
+        }
+
+        .nr-program-transport-route strong {
+          color: #17304f;
+          font-size: 13px;
+          line-height: 1.6;
+        }
+
+        .nr-program-transport-route-line {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+        }
+
+        .nr-program-transport-route-line span {
+          height: 1px;
+          flex: 1;
+          background: #cfd9e6;
+        }
+
+        .nr-program-transport-meta {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-top: 13px;
+        }
+
+        .nr-program-transport-meta span {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          min-height: 34px;
+          padding-inline: 10px;
+          border-radius: 10px;
+          color: #62758c;
+          background: #f5f8fd;
+          font-size: 10px;
+          font-weight: 800;
+        }
+
+        .nr-program-transport-meta svg {
+          width: 15px;
+          color: #176fe8;
+        }
+
+        .nr-program-transport-notes {
+          margin: 13px 0 0;
+          padding: 11px 12px;
+          border-radius: 10px;
+          color: #687b92;
+          background: #f8fafd;
+          font-size: 11px;
+          line-height: 1.8;
+          white-space: pre-line;
+        }
+
+
+        .nr-program-visas-public {
+          display: grid;
+          gap: 16px;
+        }
+
+        .nr-program-visa-public-card {
+          padding: 17px;
+          border: 1px solid #dce5f0;
+          border-radius: 18px;
+          background: #fff;
+          transition:
+            transform 180ms ease,
+            box-shadow 180ms ease;
+        }
+
+        .nr-program-visa-public-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 14px 36px rgba(20, 59, 102, 0.08);
+        }
+
+        .nr-program-visa-public-header {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 14px;
+        }
+
+        .nr-program-visa-public-header h3 {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin: 7px 0 0;
+          color: #17304f;
+          font-size: 19px;
+        }
+
+        .nr-program-visa-public-header h3 svg {
+          color: #176fe8;
+        }
+
+        .nr-program-visa-type {
+          display: inline-flex;
+          min-height: 25px;
+          align-items: center;
+          padding-inline: 9px;
+          border-radius: 999px;
+          color: #176fe8;
+          background: rgba(23, 111, 232, 0.08);
+          font-size: 10px;
+          font-weight: 900;
+        }
+
+        .nr-program-visa-inclusion {
+          display: inline-flex;
+          min-height: 29px;
+          align-items: center;
+          padding-inline: 10px;
+          border-radius: 999px;
+          font-size: 10px;
+          font-weight: 900;
+          white-space: nowrap;
+        }
+
+        .nr-program-visa-inclusion.is-included {
+          color: #047857;
+          background: rgba(16, 185, 129, 0.1);
+        }
+
+        .nr-program-visa-inclusion.is-excluded {
+          color: #b45309;
+          background: rgba(245, 158, 11, 0.11);
+        }
+
+        .nr-program-visa-description {
+          margin: 14px 0 0;
+          color: #687b92;
+          font-size: 12px;
+          line-height: 1.9;
+          white-space: pre-line;
+        }
+
+        .nr-program-visa-meta {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-top: 14px;
+        }
+
+        .nr-program-visa-meta span {
+          display: inline-flex;
+          min-height: 34px;
+          align-items: center;
+          gap: 6px;
+          padding-inline: 10px;
+          border-radius: 10px;
+          color: #62758c;
+          background: #f5f8fd;
+          font-size: 10px;
+          font-weight: 800;
+        }
+
+        .nr-program-visa-meta svg {
+          width: 15px;
+          color: #176fe8;
+        }
+
+        .nr-program-visa-requirements {
+          margin-top: 15px;
+          padding: 14px;
+          border: 1px solid rgba(23, 111, 232, 0.12);
+          border-radius: 13px;
+          background: rgba(23, 111, 232, 0.035);
+        }
+
+        .nr-program-visa-requirements-heading {
+          display: flex;
+          align-items: center;
+          gap: 7px;
+          color: #17304f;
+          font-size: 12px;
+        }
+
+        .nr-program-visa-requirements-heading svg {
+          width: 17px;
+          color: #176fe8;
+        }
+
+        .nr-program-visa-requirements ul {
+          display: grid;
+          gap: 8px;
+          margin: 12px 0 0;
+          padding: 0;
+          list-style: none;
+        }
+
+        .nr-program-visa-requirements li {
+          display: flex;
+          align-items: flex-start;
+          gap: 8px;
+          color: #63758b;
+          font-size: 11px;
+          line-height: 1.7;
+        }
+
+        .nr-program-visa-requirements li svg {
+          flex: 0 0 auto;
+          width: 15px;
+          margin-top: 2px;
+          color: #16a34a;
+        }
+
+        .nr-program-visa-notes {
+          margin: 13px 0 0;
+          padding: 11px 12px;
+          border-radius: 10px;
+          color: #687b92;
+          background: #f8fafd;
+          font-size: 11px;
+          line-height: 1.8;
+          white-space: pre-line;
+        }
+
         .nr-program-details-booking {
           position: sticky;
           top: 24px;
@@ -1771,11 +2547,13 @@ export default function PublicProgramDetailsPage() {
             grid-template-columns: repeat(2, 1fr);
           }
 
-          .nr-program-flight-route {
+          .nr-program-flight-route,
+          .nr-program-transport-route {
             grid-template-columns: 1fr;
           }
 
-          .nr-program-flight-route-line {
+          .nr-program-flight-route-line,
+          .nr-program-transport-route-line {
             width: 70px;
             margin: 2px auto;
             transform: rotate(90deg);
@@ -1823,7 +2601,8 @@ export default function PublicProgramDetailsPage() {
             padding: 15px;
           }
 
-          .nr-program-flight-public-header {
+          .nr-program-flight-public-header,
+          .nr-program-visa-public-header {
             flex-direction: column;
           }
         }

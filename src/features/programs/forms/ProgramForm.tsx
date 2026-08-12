@@ -7,11 +7,24 @@ import MediaUploader from "../../../components/ui/media/MediaUploader";
 import { useLanguage } from "../../../core/i18n";
 
 import type {
-    ProgramFlightFormValue,
+  ProgramFlightFormValue,
   ProgramFormValues,
   ProgramHotelFormValue,
   ProgramStatus,
 } from "../types";
+
+import type {
+  ProgramTransportFormValue,
+  TransportMode,
+  TransportServiceType,
+  TransportVehicleType,
+} from "../../transports/types/transport";
+
+import type {
+  ProgramVisaFormValue,
+  VisaProcessingType,
+  VisaType,
+} from "../../visas/types/visa";
 
 
 type CountryOption = {
@@ -29,15 +42,49 @@ type HotelOption = {
   stars?: number;
 };
 
+type TransportOption = {
+  id: string;
+  nameAr: string;
+  nameEn: string;
+  providerNameAr?: string | null;
+  providerNameEn?: string | null;
+  serviceType: TransportServiceType;
+  mode: TransportMode;
+  vehicleType: TransportVehicleType;
+  vehicleNameAr?: string | null;
+  vehicleNameEn?: string | null;
+  capacity: number;
+};
+
+type VisaOption = {
+  id: string;
+  nameAr: string;
+  nameEn: string;
+  visaType: VisaType;
+  processingType: VisaProcessingType;
+  processingTimeDays: number | null;
+  validityDays: number | null;
+  maxStayDays: number | null;
+  basePrice: number | null;
+  currencyCode: string | null;
+};
+
+type ProgramFormSubmitValues = ProgramFormValues & {
+  transports: ProgramTransportFormValue[];
+  visas: ProgramVisaFormValue[];
+};
+
 type ProgramFormProps = {
-  initialValues?: Partial<ProgramFormValues>;
+  initialValues?: Partial<ProgramFormSubmitValues>;
   countries?: CountryOption[];
   hotels?: HotelOption[];
-  onSubmit: (values: ProgramFormValues) => Promise<void>;
+  transports?: TransportOption[];
+  visas?: VisaOption[];
+  onSubmit: (values: ProgramFormSubmitValues) => Promise<void>;
   isSubmitting?: boolean;
 };
 
-const defaultValues: ProgramFormValues = {
+const defaultValues: ProgramFormSubmitValues = {
   titleAr: "",
   titleEn: "",
   slug: "",
@@ -60,6 +107,8 @@ const defaultValues: ProgramFormValues = {
   flightNotesAr: "",
   flightNotesEn: "",
   flights: [],
+  transports: [],
+  visas: [],
 };
 
 const emptyHotel: ProgramHotelFormValue = {
@@ -110,10 +159,41 @@ const emptyFlight: ProgramFlightFormValue = {
   sortOrder: 0,
 };
 
+
+const emptyTransport: ProgramTransportFormValue = {
+  transportId: "",
+  dayNumber: null,
+
+  pickupNameAr: "",
+  pickupNameEn: "",
+
+  dropoffNameAr: "",
+  dropoffNameEn: "",
+
+  pickupDatetime: "",
+  estimatedDurationMinutes: null,
+
+  notesAr: "",
+  notesEn: "",
+
+  isIncluded: true,
+  sortOrder: 0,
+};
+
+const emptyVisa: ProgramVisaFormValue = {
+  visaId: "",
+  isIncluded: true,
+  notesAr: "",
+  notesEn: "",
+  sortOrder: 0,
+};
+
 export default function ProgramForm({
   initialValues,
   countries = [],
   hotels = [],
+  transports = [],
+  visas = [],
   onSubmit,
   isSubmitting = false,
 }: ProgramFormProps) {
@@ -121,7 +201,7 @@ export default function ProgramForm({
   const isArabic = language === "ar";
 
   const [values, setValues] =
-  useState<ProgramFormValues>({
+  useState<ProgramFormSubmitValues>({
     ...defaultValues,
     ...initialValues,
 
@@ -132,11 +212,17 @@ export default function ProgramForm({
 
     flights:
       initialValues?.flights ?? [],
+
+    transports:
+      initialValues?.transports ?? [],
+
+    visas:
+      initialValues?.visas ?? [],
   });
 
-  function updateValue<K extends keyof ProgramFormValues>(
+  function updateValue<K extends keyof ProgramFormSubmitValues>(
     key: K,
-    value: ProgramFormValues[K],
+    value: ProgramFormSubmitValues[K],
   ) {
     setValues((currentValues) => ({
       ...currentValues,
@@ -248,6 +334,114 @@ function updateFlight<
   }));
 }
 
+
+  function addTransport() {
+    setValues((currentValues) => ({
+      ...currentValues,
+
+      transports: [
+        ...currentValues.transports,
+        {
+          ...emptyTransport,
+          sortOrder:
+            currentValues.transports.length,
+        },
+      ],
+    }));
+  }
+
+  function removeTransport(index: number) {
+    setValues((currentValues) => ({
+      ...currentValues,
+
+      transports:
+        currentValues.transports
+          .filter(
+            (_, currentIndex) =>
+              currentIndex !== index,
+          )
+          .map(
+            (transport, currentIndex) => ({
+              ...transport,
+              sortOrder: currentIndex,
+            }),
+          ),
+    }));
+  }
+
+  function updateTransport<
+    K extends keyof ProgramTransportFormValue,
+  >(
+    index: number,
+    key: K,
+    value: ProgramTransportFormValue[K],
+  ) {
+    setValues((currentValues) => ({
+      ...currentValues,
+
+      transports:
+        currentValues.transports.map(
+          (transport, currentIndex) =>
+            currentIndex === index
+              ? {
+                  ...transport,
+                  [key]: value,
+                }
+              : transport,
+        ),
+    }));
+  }
+
+  function addVisa() {
+    setValues((currentValues) => ({
+      ...currentValues,
+      visas: [
+        ...currentValues.visas,
+        {
+          ...emptyVisa,
+          sortOrder:
+            currentValues.visas.length,
+        },
+      ],
+    }));
+  }
+
+  function removeVisa(index: number) {
+    setValues((currentValues) => ({
+      ...currentValues,
+      visas: currentValues.visas
+        .filter(
+          (_, currentIndex) =>
+            currentIndex !== index,
+        )
+        .map((visa, currentIndex) => ({
+          ...visa,
+          sortOrder: currentIndex,
+        })),
+    }));
+  }
+
+  function updateVisa<
+    K extends keyof ProgramVisaFormValue,
+  >(
+    index: number,
+    key: K,
+    value: ProgramVisaFormValue[K],
+  ) {
+    setValues((currentValues) => ({
+      ...currentValues,
+      visas: currentValues.visas.map(
+        (visa, currentIndex) =>
+          currentIndex === index
+            ? {
+                ...visa,
+                [key]: value,
+              }
+            : visa,
+      ),
+    }));
+  }
+
   async function handleSubmit(
     event: React.FormEvent<HTMLFormElement>,
   ) {
@@ -270,7 +464,7 @@ function updateFlight<
     }
 
     const invalidHotel = values.hotels.find(
-      (hotel) =>
+      (hotel: ProgramHotelFormValue) =>
         !hotel.hotelId ||
         hotel.nights < 0 ||
         (hotel.checkInDate &&
@@ -288,7 +482,7 @@ function updateFlight<
     }
 
     const invalidFlight = values.flights.find(
-      (flight) =>
+      (flight: ProgramFlightFormValue) =>
         !flight.airlineNameAr.trim() ||
         !flight.airlineNameEn.trim() ||
         !flight.departureAirportAr.trim() ||
@@ -305,6 +499,54 @@ function updateFlight<
         isArabic
           ? "راجع بيانات الرحلات وتأكد من شركة الطيران والمطارات ومواعيد الإقلاع والوصول."
           : "Please review airline, airport, departure and arrival information.",
+      );
+      return;
+    }
+
+    const invalidTransport =
+      values.transports.find(
+        (transport: ProgramTransportFormValue) =>
+          !transport.transportId ||
+          (transport.dayNumber !== null &&
+            transport.dayNumber < 1) ||
+          (transport.estimatedDurationMinutes !== null &&
+            transport.estimatedDurationMinutes < 0),
+      );
+
+    if (invalidTransport) {
+      window.alert(
+        isArabic
+          ? "راجع بيانات النقل وتأكد من اختيار خدمة النقل وصحة اليوم والمدة التقديرية."
+          : "Please review transport selection, day number, and estimated duration.",
+      );
+      return;
+    }
+
+    const selectedVisaIds = values.visas
+      .map((visa) => visa.visaId)
+      .filter(Boolean);
+
+    if (
+      new Set(selectedVisaIds).size !==
+      selectedVisaIds.length
+    ) {
+      window.alert(
+        isArabic
+          ? "لا يمكن إضافة التأشيرة نفسها أكثر من مرة داخل البرنامج."
+          : "The same visa cannot be added more than once.",
+      );
+      return;
+    }
+
+    const invalidVisa = values.visas.find(
+      (visa: ProgramVisaFormValue) => !visa.visaId,
+    );
+
+    if (invalidVisa) {
+      window.alert(
+        isArabic
+          ? "راجع بيانات التأشيرات وتأكد من اختيار خدمة التأشيرة."
+          : "Please review visa selection.",
       );
       return;
     }
@@ -331,7 +573,7 @@ function updateFlight<
         notesEn: hotel.notesEn.trim(),
         sortOrder: index,
       })),
-      flights: values.flights.map((flight, index) => ({
+      flights: values.flights.map((flight: ProgramFlightFormValue, index: number) => ({
         ...flight,
         airlineNameAr: flight.airlineNameAr.trim(),
         airlineNameEn: flight.airlineNameEn.trim(),
@@ -346,6 +588,22 @@ function updateFlight<
         cabinClassEn: flight.cabinClassEn.trim(),
         notesAr: flight.notesAr.trim(),
         notesEn: flight.notesEn.trim(),
+        sortOrder: index,
+      })),
+      transports: values.transports.map((transport, index) => ({
+        ...transport,
+        pickupNameAr: transport.pickupNameAr.trim(),
+        pickupNameEn: transport.pickupNameEn.trim(),
+        dropoffNameAr: transport.dropoffNameAr.trim(),
+        dropoffNameEn: transport.dropoffNameEn.trim(),
+        notesAr: transport.notesAr.trim(),
+        notesEn: transport.notesEn.trim(),
+        sortOrder: index,
+      })),
+      visas: values.visas.map((visa, index) => ({
+        ...visa,
+        notesAr: visa.notesAr.trim(),
+        notesEn: visa.notesEn.trim(),
         sortOrder: index,
       })),
     });
@@ -747,7 +1005,7 @@ function updateFlight<
         ) : (
           <div className="nr-program-hotels-list">
             {values.hotels.map(
-              (hotel, index) => (
+              (hotel: ProgramHotelFormValue, index: number) => (
                 <article
                   key={`${hotel.hotelId || "new"}-${index}`}
                   className="nr-program-hotel-card"
@@ -800,7 +1058,7 @@ function updateFlight<
                         {hotels.map((option) => {
                           const usedElsewhere =
                             values.hotels.some(
-                              (entry, entryIndex) =>
+                              (entry: ProgramHotelFormValue, entryIndex: number) =>
                                 entryIndex !== index &&
                                 entry.hotelId === option.id,
                             );
@@ -1214,7 +1472,7 @@ function updateFlight<
           </div>
         ) : (
           <div className="nr-program-flights-list">
-            {values.flights.map((flight, index) => (
+            {values.flights.map((flight: ProgramFlightFormValue, index: number) => (
               <article
                 key={`${flight.direction}-${flight.flightNumber || "new"}-${index}`}
                 className="nr-program-flight-card"
@@ -1519,8 +1777,672 @@ function updateFlight<
       </section>
 
       <section className="nr-country-form-section">
-        <div className="nr-country-form-section-heading">
+        <div className="nr-country-form-section-heading nr-program-transport-heading">
           <span>07</span>
+
+          <div>
+            <h3>
+              {isArabic
+                ? "النقل والمواصلات"
+                : "Transport & Transfers"}
+            </h3>
+
+            <p>
+              {isArabic
+                ? "اربط البرنامج بخدمات النقل وحدد اليوم ونقطة الاستلام والوصول والوقت والمدة."
+                : "Link transport services to the program and define day, pickup, drop-off, time, and duration."}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            className="nr-program-add-transport"
+            onClick={addTransport}
+          >
+            {isArabic
+              ? "+ إضافة نقل"
+              : "+ Add Transport"}
+          </button>
+        </div>
+
+        {values.transports.length === 0 ? (
+          <div className="nr-program-transports-empty">
+            {isArabic
+              ? "لا توجد خدمات نقل مرتبطة بالبرنامج."
+              : "No transport services linked to this program."}
+          </div>
+        ) : (
+          <div className="nr-program-transports-list">
+            {values.transports.map((transport: ProgramTransportFormValue, index: number) => {
+              const selectedTransport =
+                transports.find(
+                  (option) =>
+                    option.id === transport.transportId,
+                );
+
+              return (
+                <article
+                  key={`${transport.transportId || "new"}-${index}`}
+                  className="nr-program-transport-card"
+                >
+                  <div className="nr-program-transport-card-header">
+                    <div>
+                      <strong>
+                        {isArabic
+                          ? `النقل ${index + 1}`
+                          : `Transport ${index + 1}`}
+                      </strong>
+
+                      {selectedTransport ? (
+                        <span className="nr-program-transport-badge">
+                          {isArabic
+                            ? selectedTransport.nameAr
+                            : selectedTransport.nameEn}
+                        </span>
+                      ) : null}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        removeTransport(index)
+                      }
+                    >
+                      {isArabic
+                        ? "إزالة"
+                        : "Remove"}
+                    </button>
+                  </div>
+
+                  <div className="nr-country-form-grid">
+                    <label>
+                      <span>
+                        {isArabic
+                          ? "خدمة النقل"
+                          : "Transport Service"}
+                      </span>
+
+                      <select
+                        className="nr-input"
+                        value={transport.transportId}
+                        onChange={(event) =>
+                          updateTransport(
+                            index,
+                            "transportId",
+                            event.target.value,
+                          )
+                        }
+                        required
+                      >
+                        <option value="">
+                          {isArabic
+                            ? "اختر خدمة النقل"
+                            : "Select transport"}
+                        </option>
+
+                        {transports.map((option) => (
+                          <option
+                            key={option.id}
+                            value={option.id}
+                          >
+                            {isArabic
+                              ? `${option.nameAr} — ${option.capacity} راكب`
+                              : `${option.nameEn} — ${option.capacity} passengers`}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <label>
+                      <span>
+                        {isArabic
+                          ? "اليوم داخل البرنامج"
+                          : "Program Day"}
+                      </span>
+
+                      <input
+                        className="nr-input"
+                        type="number"
+                        min={1}
+                        value={transport.dayNumber ?? ""}
+                        onChange={(event) =>
+                          updateTransport(
+                            index,
+                            "dayNumber",
+                            event.target.value
+                              ? Math.max(
+                                  1,
+                                  Number(event.target.value) || 1,
+                                )
+                              : null,
+                          )
+                        }
+                        placeholder="1"
+                      />
+                    </label>
+
+                    <label>
+                      <span>
+                        {isArabic
+                          ? "نقطة الاستلام بالعربية"
+                          : "Pickup Arabic"}
+                      </span>
+
+                      <input
+                        className="nr-input"
+                        value={transport.pickupNameAr}
+                        onChange={(event) =>
+                          updateTransport(
+                            index,
+                            "pickupNameAr",
+                            event.target.value,
+                          )
+                        }
+                        placeholder="مطار الملك عبدالعزيز"
+                      />
+                    </label>
+
+                    <label>
+                      <span>
+                        {isArabic
+                          ? "نقطة الاستلام بالإنجليزية"
+                          : "Pickup English"}
+                      </span>
+
+                      <input
+                        className="nr-input"
+                        value={transport.pickupNameEn}
+                        onChange={(event) =>
+                          updateTransport(
+                            index,
+                            "pickupNameEn",
+                            event.target.value,
+                          )
+                        }
+                        placeholder="King Abdulaziz Airport"
+                      />
+                    </label>
+
+                    <label>
+                      <span>
+                        {isArabic
+                          ? "نقطة الوصول بالعربية"
+                          : "Drop-off Arabic"}
+                      </span>
+
+                      <input
+                        className="nr-input"
+                        value={transport.dropoffNameAr}
+                        onChange={(event) =>
+                          updateTransport(
+                            index,
+                            "dropoffNameAr",
+                            event.target.value,
+                          )
+                        }
+                        placeholder="فندق مكة"
+                      />
+                    </label>
+
+                    <label>
+                      <span>
+                        {isArabic
+                          ? "نقطة الوصول بالإنجليزية"
+                          : "Drop-off English"}
+                      </span>
+
+                      <input
+                        className="nr-input"
+                        value={transport.dropoffNameEn}
+                        onChange={(event) =>
+                          updateTransport(
+                            index,
+                            "dropoffNameEn",
+                            event.target.value,
+                          )
+                        }
+                        placeholder="Makkah Hotel"
+                      />
+                    </label>
+
+                    <label>
+                      <span>
+                        {isArabic
+                          ? "موعد الاستلام"
+                          : "Pickup Date & Time"}
+                      </span>
+
+                      <input
+                        className="nr-input"
+                        type="datetime-local"
+                        value={transport.pickupDatetime}
+                        onChange={(event) =>
+                          updateTransport(
+                            index,
+                            "pickupDatetime",
+                            event.target.value,
+                          )
+                        }
+                      />
+                    </label>
+
+                    <label>
+                      <span>
+                        {isArabic
+                          ? "المدة التقديرية بالدقائق"
+                          : "Estimated Duration (minutes)"}
+                      </span>
+
+                      <input
+                        className="nr-input"
+                        type="number"
+                        min={0}
+                        value={
+                          transport.estimatedDurationMinutes ??
+                          ""
+                        }
+                        onChange={(event) =>
+                          updateTransport(
+                            index,
+                            "estimatedDurationMinutes",
+                            event.target.value
+                              ? Math.max(
+                                  0,
+                                  Number(event.target.value) || 0,
+                                )
+                              : null,
+                          )
+                        }
+                        placeholder="90"
+                      />
+                    </label>
+                  </div>
+
+                  {selectedTransport ? (
+                    <div className="nr-program-transport-summary">
+                      <span>
+                        {isArabic
+                          ? "النوع"
+                          : "Type"}
+                        <strong>
+                          {selectedTransport.serviceType}
+                        </strong>
+                      </span>
+
+                      <span>
+                        {isArabic
+                          ? "النمط"
+                          : "Mode"}
+                        <strong>
+                          {selectedTransport.mode === "private"
+                            ? isArabic
+                              ? "خاص"
+                              : "Private"
+                            : isArabic
+                              ? "مشترك"
+                              : "Shared"}
+                        </strong>
+                      </span>
+
+                      <span>
+                        {isArabic
+                          ? "المركبة"
+                          : "Vehicle"}
+                        <strong>
+                          {isArabic
+                            ? selectedTransport.vehicleNameAr ||
+                              selectedTransport.vehicleType
+                            : selectedTransport.vehicleNameEn ||
+                              selectedTransport.vehicleType}
+                        </strong>
+                      </span>
+
+                      <span>
+                        {isArabic
+                          ? "السعة"
+                          : "Capacity"}
+                        <strong>
+                          {selectedTransport.capacity}
+                        </strong>
+                      </span>
+                    </div>
+                  ) : null}
+
+                  <div className="nr-country-form-grid nr-program-transport-notes">
+                    <label>
+                      <span>
+                        {isArabic
+                          ? "ملاحظات النقل بالعربية"
+                          : "Arabic Transport Notes"}
+                      </span>
+
+                      <textarea
+                        className="nr-input"
+                        rows={3}
+                        value={transport.notesAr}
+                        onChange={(event) =>
+                          updateTransport(
+                            index,
+                            "notesAr",
+                            event.target.value,
+                          )
+                        }
+                      />
+                    </label>
+
+                    <label>
+                      <span>
+                        {isArabic
+                          ? "ملاحظات النقل بالإنجليزية"
+                          : "English Transport Notes"}
+                      </span>
+
+                      <textarea
+                        className="nr-input"
+                        rows={3}
+                        value={transport.notesEn}
+                        onChange={(event) =>
+                          updateTransport(
+                            index,
+                            "notesEn",
+                            event.target.value,
+                          )
+                        }
+                      />
+                    </label>
+                  </div>
+
+                  <label className="nr-country-form-checkbox nr-program-transport-included">
+                    <input
+                      type="checkbox"
+                      checked={transport.isIncluded}
+                      onChange={(event) =>
+                        updateTransport(
+                          index,
+                          "isIncluded",
+                          event.target.checked,
+                        )
+                      }
+                    />
+
+                    <span>
+                      {isArabic
+                        ? "خدمة النقل مشمولة ضمن البرنامج"
+                        : "Transport is included in the program"}
+                    </span>
+                  </label>
+                </article>
+              );
+            })}
+          </div>
+        )}
+
+        {transports.length === 0 ? (
+          <p className="nr-program-transports-warning">
+            {isArabic
+              ? "لا توجد خدمات نقل متاحة. أضف خدمة نقل مفعّلة من وحدة النقل أولًا."
+              : "No transport services are available. Add an active transport service first."}
+          </p>
+        ) : null}
+      </section>
+
+      <section className="nr-country-form-section">
+        <div className="nr-country-form-section-heading nr-program-visa-heading">
+          <span>08</span>
+
+          <div>
+            <h3>
+              {isArabic
+                ? "التأشيرات"
+                : "Visas"}
+            </h3>
+
+            <p>
+              {isArabic
+                ? "اربط البرنامج بخدمات التأشيرات وحدد ما إذا كانت مشمولة وأضف الملاحظات."
+                : "Link visa services to the program, choose inclusion, and add notes."}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            className="nr-program-add-visa"
+            onClick={addVisa}
+          >
+            {isArabic
+              ? "+ إضافة تأشيرة"
+              : "+ Add Visa"}
+          </button>
+        </div>
+
+        {values.visas.length === 0 ? (
+          <div className="nr-program-visas-empty">
+            {isArabic
+              ? "لا توجد تأشيرات مرتبطة بالبرنامج."
+              : "No visas linked to this program."}
+          </div>
+        ) : (
+          <div className="nr-program-visas-list">
+            {values.visas.map((visa: ProgramVisaFormValue, index: number) => {
+              const selectedVisa =
+                visas.find(
+                  (option) =>
+                    option.id === visa.visaId,
+                );
+
+              return (
+                <article
+                  key={`${visa.visaId || "new"}-${index}`}
+                  className="nr-program-visa-card"
+                >
+                  <div className="nr-program-visa-card-header">
+                    <div>
+                      <strong>
+                        {isArabic
+                          ? `التأشيرة ${index + 1}`
+                          : `Visa ${index + 1}`}
+                      </strong>
+
+                      {selectedVisa ? (
+                        <span className="nr-program-visa-badge">
+                          {isArabic
+                            ? selectedVisa.nameAr
+                            : selectedVisa.nameEn}
+                        </span>
+                      ) : null}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        removeVisa(index)
+                      }
+                    >
+                      {isArabic
+                        ? "إزالة"
+                        : "Remove"}
+                    </button>
+                  </div>
+
+                  <div className="nr-country-form-grid">
+                    <label>
+                      <span>
+                        {isArabic
+                          ? "خدمة التأشيرة"
+                          : "Visa Service"}
+                      </span>
+
+                      <select
+                        className="nr-input"
+                        value={visa.visaId}
+                        onChange={(event) =>
+                          updateVisa(
+                            index,
+                            "visaId",
+                            event.target.value,
+                          )
+                        }
+                        required
+                      >
+                        <option value="">
+                          {isArabic
+                            ? "اختر التأشيرة"
+                            : "Select visa"}
+                        </option>
+
+                        {visas.map((option) => {
+                          const usedElsewhere =
+                            values.visas.some(
+                              (entry: ProgramVisaFormValue, entryIndex: number) =>
+                                entryIndex !== index &&
+                                entry.visaId === option.id,
+                            );
+
+                          return (
+                            <option
+                              key={option.id}
+                              value={option.id}
+                              disabled={usedElsewhere}
+                            >
+                              {isArabic
+                                ? option.nameAr
+                                : option.nameEn}
+                            </option>
+                          );
+                        })}
+                      </select>
+                    </label>
+                  </div>
+
+                  {selectedVisa ? (
+                    <div className="nr-program-visa-summary">
+                      <span>
+                        {isArabic
+                          ? "النوع"
+                          : "Type"}
+                        <strong>
+                          {selectedVisa.visaType}
+                        </strong>
+                      </span>
+
+                      <span>
+                        {isArabic
+                          ? "المعالجة"
+                          : "Processing"}
+                        <strong>
+                          {selectedVisa.processingType}
+                        </strong>
+                      </span>
+
+                      <span>
+                        {isArabic
+                          ? "مدة المعالجة"
+                          : "Processing Time"}
+                        <strong>
+                          {selectedVisa.processingTimeDays !== null
+                            ? isArabic
+                              ? `${selectedVisa.processingTimeDays} يوم`
+                              : `${selectedVisa.processingTimeDays} days`
+                            : "—"}
+                        </strong>
+                      </span>
+
+                      <span>
+                        {isArabic
+                          ? "الصلاحية"
+                          : "Validity"}
+                        <strong>
+                          {selectedVisa.validityDays !== null
+                            ? isArabic
+                              ? `${selectedVisa.validityDays} يوم`
+                              : `${selectedVisa.validityDays} days`
+                            : "—"}
+                        </strong>
+                      </span>
+                    </div>
+                  ) : null}
+
+                  <div className="nr-country-form-grid nr-program-visa-notes">
+                    <label>
+                      <span>
+                        {isArabic
+                          ? "ملاحظات التأشيرة بالعربية"
+                          : "Arabic Visa Notes"}
+                      </span>
+
+                      <textarea
+                        className="nr-input"
+                        rows={3}
+                        value={visa.notesAr}
+                        onChange={(event) =>
+                          updateVisa(
+                            index,
+                            "notesAr",
+                            event.target.value,
+                          )
+                        }
+                      />
+                    </label>
+
+                    <label>
+                      <span>
+                        {isArabic
+                          ? "ملاحظات التأشيرة بالإنجليزية"
+                          : "English Visa Notes"}
+                      </span>
+
+                      <textarea
+                        className="nr-input"
+                        rows={3}
+                        value={visa.notesEn}
+                        onChange={(event) =>
+                          updateVisa(
+                            index,
+                            "notesEn",
+                            event.target.value,
+                          )
+                        }
+                      />
+                    </label>
+                  </div>
+
+                  <label className="nr-country-form-checkbox nr-program-visa-included">
+                    <input
+                      type="checkbox"
+                      checked={visa.isIncluded}
+                      onChange={(event) =>
+                        updateVisa(
+                          index,
+                          "isIncluded",
+                          event.target.checked,
+                        )
+                      }
+                    />
+
+                    <span>
+                      {isArabic
+                        ? "التأشيرة مشمولة ضمن البرنامج"
+                        : "Visa is included in the program"}
+                    </span>
+                  </label>
+                </article>
+              );
+            })}
+          </div>
+        )}
+
+        {visas.length === 0 ? (
+          <p className="nr-program-visas-warning">
+            {isArabic
+              ? "لا توجد تأشيرات متاحة. أضف تأشيرة مفعّلة من وحدة التأشيرات أولًا."
+              : "No visa services are available. Add an active visa service first."}
+          </p>
+        ) : null}
+      </section>
+
+      <section className="nr-country-form-section">
+        <div className="nr-country-form-section-heading">
+          <span>09</span>
 
           <div>
             <h3>
@@ -1902,6 +2824,250 @@ function updateFlight<
           margin-top: 16px;
         }
 
+
+        .nr-program-transport-heading {
+          align-items: flex-start;
+        }
+
+        .nr-program-transport-heading > div {
+          flex: 1;
+        }
+
+        .nr-program-add-transport {
+          flex: 0 0 auto;
+          min-height: 40px;
+          padding-inline: 15px;
+          border: 0;
+          border-radius: 11px;
+          color: #fff;
+          background: var(--nour-primary);
+          font: inherit;
+          font-size: 11px;
+          font-weight: 900;
+          cursor: pointer;
+        }
+
+        .nr-program-transports-empty {
+          padding: 22px;
+          border: 1px dashed var(--nour-border);
+          border-radius: 14px;
+          color: #7c899c;
+          text-align: center;
+        }
+
+        .nr-program-transports-list {
+          display: grid;
+          gap: 15px;
+        }
+
+        .nr-program-transport-card {
+          padding: 17px;
+          border: 1px solid var(--nour-border);
+          border-radius: 16px;
+          background: var(--nour-background);
+        }
+
+        .nr-program-transport-card-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          margin-bottom: 15px;
+        }
+
+        .nr-program-transport-card-header > div {
+          display: flex;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 9px;
+        }
+
+        .nr-program-transport-card-header button {
+          min-height: 32px;
+          padding-inline: 10px;
+          border: 1px solid rgba(220, 38, 38, 0.2);
+          border-radius: 8px;
+          color: #dc2626;
+          background: rgba(220, 38, 38, 0.05);
+          font: inherit;
+          font-size: 10px;
+          font-weight: 800;
+          cursor: pointer;
+        }
+
+        .nr-program-transport-badge {
+          display: inline-flex;
+          min-height: 26px;
+          align-items: center;
+          padding-inline: 9px;
+          border-radius: 999px;
+          color: var(--nour-primary);
+          background: rgba(23, 111, 232, 0.08);
+          font-size: 10px;
+          font-weight: 900;
+        }
+
+        .nr-program-transport-summary {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 10px;
+          margin-top: 15px;
+          padding: 13px;
+          border: 1px solid rgba(23, 111, 232, 0.12);
+          border-radius: 12px;
+          background: rgba(23, 111, 232, 0.04);
+        }
+
+        .nr-program-transport-summary span {
+          display: flex;
+          flex-direction: column;
+          gap: 3px;
+          color: #7c899c;
+          font-size: 9px;
+        }
+
+        .nr-program-transport-summary strong {
+          color: var(--nour-text-primary);
+          font-size: 11px;
+        }
+
+        .nr-program-transport-notes {
+          margin-top: 15px;
+        }
+
+        .nr-program-transport-included {
+          margin-top: 14px;
+        }
+
+        .nr-program-transports-warning {
+          margin: 12px 0 0;
+          color: #d97706;
+          font-size: 11px;
+          line-height: 1.7;
+        }
+
+
+        .nr-program-visa-heading {
+          align-items: flex-start;
+        }
+
+        .nr-program-visa-heading > div {
+          flex: 1;
+        }
+
+        .nr-program-add-visa {
+          flex: 0 0 auto;
+          min-height: 40px;
+          padding-inline: 15px;
+          border: 0;
+          border-radius: 11px;
+          color: #fff;
+          background: var(--nour-primary);
+          font: inherit;
+          font-size: 11px;
+          font-weight: 900;
+          cursor: pointer;
+        }
+
+        .nr-program-visas-empty {
+          padding: 22px;
+          border: 1px dashed var(--nour-border);
+          border-radius: 14px;
+          color: #7c899c;
+          text-align: center;
+        }
+
+        .nr-program-visas-list {
+          display: grid;
+          gap: 15px;
+        }
+
+        .nr-program-visa-card {
+          padding: 17px;
+          border: 1px solid var(--nour-border);
+          border-radius: 16px;
+          background: var(--nour-background);
+        }
+
+        .nr-program-visa-card-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          margin-bottom: 15px;
+        }
+
+        .nr-program-visa-card-header > div {
+          display: flex;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 9px;
+        }
+
+        .nr-program-visa-card-header button {
+          min-height: 32px;
+          padding-inline: 10px;
+          border: 1px solid rgba(220, 38, 38, 0.2);
+          border-radius: 8px;
+          color: #dc2626;
+          background: rgba(220, 38, 38, 0.05);
+          font: inherit;
+          font-size: 10px;
+          font-weight: 800;
+          cursor: pointer;
+        }
+
+        .nr-program-visa-badge {
+          display: inline-flex;
+          min-height: 26px;
+          align-items: center;
+          padding-inline: 9px;
+          border-radius: 999px;
+          color: var(--nour-primary);
+          background: rgba(23, 111, 232, 0.08);
+          font-size: 10px;
+          font-weight: 900;
+        }
+
+        .nr-program-visa-summary {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 10px;
+          margin-top: 15px;
+          padding: 13px;
+          border: 1px solid rgba(23, 111, 232, 0.12);
+          border-radius: 12px;
+          background: rgba(23, 111, 232, 0.04);
+        }
+
+        .nr-program-visa-summary span {
+          display: flex;
+          flex-direction: column;
+          gap: 3px;
+          color: #7c899c;
+          font-size: 9px;
+        }
+
+        .nr-program-visa-summary strong {
+          color: var(--nour-text-primary);
+          font-size: 11px;
+        }
+
+        .nr-program-visa-notes {
+          margin-top: 15px;
+        }
+
+        .nr-program-visa-included {
+          margin-top: 14px;
+        }
+
+        .nr-program-visas-warning {
+          margin: 12px 0 0;
+          color: #d97706;
+          font-size: 11px;
+          line-height: 1.7;
+        }
+
         @media (max-width: 760px) {
           .nr-program-hotel-heading {
             flex-direction: column;
@@ -1909,13 +3075,22 @@ function updateFlight<
           }
 
           .nr-program-add-hotel,
-          .nr-program-add-flight {
+          .nr-program-add-flight,
+          .nr-program-add-transport,
+          .nr-program-add-visa {
             width: 100%;
           }
 
-          .nr-program-flight-heading {
+          .nr-program-flight-heading,
+          .nr-program-transport-heading,
+          .nr-program-visa-heading {
             flex-direction: column;
             align-items: stretch;
+          }
+
+          .nr-program-transport-summary,
+          .nr-program-visa-summary {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
           }
 
           .nr-flight-inclusion-grid {

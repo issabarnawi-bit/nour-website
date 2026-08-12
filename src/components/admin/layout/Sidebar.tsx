@@ -5,7 +5,9 @@ import Link from "next/link";
 
 import {
   BarChart3,
+  BusFront,
   CircleGauge,
+  FileCheck2,
   FolderOpen,
   Globe2,
   Hotel,
@@ -48,12 +50,19 @@ export default function Sidebar() {
       icon: FolderOpen,
     },
     {
-      label:
-        language === "ar"
-          ? "الفنادق"
-          : "Hotels",
+      label: language === "ar" ? "الفنادق" : "Hotels",
       href: "/admin/hotels",
       icon: Hotel,
+    },
+    {
+      label: language === "ar" ? "النقل" : "Transport",
+      href: "/admin/transports",
+      icon: BusFront,
+    },
+    {
+      label: language === "ar" ? "التأشيرات" : "Visas",
+      href: "/admin/visas",
+      icon: FileCheck2,
     },
     {
       label: t.sidebar.media,
@@ -66,18 +75,12 @@ export default function Sidebar() {
       icon: Users,
     },
     {
-      label:
-        language === "ar"
-          ? "التحليلات"
-          : "Analytics",
+      label: language === "ar" ? "التحليلات" : "Analytics",
       href: "/admin/analytics",
       icon: BarChart3,
     },
     {
-      label:
-        language === "ar"
-          ? "الإعدادات"
-          : "Settings",
+      label: language === "ar" ? "الإعدادات" : "Settings",
       href: "/admin/settings",
       icon: Settings,
     },
@@ -98,7 +101,6 @@ export default function Sidebar() {
 
         <div className="nr-admin-sidebar-brand-text">
           <strong>NourApp Platform</strong>
-
           <small>
             {language === "ar"
               ? "لوحة الإدارة"
@@ -129,10 +131,7 @@ export default function Sidebar() {
                 className="nr-admin-sidebar-link-icon"
                 aria-hidden={true}
               >
-                <Icon
-                  size={20}
-                  strokeWidth={1.9}
-                />
+                <Icon size={20} strokeWidth={1.9} />
               </span>
 
               <span className="nr-admin-sidebar-link-label">
@@ -157,9 +156,7 @@ export default function Sidebar() {
                 : "System Online"}
             </strong>
 
-            <small>
-              Supabase Production
-            </small>
+            <small>Supabase Production</small>
           </div>
         </div>
       </div>

@@ -113,8 +113,94 @@ export default function NourWorldMap({
   const [activeId, setActiveId] =
     useState<string | null>(null);
 
+  const [selectedId, setSelectedId] =
+    useState<string | null>(null);
+
   const [paused, setPaused] =
     useState(false);
+
+  const [zoom, setZoom] =
+    useState(1);
+
+  const [zoomOrigin, setZoomOrigin] =
+    useState({
+      x: 50,
+      y: 50,
+    });
+
+  const zoomIn = () => {
+    setZoom((current) =>
+      Math.min(
+        Number((current + 0.2).toFixed(1)),
+        2.2,
+      ),
+    );
+  };
+
+  const zoomOut = () => {
+    setZoom((current) =>
+      Math.max(
+        Number((current - 0.2).toFixed(1)),
+        1,
+      ),
+    );
+  };
+
+  const resetZoom = () => {
+    setZoom(1);
+
+    setZoomOrigin({
+      x: 50,
+      y: 50,
+    });
+  };
+
+  const handleMapWheel = (
+    event: React.WheelEvent<HTMLDivElement>,
+  ) => {
+    event.preventDefault();
+
+    const bounds =
+      event.currentTarget.getBoundingClientRect();
+
+    const x =
+      ((event.clientX - bounds.left) /
+        bounds.width) *
+      100;
+
+    const y =
+      ((event.clientY - bounds.top) /
+        bounds.height) *
+      100;
+
+    setZoomOrigin({
+      x: Math.min(
+        Math.max(x, 0),
+        100,
+      ),
+
+      y: Math.min(
+        Math.max(y, 0),
+        100,
+      ),
+    });
+
+    const direction =
+      event.deltaY < 0 ? 1 : -1;
+
+    setZoom((current) => {
+      const next =
+        current + direction * 0.15;
+
+      return Math.min(
+        Math.max(
+          Number(next.toFixed(2)),
+          1,
+        ),
+        2.2,
+      );
+    });
+  };
 
   const countriesQuery = useQuery({
     queryKey: [
@@ -198,6 +284,41 @@ export default function NourWorldMap({
     ],
   );
 
+  const selectedCountry =
+    useMemo(
+      () =>
+        selectedId
+          ? countriesWithPositions.find(
+              (country) =>
+                country.id === selectedId,
+            ) ?? null
+          : null,
+
+      [
+        countriesWithPositions,
+        selectedId,
+      ],
+    );
+
+  useEffect(() => {
+    if (!selectedId) {
+      return;
+    }
+
+    const selectedExists =
+      countriesWithPositions.some(
+        (country) =>
+          country.id === selectedId,
+      );
+
+    if (!selectedExists) {
+      setSelectedId(null);
+    }
+  }, [
+    countriesWithPositions,
+    selectedId,
+  ]);
+
   const saudiCountry =
     useMemo(
       () =>
@@ -274,10 +395,13 @@ export default function NourWorldMap({
     countriesWithPositions,
   ]);
 
+  const ctaCountry =
+    selectedCountry ?? activeCountry;
+
   const activeProgramsUrl =
-    activeCountry
+    ctaCountry
       ? `/programs?country=${encodeURIComponent(
-          activeCountry.id,
+          ctaCountry.id,
         )}`
       : "/programs";
 
@@ -377,10 +501,10 @@ export default function NourWorldMap({
           href={activeProgramsUrl}
         >
           <span>
-            {activeCountry
+            {ctaCountry
               ? isArabic
-                ? `استكشف برامج ${activeCountry.nameAr}`
-                : `Explore ${activeCountry.nameEn} programs`
+                ? `استكشف برامج ${ctaCountry.nameAr}`
+                : `Explore ${ctaCountry.nameEn} programs`
               : isArabic
                 ? "استكشف برامج نور آب"
                 : "Explore NourApp programs"}
@@ -403,7 +527,7 @@ export default function NourWorldMap({
 
             <strong>
               {isArabic
-                ? "اختر دولة على الخريطة"
+                ? "اختر دولتك على الخريطة واستكشف البرامج"
                 : "Choose a country on the map"}
             </strong>
           </div>
@@ -421,34 +545,30 @@ export default function NourWorldMap({
           </span>
         </div>
 
-        <div className={styles.map}>
+        <div
+          className={styles.map}
+          onWheel={handleMapWheel}
+          onDoubleClick={resetZoom}
+        >
+          <div
+            className={styles.mapStage}
+            style={{
+              transform: `scale(${zoom})`,
+              transformOrigin: `${zoomOrigin.x}% ${zoomOrigin.y}%`,
+            }}
+          >
           {/*
-            ضع الخريطة الواقعية داخل:
-            public/images/site/world-map-realistic.svg
+            خريطة عالمية بيضاء بحدود دول واضحة.
+            ضع الملف في:
+            public/images/site/world-map-white.svg
           */}
           <img
             className={styles.realisticMap}
-                src="/images/site/world-map-equirectangular.jpg"
+                src="/images/site/world-map-white.svg"
 
             alt=""
             aria-hidden="true"
           />
-
-          <svg
-            className={styles.decorGrid}
-            viewBox="0 0 1000 520"
-            preserveAspectRatio="none"
-            aria-hidden="true"
-          >
-            <g>
-              <path d="M0 130H1000" />
-              <path d="M0 260H1000" />
-              <path d="M0 390H1000" />
-              <path d="M250 0V520" />
-              <path d="M500 0V520" />
-              <path d="M750 0V520" />
-            </g>
-          </svg>
 
           {saudiCountry ? (
             <svg
@@ -583,17 +703,20 @@ export default function NourWorldMap({
                     left: `${country.position.x}%`,
                     top: `${country.position.y}%`,
                   }}
-                  onClick={() =>
-                    setActiveId(
-                      country.id,
-                    )
-                  }
-                  onFocus={() => {
-                    setPaused(true);
-
+                  onClick={() => {
                     setActiveId(
                       country.id,
                     );
+
+                    setSelectedId(
+                      (current) =>
+                        current === country.id
+                          ? null
+                          : country.id,
+                    );
+                  }}
+                  onFocus={() => {
+                    setPaused(true);
                   }}
                   onBlur={() =>
                     setPaused(false)
@@ -624,15 +747,17 @@ export default function NourWorldMap({
             },
           )}
 
+          </div>
+
           <AnimatePresence mode="wait">
-            {activeCountry ? (
+            {selectedCountry ? (
               <motion.article
-                key={activeCountry.id}
-                className={styles.card}
+                key={selectedCountry.id}
+                className={`${styles.card} ${styles.clickCard}`}
                 initial={{
                   opacity: 0,
-                  y: 12,
-                  scale: 0.96,
+                  y: 14,
+                  scale: 0.98,
                 }}
                 animate={{
                   opacity: 1,
@@ -641,32 +766,33 @@ export default function NourWorldMap({
                 }}
                 exit={{
                   opacity: 0,
-                  y: -8,
-                  scale: 0.97,
+                  y: 10,
+                  scale: 0.98,
                 }}
                 transition={{
-                  duration: 0.28,
-                }}
-                style={{
-                  left: `${Math.min(
-                    Math.max(
-                      activeCountry
-                        .position.x,
-                      24,
-                    ),
-                    76,
-                  )}%`,
-
-                  top: `${
-                    activeCountry.position
-                      .y < 45
-                      ? activeCountry
-                          .position.y + 12
-                      : activeCountry
-                          .position.y - 12
-                  }%`,
+                  duration: 0.22,
                 }}
               >
+                <button
+                  type="button"
+                  className={styles.cardClose}
+                  onClick={() =>
+                    setSelectedId(null)
+                  }
+                  aria-label={
+                    isArabic
+                      ? "إغلاق بطاقة الدولة"
+                      : "Close country card"
+                  }
+                  title={
+                    isArabic
+                      ? "إغلاق"
+                      : "Close"
+                  }
+                >
+                  ×
+                </button>
+
                 <div
                   className={
                     styles.cardTop
@@ -677,7 +803,7 @@ export default function NourWorldMap({
                       styles.pin
                     }
                   >
-                    {activeCountry.iso2 ===
+                    {selectedCountry.iso2 ===
                     SAUDI_ISO2 ? (
                       <KaabaIcon />
                     ) : (
@@ -688,13 +814,13 @@ export default function NourWorldMap({
                   <div>
                     <small>
                       {isArabic
-                        ? activeCountry.nameAr
-                        : activeCountry.nameEn}
+                        ? selectedCountry.nameAr
+                        : selectedCountry.nameEn}
                     </small>
 
                     <strong>
                       {getProgramsLabel(
-                        activeCountry,
+                        selectedCountry,
                         isArabic,
                       )}
                     </strong>
@@ -702,9 +828,9 @@ export default function NourWorldMap({
                 </div>
 
                 <p>
-                  {activeCountry.hasPublishedPrograms
+                  {selectedCountry.hasPublishedPrograms
                     ? isArabic
-                      ? "اضغط على زر استكشاف البرامج لعرض برامج العمرة المنشورة والمتاحة لهذه الدولة."
+                      ? "اضغط على استكشاف البرامج لعرض برامج العمرة المنشورة والمتاحة لهذه الدولة."
                       : "Select Explore Programs to view the published Umrah programs available for this country."
                     : isArabic
                       ? "الدولة مفعّلة على المنصة، ولم تُنشر برامج مرتبطة بها حتى الآن."
@@ -713,6 +839,78 @@ export default function NourWorldMap({
               </motion.article>
             ) : null}
           </AnimatePresence>
+
+          <div className={styles.zoomHint}>
+            {isArabic
+              ? "مرّر عجلة الماوس للتكبير والتصغير"
+              : "Use the mouse wheel to zoom"}
+          </div>
+
+          <div
+            className={styles.zoomControls}
+            aria-label={
+              isArabic
+                ? "التحكم في تكبير الخريطة"
+                : "Map zoom controls"
+            }
+          >
+            <button
+              type="button"
+              className={styles.zoomButton}
+              onClick={zoomIn}
+              disabled={zoom >= 2.2}
+              aria-label={
+                isArabic
+                  ? "تكبير الخريطة"
+                  : "Zoom in"
+              }
+              title={
+                isArabic
+                  ? "تكبير"
+                  : "Zoom in"
+              }
+            >
+              +
+            </button>
+
+            <button
+              type="button"
+              className={styles.zoomButton}
+              onClick={zoomOut}
+              disabled={zoom <= 1}
+              aria-label={
+                isArabic
+                  ? "تصغير الخريطة"
+                  : "Zoom out"
+              }
+              title={
+                isArabic
+                  ? "تصغير"
+                  : "Zoom out"
+              }
+            >
+              −
+            </button>
+
+            <button
+              type="button"
+              className={styles.zoomReset}
+              onClick={resetZoom}
+              disabled={zoom === 1}
+              aria-label={
+                isArabic
+                  ? "إعادة الخريطة للحجم الافتراضي"
+                  : "Reset map zoom"
+              }
+              title={
+                isArabic
+                  ? "الحجم الافتراضي"
+                  : "Reset zoom"
+              }
+            >
+              {Math.round(zoom * 100)}%
+            </button>
+          </div>
         </div>
 
         {countriesWithPositions.length >
@@ -733,11 +931,18 @@ export default function NourWorldMap({
                       ? styles.activeTab
                       : ""
                   }
-                  onClick={() =>
+                  onClick={() => {
                     setActiveId(
                       country.id,
-                    )
-                  }
+                    );
+
+                    setSelectedId(
+                      (current) =>
+                        current === country.id
+                          ? null
+                          : country.id,
+                    );
+                  }}
                 >
                   {isArabic
                     ? country.nameAr

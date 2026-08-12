@@ -1,7 +1,9 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useLanguage } from "../../src/core/i18n";
 
-const privacySections = [
+const privacySectionsAr = [
   {
     title: "1. مقدمة",
     content: [
@@ -207,46 +209,278 @@ const privacySections = [
   },
 ];
 
+
+const privacySectionsEn = [
+  {
+    title: "1. Introduction",
+    content: [
+      "Code Land Information Technology Company respects the privacy of users of the NourApp platform and application. The website, application, and related services are collectively referred to as the Platform.",
+      "This Policy explains how we collect, use, store, share, and protect your personal data when you use NourApp.",
+      "By using the Platform or creating an account, you acknowledge that you have reviewed this Policy. Where consent is required, your data will only be processed after the necessary consent has been obtained.",
+    ],
+  },
+  {
+    title: "2. Data Controller",
+    content: [
+      "Code Land Information Technology Company is the controller of personal data processed through NourApp unless otherwise stated.",
+    ],
+    items: [
+      "Entity name: Code Land Information Technology Company.",
+      "Trade name: NourApp.",
+      "Contact number: +966 56 748 8377.",
+      "Address: Abdulrahman Bin Abdulqader Faqih Street, Al Naseem District, Makkah 24372, Kingdom of Saudi Arabia.",
+    ],
+  },
+  {
+    title: "3. Scope of this Policy",
+    content: ["This Policy applies to data collected through:"],
+    items: [
+      "The NourApp website.",
+      "NourApp applications on mobile phones and smart devices.",
+      "User, service-provider, and partner accounts.",
+      "Technical support and customer service.",
+      "Electronic forms, surveys, and correspondence.",
+      "Payments, subscriptions, and orders.",
+      "Cookies and similar technologies.",
+    ],
+  },
+  {
+    title: "4. Data We Collect",
+    content: [
+      "We may collect different categories of data depending on how you use the Platform and the services you request.",
+    ],
+    items: [
+      "Identity data, such as name, date of birth, nationality, and identification number where required.",
+      "Contact data, such as phone number, email, address, city, and country.",
+      "Account data, such as username, account settings, and login records.",
+      "Order, booking, subscription, invoice, and payment-status data.",
+      "Approximate or precise location data after device permission is obtained.",
+      "Technical data, such as device type, browser, operating system, and IP address.",
+      "Support messages, complaints, inquiries, and attachments.",
+      "Service-provider and establishment data, licenses, and bank-account information.",
+    ],
+  },
+  {
+    title: "5. Sources of Data",
+    items: [
+      "Directly from you when you register or use the Platform.",
+      "Automatically from your device or browser.",
+      "From payment, delivery, and verification providers.",
+      "From service providers and partners registered on the Platform.",
+      "From government authorities or public sources where permitted by law.",
+      "From third-party login services.",
+    ],
+  },
+  {
+    title: "6. Purposes of Processing",
+    items: [
+      "Creating and managing accounts and verifying user identity.",
+      "Providing Platform services and fulfilling orders and bookings.",
+      "Processing payments and refunds and issuing invoices.",
+      "Enabling communication between users and service providers.",
+      "Providing location and delivery services.",
+      "Providing technical support and handling complaints.",
+      "Personalizing the user experience and improving services.",
+      "Analyzing performance and developing new features.",
+      "Preventing fraud and misuse.",
+      "Protecting the Platform and user accounts.",
+      "Sending permitted operational and marketing notifications.",
+      "Meeting legal, accounting, and tax requirements.",
+    ],
+  },
+  {
+    title: "7. Legal Bases for Processing",
+    items: [
+      "Consent of the data subject.",
+      "Performance of a contract to which the data subject is a party.",
+      "Taking steps at the user's request before entering into a contract.",
+      "Compliance with a legal obligation applicable to the Company.",
+      "Protection of the vital interests of the data subject or another person.",
+      "Pursuit of a legitimate interest that does not conflict with the rights of the data subject.",
+      "Any other cases permitted by applicable laws and regulations.",
+    ],
+  },
+  {
+    title: "8. Cookies",
+    content: [
+      "The Platform may use cookies and similar technologies to operate the website, remember user preferences, analyze usage, prevent fraud, and improve security.",
+      "You can manage cookies through your browser settings. Disabling necessary cookies may affect some Platform functions.",
+    ],
+  },
+  {
+    title: "9. Data Sharing and Disclosure",
+    content: ["NourApp does not sell your personal data."],
+    items: [
+      "Service providers and suppliers necessary to fulfill an order.",
+      "Delivery, transport, and logistics companies.",
+      "Banks and payment and collection providers.",
+      "Hosting and cloud-computing providers.",
+      "Messaging, notification, and technical-support services.",
+      "Identity-verification and anti-fraud providers.",
+      "Legal advisers, accountants, and auditors.",
+      "Competent government, judicial, and regulatory authorities.",
+      "Any other party after obtaining the required consent.",
+    ],
+  },
+  {
+    title: "10. International Data Transfers",
+    content: [
+      "Certain technical or operational services may require data to be transferred to or stored outside the Kingdom of Saudi Arabia.",
+      "When making an international transfer, the Company applies the required legal safeguards and limits the transfer to the minimum data necessary.",
+    ],
+  },
+  {
+    title: "11. Data Retention and Disposal",
+    content: [
+      "We retain data for as long as necessary to fulfill the purpose for which it was collected or for the period required under applicable laws and contractual, accounting, and tax obligations.",
+      "After the purpose or retention period ends, data is securely destroyed or de-identified unless the law requires it to be retained for a longer period.",
+    ],
+  },
+  {
+    title: "12. Data Protection",
+    items: [
+      "Access-control measures.",
+      "Encryption of data in transit and at rest where appropriate.",
+      "Authentication and account-protection measures.",
+      "Secure backups.",
+      "Monitoring of systems and security logs.",
+      "Vulnerability and update management.",
+      "Employee training on privacy and information security.",
+      "Reviewing service providers and restricting their access to data.",
+    ],
+  },
+  {
+    title: "13. Data Breaches and Security Incidents",
+    content: [
+      "If an incident affecting personal data occurs, the Company takes appropriate steps to contain, assess, and remediate the incident.",
+      "Relevant authorities and affected data subjects will be notified when required by applicable laws.",
+    ],
+  },
+  {
+    title: "14. Data Subject Rights",
+    items: [
+      "The right to know how data is collected and the purpose of processing.",
+      "The right to access personal data.",
+      "The right to request a clear and readable copy of personal data.",
+      "The right to correct, complete, or update personal data.",
+      "The right to request destruction of data when the purpose for processing has ended.",
+      "The right to withdraw consent where processing is based on consent.",
+      "The right to submit a complaint regarding the processing of personal data.",
+    ],
+  },
+  {
+    title: "15. Exercising Your Rights",
+    content: [
+      "You may exercise your rights or submit an inquiry or complaint using the contact methods shown at the end of this page.",
+      "We may request information necessary to verify your identity and determine the nature of your request before processing it.",
+    ],
+  },
+  {
+    title: "16. Children and Persons Lacking Legal Capacity",
+    content: [
+      "The Platform does not target children or persons lacking legal capacity unless the nature of the service permits it and applicable requirements are implemented.",
+      "Where the service requires processing data relating to a child or a person lacking legal capacity, we may request consent from the legal guardian or custodian.",
+    ],
+  },
+  {
+    title: "17. Marketing Communications",
+    content: [
+      "The Platform may send offers, news, and marketing messages where permitted by law.",
+      "You may unsubscribe through the unsubscribe link, account settings, or by contacting customer service.",
+      "Necessary operational notifications relating to accounts, orders, payments, and security may continue to be sent.",
+    ],
+  },
+  {
+    title: "18. Updates to this Privacy Policy",
+    content: [
+      "The Company may update this Policy when services, legal requirements, or data-processing practices change.",
+      "The updated version will be published on the Platform with the date of the latest update, and users may be notified of material changes.",
+    ],
+  },
+  {
+    title: "19. Governing Language",
+    content: [
+      "This Policy may be made available in other languages for convenience. If there is any conflict between the Arabic version and any translation, the Arabic version will prevail unless applicable law provides otherwise.",
+    ],
+  },
+  {
+    title: "20. Contact Us",
+    content: [
+      "For privacy-related inquiries or questions about how your data is processed, please contact the privacy administration of NourApp.",
+    ],
+    items: [
+      "Phone: +966 56 748 8377.",
+      "Website: NourAppglobal.com.",
+      "Address: Abdulrahman Bin Abdulqader Faqih Street, Al Naseem District, Makkah 24372, Kingdom of Saudi Arabia.",
+    ],
+  },
+];
+
 export default function PrivacyPage() {
+  const { language } = useLanguage();
+  const isArabic = language === "ar";
+  const privacySections = isArabic ? privacySectionsAr : privacySectionsEn;
+
   return (
-    <main className="legal-page">
+    <main className="legal-page" dir={isArabic ? "rtl" : "ltr"}>
       <div className="legal-page-glow legal-page-glow-one" aria-hidden="true" />
       <div className="legal-page-glow legal-page-glow-two" aria-hidden="true" />
+
       <header className="legal-header">
-        <div className="container legal-navigation" aria-label="التنقل القانوني">
+        <div
+          className="container legal-navigation"
+          aria-label={isArabic ? "التنقل القانوني" : "Legal navigation"}
+        >
           <Link href="/" className="legal-brand">
-       <Image
-  src="/images/site/v-logo.png"
-  alt="شعار  نور آب"
-  width={92}
+            <Image
+              src="/images/site/v-logo.png"
+              alt={isArabic ? "شعار نور آب" : "NourApp logo"}
+              width={92}
               height={92}
-  priority
-/>
+              priority
+            />
             <span className="legal-brand-copy">
-              
-              <small>رفيق رحلتك إلى العمرة</small>
+              <small>
+                {isArabic
+                  ? "رفيق رحلتك إلى العمرة"
+                  : "Your companion for the Umrah journey"}
+              </small>
             </span>
           </Link>
 
           <Link href="/" className="back-home">
-            العودة إلى الرئيسية ←
+            {isArabic ? "العودة إلى الرئيسية ←" : "← Back to Home"}
           </Link>
         </div>
       </header>
 
       <section className="legal-hero">
         <div className="container legal-hero-inner">
-          <span className="section-label"><span aria-hidden="true">✦</span> الوثائق القانونية</span>
-          <h1>سياسة الخصوصية</h1>
+          <span className="section-label">
+            <span aria-hidden="true">✦</span>{" "}
+            {isArabic ? "الوثائق القانونية" : "Legal Documents"}
+          </span>
+
+          <h1>{isArabic ? "سياسة الخصوصية" : "Privacy Policy"}</h1>
+
           <p>
-            توضح هذه السياسة كيفية جمع بيانات المستخدمين واستخدامها وحمايتها
-            عند استخدام موقع وتطبيق وخدمات منصة  نور آب.
+            {isArabic
+              ? "توضح هذه السياسة كيفية جمع بيانات المستخدمين واستخدامها وحمايتها عند استخدام موقع وتطبيق وخدمات منصة نور آب."
+              : "This Policy explains how user data is collected, used, and protected when using the NourApp website, application, and services."}
           </p>
 
           <div className="legal-meta">
-            <span>تاريخ النفاذ: 18 يوليو 2026</span>
-            <span>آخر تحديث: 18 يوليو 2026</span>
-            <span>الإصدار: 1.0</span>
+            <span>
+              {isArabic
+                ? "تاريخ النفاذ: 18 يوليو 2026"
+                : "Effective date: July 18, 2026"}
+            </span>
+            <span>
+              {isArabic
+                ? "آخر تحديث: 18 يوليو 2026"
+                : "Last updated: July 18, 2026"}
+            </span>
+            <span>{isArabic ? "الإصدار: 1.0" : "Version: 1.0"}</span>
           </div>
         </div>
       </section>
@@ -254,8 +488,7 @@ export default function PrivacyPage() {
       <section className="legal-content-section">
         <div className="container legal-layout">
           <aside className="legal-sidebar">
-            <strong>محتويات الصفحة</strong>
-
+            <strong>{isArabic ? "محتويات الصفحة" : "On this page"}</strong>
             <nav>
               {privacySections.map((section, index) => (
                 <a href={`#section-${index + 1}`} key={section.title}>
@@ -265,10 +498,14 @@ export default function PrivacyPage() {
             </nav>
           </aside>
 
-          <article className="legal-document" aria-label="سياسة الخصوصية">
+          <article
+            className="legal-document"
+            aria-label={isArabic ? "سياسة الخصوصية" : "Privacy Policy"}
+          >
             <div className="legal-notice">
-              يرجى قراءة هذه السياسة بعناية قبل إنشاء حساب أو استخدام خدمات
-              منصة  نور آب.
+              {isArabic
+                ? "يرجى قراءة هذه السياسة بعناية قبل إنشاء حساب أو استخدام خدمات منصة نور آب."
+                : "Please read this Policy carefully before creating an account or using NourApp services."}
             </div>
 
             {privacySections.map((section, index) => (
@@ -299,11 +536,19 @@ export default function PrivacyPage() {
       <footer className="legal-footer">
         <div className="legal-footer-orb" aria-hidden="true" />
         <div className="container">
-          <span>© 2026  نور آب. جميع الحقوق محفوظة.</span>
+          <span>
+            {isArabic
+              ? "© 2026 نور آب. جميع الحقوق محفوظة."
+              : "© 2026 NourApp. All rights reserved."}
+          </span>
 
           <div>
-            <Link href="/privacy">سياسة الخصوصية</Link>
-            <Link href="/terms">الشروط والأحكام</Link>
+            <Link href="/privacy">
+              {isArabic ? "سياسة الخصوصية" : "Privacy Policy"}
+            </Link>
+            <Link href="/terms">
+              {isArabic ? "الشروط والأحكام" : "Terms & Conditions"}
+            </Link>
           </div>
         </div>
       </footer>
