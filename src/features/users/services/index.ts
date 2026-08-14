@@ -34,42 +34,12 @@ export type InviteAdminUserInput = {
   roleId: string;
 };
 
-type AdminProfileRow = {
-  id: string;
-  full_name: string;
-  email: string;
-  status: AdminUserStatus;
-  last_login_at: string | null;
-};
-
 type RoleRow = {
   id: string;
-  code: string;
-  name: string;
+  key: string;
+  name_ar: string;
+  name_en: string;
 };
-
-type AdminUserRoleRow = {
-  user_id: string;
-  role_id: string;
-  roles:
-    | RoleRow
-    | RoleRow[]
-    | null;
-};
-
-function getRole(
-  value: AdminUserRoleRow["roles"],
-): RoleRow | null {
-  if (!value) {
-    return null;
-  }
-
-  if (Array.isArray(value)) {
-    return value[0] ?? null;
-  }
-
-  return value;
-}
 
 export async function getCurrentUserId(
   supabase: SupabaseClient,
@@ -98,12 +68,13 @@ export async function getAvailableRoles(
     .from("roles")
     .select(`
       id,
-      code,
-      name
+      key,
+      name_ar,
+      name_en
     `)
     .eq("is_active", true)
     .is("deleted_at", null)
-    .order("name", {
+    .order("sort_order", {
       ascending: true,
     });
 
@@ -117,9 +88,9 @@ export async function getAvailableRoles(
     (data ?? []) as RoleRow[]
   ).map((role) => ({
     id: role.id,
-    code: role.code,
-    nameAr: role.name,
-    nameEn: role.name,
+    code: role.key,
+    nameAr: role.name_ar,
+    nameEn: role.name_en,
   }));
 }
 
@@ -227,6 +198,7 @@ export async function inviteAdminUser(
     );
   }
 }
+
 export async function deleteAdminUser(
   userId: string,
 ): Promise<void> {

@@ -20,22 +20,18 @@ export async function POST(request: Request) {
 
     if (userError || !currentUser) {
       return NextResponse.json(
-        {
-          message: "يجب تسجيل الدخول.",
-        },
-        {
-          status: 401,
-        },
+        { message: "يجب تسجيل الدخول." },
+        { status: 401 },
       );
     }
 
     const {
-      data: isSuperAdmin,
+      data: canManageUsers,
       error: permissionError,
     } = await supabase.rpc(
-      "is_super_admin",
+      "current_user_has_permission",
       {
-        user_id: currentUser.id,
+        permission_code: "users.manage",
       },
     );
 
@@ -44,21 +40,16 @@ export async function POST(request: Request) {
         {
           message: `تعذر التحقق من الصلاحية: ${permissionError.message}`,
         },
-        {
-          status: 500,
-        },
+        { status: 500 },
       );
     }
 
-    if (!isSuperAdmin) {
+    if (!canManageUsers) {
       return NextResponse.json(
         {
-          message:
-            "ليس لديك صلاحية دعوة مستخدمين.",
+          message: "ليس لديك صلاحية دعوة المستخدمين.",
         },
-        {
-          status: 403,
-        },
+        { status: 403 },
       );
     }
 
@@ -74,12 +65,9 @@ export async function POST(request: Request) {
     if (!email || !roleId) {
       return NextResponse.json(
         {
-          message:
-            "البريد الإلكتروني والدور مطلوبان.",
+          message: "البريد الإلكتروني والدور مطلوبان.",
         },
-        {
-          status: 400,
-        },
+        { status: 400 },
       );
     }
 
@@ -89,12 +77,9 @@ export async function POST(request: Request) {
     if (!emailPattern.test(email)) {
       return NextResponse.json(
         {
-          message:
-            "البريد الإلكتروني غير صالح.",
+          message: "البريد الإلكتروني غير صالح.",
         },
-        {
-          status: 400,
-        },
+        { status: 400 },
       );
     }
 
@@ -113,8 +98,9 @@ export async function POST(request: Request) {
       .from("roles")
       .select(`
         id,
-        code,
-        name
+        key,
+        name_ar,
+        name_en
       `)
       .eq("id", roleId)
       .eq("is_active", true)
@@ -126,21 +112,16 @@ export async function POST(request: Request) {
         {
           message: `تعذر التحقق من الدور: ${roleError.message}`,
         },
-        {
-          status: 500,
-        },
+        { status: 500 },
       );
     }
 
     if (!role) {
       return NextResponse.json(
         {
-          message:
-            "الدور المحدد غير موجود أو غير نشط.",
+          message: "الدور المحدد غير موجود أو غير نشط.",
         },
-        {
-          status: 400,
-        },
+        { status: 400 },
       );
     }
 
@@ -153,7 +134,7 @@ export async function POST(request: Request) {
           data: {
             full_name: fullName,
             admin_role_id: role.id,
-            admin_role_code: role.code,
+            admin_role_key: role.key,
           },
         });
 
@@ -162,9 +143,7 @@ export async function POST(request: Request) {
         {
           message: `تعذر إرسال الدعوة: ${inviteError.message}`,
         },
-        {
-          status: 400,
-        },
+        { status: 400 },
       );
     }
 
@@ -174,14 +153,14 @@ export async function POST(request: Request) {
     if (!invitedUser) {
       return NextResponse.json(
         {
-          message:
-            "تم إرسال الدعوة ولكن لم يتم إنشاء المستخدم.",
+          message: "تم إرسال الدعوة ولكن لم يتم إنشاء المستخدم.",
         },
-        {
-          status: 500,
-        },
+        { status: 500 },
       );
     }
+
+    const now =
+      new Date().toISOString();
 
     const {
       error: profileError,
@@ -193,8 +172,7 @@ export async function POST(request: Request) {
           email,
           full_name: fullName,
           status: "invited",
-          updated_at:
-            new Date().toISOString(),
+          updated_at: now,
         },
         {
           onConflict: "id",
@@ -210,9 +188,36 @@ export async function POST(request: Request) {
         {
           message: `تعذر إنشاء الملف الإداري: ${profileError.message}`,
         },
+        { status: 500 },
+      );
+    }
+
+    const {
+      error: clearRolesError,
+    } = await adminClient
+      .from("admin_user_roles")
+      .update({
+        deleted_at: now,
+        updated_at: now,
+      })
+      .eq("user_id", invitedUser.id)
+      .is("deleted_at", null);
+
+    if (clearRolesError) {
+      await adminClient
+        .from("admin_profiles")
+        .delete()
+        .eq("id", invitedUser.id);
+
+      await adminClient.auth.admin.deleteUser(
+        invitedUser.id,
+      );
+
+      return NextResponse.json(
         {
-          status: 500,
+          message: `تعذر تجهيز أدوار المستخدم: ${clearRolesError.message}`,
         },
+        { status: 500 },
       );
     }
 
@@ -226,12 +231,10 @@ export async function POST(request: Request) {
           role_id: role.id,
           assigned_by: currentUser.id,
           deleted_at: null,
-          updated_at:
-            new Date().toISOString(),
+          updated_at: now,
         },
         {
-          onConflict:
-            "user_id,role_id",
+          onConflict: "user_id,role_id",
         },
       );
 
@@ -249,26 +252,23 @@ export async function POST(request: Request) {
         {
           message: `تعذر ربط الدور بالمستخدم: ${assignmentError.message}`,
         },
-        {
-          status: 500,
-        },
+        { status: 500 },
       );
     }
 
     return NextResponse.json(
       {
-        message:
-          "تم إرسال الدعوة بنجاح.",
+        message: "تم إرسال الدعوة وربط الدور بنجاح.",
         user: {
           id: invitedUser.id,
           email,
           fullName,
-          role: role.name,
+          role: isArabicName(role.name_ar, role.name_en),
+          roleId: role.id,
+          roleKey: role.key,
         },
       },
-      {
-        status: 201,
-      },
+      { status: 201 },
     );
   } catch (error) {
     return NextResponse.json(
@@ -278,9 +278,17 @@ export async function POST(request: Request) {
             ? error.message
             : "حدث خطأ غير متوقع.",
       },
-      {
-        status: 500,
-      },
+      { status: 500 },
     );
   }
+}
+
+function isArabicName(
+  nameAr: string,
+  nameEn: string,
+) {
+  return {
+    ar: nameAr,
+    en: nameEn,
+  };
 }
