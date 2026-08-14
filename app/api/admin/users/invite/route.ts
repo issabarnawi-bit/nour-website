@@ -9,6 +9,19 @@ type InviteUserBody = {
   fullName?: string;
 };
 
+function getSiteUrl() {
+  const configuredUrl =
+    process.env.NEXT_PUBLIC_SITE_URL?.trim();
+
+  if (!configuredUrl) {
+    throw new Error(
+      "NEXT_PUBLIC_SITE_URL is missing.",
+    );
+  }
+
+  return configuredUrl.replace(/\/+$/, "");
+}
+
 export async function POST(request: Request) {
   try {
     const supabase = await createClient();
@@ -20,8 +33,12 @@ export async function POST(request: Request) {
 
     if (userError || !currentUser) {
       return NextResponse.json(
-        { message: "يجب تسجيل الدخول." },
-        { status: 401 },
+        {
+          message: "يجب تسجيل الدخول.",
+        },
+        {
+          status: 401,
+        },
       );
     }
 
@@ -40,16 +57,21 @@ export async function POST(request: Request) {
         {
           message: `تعذر التحقق من الصلاحية: ${permissionError.message}`,
         },
-        { status: 500 },
+        {
+          status: 500,
+        },
       );
     }
 
     if (!canManageUsers) {
       return NextResponse.json(
         {
-          message: "ليس لديك صلاحية دعوة المستخدمين.",
+          message:
+            "ليس لديك صلاحية دعوة المستخدمين.",
         },
-        { status: 403 },
+        {
+          status: 403,
+        },
       );
     }
 
@@ -65,9 +87,12 @@ export async function POST(request: Request) {
     if (!email || !roleId) {
       return NextResponse.json(
         {
-          message: "البريد الإلكتروني والدور مطلوبان.",
+          message:
+            "البريد الإلكتروني والدور مطلوبان.",
         },
-        { status: 400 },
+        {
+          status: 400,
+        },
       );
     }
 
@@ -77,9 +102,12 @@ export async function POST(request: Request) {
     if (!emailPattern.test(email)) {
       return NextResponse.json(
         {
-          message: "البريد الإلكتروني غير صالح.",
+          message:
+            "البريد الإلكتروني غير صالح.",
         },
-        { status: 400 },
+        {
+          status: 400,
+        },
       );
     }
 
@@ -112,18 +140,27 @@ export async function POST(request: Request) {
         {
           message: `تعذر التحقق من الدور: ${roleError.message}`,
         },
-        { status: 500 },
+        {
+          status: 500,
+        },
       );
     }
 
     if (!role) {
       return NextResponse.json(
         {
-          message: "الدور المحدد غير موجود أو غير نشط.",
+          message:
+            "الدور المحدد غير موجود أو غير نشط.",
         },
-        { status: 400 },
+        {
+          status: 400,
+        },
       );
     }
+
+    const siteUrl = getSiteUrl();
+    const inviteRedirectUrl =
+      `${siteUrl}/admin/invite`;
 
     const {
       data: invitation,
@@ -131,6 +168,7 @@ export async function POST(request: Request) {
     } =
       await adminClient.auth.admin
         .inviteUserByEmail(email, {
+          redirectTo: inviteRedirectUrl,
           data: {
             full_name: fullName,
             admin_role_id: role.id,
@@ -143,7 +181,9 @@ export async function POST(request: Request) {
         {
           message: `تعذر إرسال الدعوة: ${inviteError.message}`,
         },
-        { status: 400 },
+        {
+          status: 400,
+        },
       );
     }
 
@@ -153,9 +193,12 @@ export async function POST(request: Request) {
     if (!invitedUser) {
       return NextResponse.json(
         {
-          message: "تم إرسال الدعوة ولكن لم يتم إنشاء المستخدم.",
+          message:
+            "تم إرسال الدعوة ولكن لم يتم إنشاء المستخدم.",
         },
-        { status: 500 },
+        {
+          status: 500,
+        },
       );
     }
 
@@ -188,7 +231,9 @@ export async function POST(request: Request) {
         {
           message: `تعذر إنشاء الملف الإداري: ${profileError.message}`,
         },
-        { status: 500 },
+        {
+          status: 500,
+        },
       );
     }
 
@@ -217,7 +262,9 @@ export async function POST(request: Request) {
         {
           message: `تعذر تجهيز أدوار المستخدم: ${clearRolesError.message}`,
         },
-        { status: 500 },
+        {
+          status: 500,
+        },
       );
     }
 
@@ -234,7 +281,8 @@ export async function POST(request: Request) {
           updated_at: now,
         },
         {
-          onConflict: "user_id,role_id",
+          onConflict:
+            "user_id,role_id",
         },
       );
 
@@ -252,23 +300,29 @@ export async function POST(request: Request) {
         {
           message: `تعذر ربط الدور بالمستخدم: ${assignmentError.message}`,
         },
-        { status: 500 },
+        {
+          status: 500,
+        },
       );
     }
 
     return NextResponse.json(
       {
-        message: "تم إرسال الدعوة وربط الدور بنجاح.",
+        message:
+          "تم إرسال الدعوة وربط الدور بنجاح.",
         user: {
           id: invitedUser.id,
           email,
           fullName,
-          role: isArabicName(role.name_ar, role.name_en),
           roleId: role.id,
           roleKey: role.key,
+          roleNameAr: role.name_ar,
+          roleNameEn: role.name_en,
         },
       },
-      { status: 201 },
+      {
+        status: 201,
+      },
     );
   } catch (error) {
     return NextResponse.json(
@@ -278,17 +332,9 @@ export async function POST(request: Request) {
             ? error.message
             : "حدث خطأ غير متوقع.",
       },
-      { status: 500 },
+      {
+        status: 500,
+      },
     );
   }
-}
-
-function isArabicName(
-  nameAr: string,
-  nameEn: string,
-) {
-  return {
-    ar: nameAr,
-    en: nameEn,
-  };
 }
