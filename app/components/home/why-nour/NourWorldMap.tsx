@@ -269,20 +269,20 @@ export default function NourWorldMap({
       <header className={styles.sectionIntro}>
         <span className={styles.eyebrow}>
           {isArabic
-            ? "خريطة نور العالمية"
-            : "Nour global map"}
+            ? "من العالم إلى مكة"
+            : "From the world to Makkah"}
         </span>
 
         <h3>
           {isArabic
-            ? "اكتشف برامج العمرة حول العالم"
-            : "Discover Umrah programs around the world"}
+            ? "اكتشف من أين تبدأ رحلتك إلى مكة"
+            : "Discover where your journey to Makkah begins"}
         </h3>
 
         <p>
           {isArabic
-            ? "اختر دولتك، استعرض البرامج المتاحة، وابدأ رحلتك من أقرب نقطة إليك."
-            : "Choose your country, explore available programs, and start your journey from the nearest point to you."}
+            ? "اختر دولتك وشاهد البرامج المتاحة والمسار الذي يربط رحلتك بمكة المكرمة."
+            : "Choose your country, view available programs, and see the route connecting your journey to Makkah."}
         </p>
       </header>
 
@@ -291,13 +291,13 @@ export default function NourWorldMap({
           <div>
             <small>
               {isArabic
-                ? "شبكة الرحلات إلى مكة"
-                : "Journey network to Makkah"}
+                ? "شبكة نور للرحلات"
+                : "Nour journey network"}
             </small>
             <strong>
               {isArabic
-                ? "مسارات متصلة بمكة المكرمة"
-                : "Routes connected to Makkah"}
+                ? "رحلات تنطلق من دول متعددة إلى مكة"
+                : "Journeys connecting multiple countries to Makkah"}
             </strong>
           </div>
 
@@ -631,8 +631,8 @@ export default function NourWorldMap({
           >
             <span className={styles.panelKicker}>
               {isArabic
-                ? "رحلتك تبدأ من هنا"
-                : "Your journey starts here"}
+                ? "اختر نقطة الانطلاق"
+                : "Choose your starting point"}
             </span>
 
             <h4>
@@ -745,6 +745,12 @@ export default function NourWorldMap({
               ))}
           </div>
         ) : null}
+
+        <p className={styles.mapHint}>
+          {isArabic
+            ? "اختر دولة من الخريطة أو من القائمة لعرض البرامج المتاحة."
+            : "Choose a country on the map or from the list to view available programs."}
+        </p>
       </div>
     </motion.section>
   );

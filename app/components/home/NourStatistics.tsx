@@ -118,6 +118,7 @@ export default function Statistics({
       className="nr-statistics nr-statistics-haram"
       aria-labelledby="nr-statistics-title"
       ref={sectionRef}
+      dir={language === "ar" ? "rtl" : "ltr"}
     >
       <div
         className="nr-statistics-haram-bg"
@@ -179,7 +180,7 @@ export default function Statistics({
           <h2 id="nr-statistics-title">
             {language === "ar"
               ? "رؤية تنمو لخدمة ضيوف الرحمن"
-              : "A growing vision to serve the Guests of Allah"}
+              : "A growing vision for serving the Guests of Allah"}
           </h2>
 
           <p>
@@ -562,6 +563,51 @@ export default function Statistics({
           color: #9fb0c5;
         }
 
+
+        .nr-statistics-haram[dir="ltr"]
+          .nr-statistics-heading {
+          max-width: 980px;
+          margin-inline: auto;
+          text-align: center;
+        }
+
+        .nr-statistics-haram[dir="ltr"]
+          .nr-statistics-heading h2 {
+          max-width: 900px;
+          margin-inline: auto;
+          font-size: clamp(38px, 4vw, 58px);
+          line-height: 1.12;
+          text-wrap: balance;
+        }
+
+        .nr-statistics-haram[dir="ltr"]
+          .nr-statistics-heading p {
+          max-width: 820px;
+          margin-inline: auto;
+        }
+
+        .nr-statistics-haram[dir="ltr"]
+          .nr-statistic-card {
+          min-height: 190px;
+          padding: 24px 26px;
+        }
+
+        .nr-statistics-haram[dir="ltr"]
+          .nr-statistic-value {
+          font-size: clamp(42px, 4vw, 58px);
+        }
+
+        .nr-statistics-haram[dir="ltr"]
+          .nr-statistic-card h3 {
+          margin-top: 20px;
+          font-size: 17px;
+        }
+
+        .nr-statistics-haram[dir="ltr"]
+          .nr-statistic-card p {
+          font-size: 11px;
+        }
+
         @media (max-width: 768px) {
           .nr-statistics-haram {
             padding-block: 72px 86px;
@@ -643,49 +689,6 @@ export default function Statistics({
               );
           }
         }
-          .nr-statistics-haram {
-  padding-block: 52px 60px;
-}
-
-.nr-statistics-haram .nr-statistics-heading {
-  max-width: 94%;
-  margin-inline: auto;
-  margin-bottom: 26px;
-  text-align: center;
-}
-
-.nr-statistics-haram .nr-statistics-heading h2 {
-  font-size: clamp(28px, 8vw, 38px);
-  line-height: 1.2;
-}
-
-.nr-statistics-haram .nr-statistics-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  gap: 10px !important;
-}
-
-.nr-statistics-haram .nr-statistic-card {
-  min-height: 175px !important;
-  padding: 18px 14px !important;
-  border-radius: 18px !important;
-}
-
-.nr-statistics-haram .nr-statistic-value {
-  margin-top: 22px !important;
-  font-size: clamp(34px, 9vw, 46px) !important;
-  line-height: 1 !important;
-}
-
-.nr-statistics-haram .nr-statistic-card h3 {
-  margin-top: 20px !important;
-  font-size: 14px !important;
-}
-
-.nr-statistics-haram .nr-statistic-card p {
-  margin-top: 6px !important;
-  font-size: 9px !important;
-  line-height: 1.5 !important;
-}
 
         @media (
           prefers-reduced-motion: reduce

@@ -103,7 +103,7 @@ export default function Header({
 
   const startLabel = language === "ar" ? "ابدأ رحلتك" : "Start your journey";
   const partnerLabel = language === "ar" ? "كن شريك نور" : "Partner with Nour";
-  const joinLabel = language === "ar" ? "انضم لنا" : "Join us";
+  const joinLabel = language === "ar" ? "انضم الينا" : "Join us";
 
   return (
     <>

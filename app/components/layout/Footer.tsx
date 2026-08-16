@@ -3,6 +3,15 @@
 import type { ComponentType } from "react";
 import Image from "next/image";
 import {
+  ExternalLink,
+  Globe2,
+  Mail,
+  MapPin,
+  MessageCircle,
+  Phone,
+  ShieldCheck,
+} from "lucide-react";
+import {
   FaFacebookF,
   FaInstagram,
   FaLinkedinIn,
@@ -39,9 +48,7 @@ type SocialLink = {
 function normalizeExternalUrl(value: string): string {
   const trimmedValue = value.trim();
 
-  if (!trimmedValue) {
-    return "";
-  }
+  if (!trimmedValue) return "";
 
   if (
     trimmedValue.startsWith("http://") ||
@@ -57,7 +64,6 @@ export default function Footer({
   language,
 }: FooterProps) {
   const { getText } = usePublicSettings();
-
   const isArabic = language === "ar";
 
   const platformName = getText(
@@ -120,115 +126,103 @@ export default function Footer({
     {
       key: "facebook",
       label: "Facebook",
-      url: getText(
-        "social.facebook_url",
-        "",
-      ),
+      url: getText("social.facebook_url", ""),
       icon: FaFacebookF,
     },
     {
       key: "instagram",
       label: "Instagram",
-      url: getText(
-        "social.instagram_url",
-        "",
-      ),
+      url: getText("social.instagram_url", ""),
       icon: FaInstagram,
     },
     {
       key: "x",
       label: "X",
-      url: getText(
-        "social.x_url",
-        "",
-      ),
+      url: getText("social.x_url", ""),
       icon: FaXTwitter,
     },
     {
       key: "youtube",
       label: "YouTube",
-      url: getText(
-        "social.youtube_url",
-        "",
-      ),
+      url: getText("social.youtube_url", ""),
       icon: FaYoutube,
     },
     {
       key: "linkedin",
       label: "LinkedIn",
-      url: getText(
-        "social.linkedin_url",
-        "",
-      ),
+      url: getText("social.linkedin_url", ""),
       icon: FaLinkedinIn,
     },
     {
       key: "tiktok",
       label: "TikTok",
-      url: getText(
-        "social.tiktok_url",
-        "",
-      ),
+      url: getText("social.tiktok_url", ""),
       icon: FaTiktok,
     },
   ]
-    .filter(
-      (socialLink) =>
-        socialLink.url.trim().length > 0,
-    )
-    .map((socialLink) => ({
-      ...socialLink,
-      url: normalizeExternalUrl(
-        socialLink.url,
-      ),
+    .filter((item) => item.url.trim().length > 0)
+    .map((item) => ({
+      ...item,
+      url: normalizeExternalUrl(item.url),
     }));
 
   return (
-    <footer className="nr-footer">
-      <section className="nr-newsletter">
-        <div className="nr-container nr-newsletter-grid">
+    <footer
+      className="nr-footer nr-footer-premium"
+      dir={isArabic ? "rtl" : "ltr"}
+    >
+      <section className="nr-newsletter nr-newsletter-premium">
+        <div className="nr-container nr-newsletter-premium-shell">
           <div className="nr-newsletter-copy">
-            <span className="nr-kicker">
-              {isArabic
-                ? "ابقَ على اطلاع"
-                : "Stay informed"}
+            <span className="nr-newsletter-kicker">
+              {isArabic ? "ابقَ على اطلاع" : "Stay informed"}
             </span>
 
             <h2>
               {isArabic
-                ? `اشترك في تحديثات ${platformName}`
-                : `Subscribe to ${platformName} updates`}
+                ? `كن أول من يعرف جديد ${platformName}`
+                : `Be the first to know what's new at ${platformName}`}
             </h2>
 
             <p>
               {isArabic
-                ? "احصل على أحدث البرامج والعروض والتحديثات المتعلقة بخدمات العمرة."
-                : "Receive the latest programs, offers, and updates related to Umrah services."}
+                ? "برامج جديدة، تحديثات مهمة وعروض مختارة تصل إليك مباشرة."
+                : "New programs, important updates, and selected offers delivered directly to you."}
             </p>
+
+            <div className="nr-newsletter-trust">
+              <ShieldCheck />
+              <span>
+                {isArabic
+                  ? "اشتراك اختياري ويمكنك إلغاؤه في أي وقت."
+                  : "Optional subscription. Unsubscribe at any time."}
+              </span>
+            </div>
           </div>
 
-          <NewsletterSubscribeForm
-            language={language}
-          />
+          <NewsletterSubscribeForm language={language} />
         </div>
       </section>
 
-      <div className="nr-container nr-footer-content">
+      <div className="nr-container nr-footer-content nr-footer-premium-content">
         <div className="nr-footer-brand">
-          <Image
-            src="/images/site/v-logo.png"
-            alt={platformName}
-            width={170}
-            height={58}
-          />
+          <div className="nr-footer-brand-head">
+            <Image
+              src="/images/site/v-logo.png"
+              alt={platformName}
+              width={130}
+              height={110}
+            />
 
-          <span>
-            © {new Date().getFullYear()}{" "}
-            {platformName}.{" "}
-            {isArabic
-              ? "جميع الحقوق محفوظة"
-              : "All rights reserved"}
-          </span>
+            <div>
+              <strong>{platformName}</strong>
+              <p>
+                {isArabic
+                  ? "تجربة رقمية متكاملة تساعد المعتمر على التخطيط لرحلته ومتابعة تفاصيلها بوضوح وطمأنينة."
+                  : "An integrated digital experience helping pilgrims plan and follow their Umrah journey with clarity and confidence."}
+              </p>
+            </div>
+          </div>
 
           {socialLinks.length > 0 ? (
             <div
@@ -239,96 +233,132 @@ export default function Footer({
                   : "Social media links"
               }
             >
-              {socialLinks.map(
-                (socialLink) => {
-                  const Icon =
-                    socialLink.icon;
+              {socialLinks.map((socialLink) => {
+                const Icon = socialLink.icon;
 
-                  return (
-                    <a
-                      key={socialLink.key}
-                      href={socialLink.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={
-                        socialLink.label
-                      }
-                      title={
-                        socialLink.label
-                      }
-                    >
-                      <Icon
-                        size={19}
-                        aria-hidden={true}
-                      />
-                    </a>
-                  );
-                },
-              )}
+                return (
+                  <a
+                    key={socialLink.key}
+                    href={socialLink.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={socialLink.label}
+                    title={socialLink.label}
+                  >
+                    <Icon
+                      size={17}
+                      aria-hidden={true}
+                    />
+                  </a>
+                );
+              })}
             </div>
           ) : null}
         </div>
 
-        <div className="nr-footer-contact">
-          {normalizedPhone ? (
-            <a
-              href={`tel:${normalizedPhone}`}
-              dir="ltr"
-            >
-              {supportPhone}
-            </a>
-          ) : null}
+        <div className="nr-footer-column">
+          <span className="nr-footer-column-title">
+            {isArabic ? "تواصل معنا" : "Contact"}
+          </span>
 
-          {supportEmail ? (
-            <a
-              href={`mailto:${supportEmail}`}
-              dir="ltr"
-            >
-              {supportEmail}
-            </a>
-          ) : null}
+          <div className="nr-footer-contact">
+            {normalizedPhone ? (
+              <a href={`tel:${normalizedPhone}`} dir="ltr">
+                <Phone />
+                <span>{supportPhone}</span>
+              </a>
+            ) : null}
 
-          {whatsappUrl ? (
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {isArabic
-                ? "تواصل عبر واتساب"
-                : "Contact via WhatsApp"}
-            </a>
-          ) : null}
+            {supportEmail ? (
+              <a href={`mailto:${supportEmail}`} dir="ltr">
+                <Mail />
+                <span>{supportEmail}</span>
+              </a>
+            ) : null}
 
-          {normalizedWebsiteUrl ? (
-            <a
-              href={normalizedWebsiteUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              dir="ltr"
-            >
-              {displayedWebsite}
-            </a>
-          ) : null}
-
-          {address ? (
-            <span>{address}</span>
-          ) : null}
+            {whatsappUrl ? (
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <MessageCircle />
+                <span>
+                  {isArabic
+                    ? "تواصل عبر واتساب"
+                    : "WhatsApp"}
+                </span>
+              </a>
+            ) : null}
+          </div>
         </div>
 
-        <div className="nr-footer-links">
-          <a href="/privacy">
-            {isArabic
-              ? "سياسة الخصوصية"
-              : "Privacy Policy"}
-          </a>
+        <div className="nr-footer-column">
+          <span className="nr-footer-column-title">
+            {isArabic ? "نور آب" : "NourApp"}
+          </span>
 
-          <a href="/terms">
-            {isArabic
-              ? "الشروط والأحكام"
-              : "Terms and Conditions"}
-          </a>
+          <div className="nr-footer-contact">
+            {normalizedWebsiteUrl ? (
+              <a
+                href={normalizedWebsiteUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Globe2 />
+                <span dir="ltr">{displayedWebsite}</span>
+              </a>
+            ) : null}
+
+            {address ? (
+              <span className="nr-footer-contact-static">
+                <MapPin />
+                <span>{address}</span>
+              </span>
+            ) : null}
+          </div>
         </div>
+
+        <div className="nr-footer-column">
+          <span className="nr-footer-column-title">
+            {isArabic ? "روابط مهمة" : "Important links"}
+          </span>
+
+          <div className="nr-footer-links">
+            <a href="/privacy">
+              <span>
+                {isArabic
+                  ? "سياسة الخصوصية"
+                  : "Privacy Policy"}
+              </span>
+              <ExternalLink />
+            </a>
+
+            <a href="/terms">
+              <span>
+                {isArabic
+                  ? "الشروط والأحكام"
+                  : "Terms & Conditions"}
+              </span>
+              <ExternalLink />
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div className="nr-container nr-footer-bottom">
+        <span>
+          © {new Date().getFullYear()} {platformName}.{" "}
+          {isArabic
+            ? "جميع الحقوق محفوظة."
+            : "All rights reserved."}
+        </span>
+
+        <span className="nr-footer-bottom-note">
+          {isArabic
+            ? "صُمم لتجربة عمرة أوضح وأسهل."
+            : "Designed for a clearer, easier Umrah journey."}
+        </span>
       </div>
     </footer>
   );

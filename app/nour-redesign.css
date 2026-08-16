@@ -4051,3 +4051,433 @@ html[data-theme="dark"]
     font-size: 30px;
   }
 }
+
+
+/* =========================================================
+   NOURAPP — NEWSLETTER + FOOTER COMPACT FIX
+   Strong final overrides for desktop / tablet / mobile
+========================================================= */
+
+.nr-footer.nr-footer-premium {
+  padding: 0 !important;
+}
+
+/* ---------- Newsletter ---------- */
+
+.nr-footer-premium .nr-newsletter-premium {
+  padding: 48px 0 42px !important;
+}
+
+.nr-footer-premium .nr-container.nr-newsletter-premium-shell {
+  width: min(1280px, calc(100% - 56px)) !important;
+  display: grid !important;
+  grid-template-columns: minmax(320px, .72fr) minmax(0, 1.28fr) !important;
+  align-items: center !important;
+  gap: 42px !important;
+  padding: 30px 34px !important;
+  margin-inline: auto !important;
+  border-radius: 26px !important;
+}
+
+.nr-footer-premium .nr-newsletter-copy {
+  max-width: 480px !important;
+  margin: 0 !important;
+  text-align: start !important;
+}
+
+.nr-footer-premium .nr-newsletter-copy h2 {
+  max-width: 480px !important;
+  margin: 12px 0 9px !important;
+  font-size: clamp(28px, 2.55vw, 40px) !important;
+  line-height: 1.16 !important;
+}
+
+.nr-footer-premium .nr-newsletter-copy p {
+  max-width: 470px !important;
+  margin: 0 !important;
+  font-size: 12px !important;
+  line-height: 1.7 !important;
+}
+
+.nr-footer-premium .nr-newsletter-trust {
+  justify-content: flex-start !important;
+  margin: 12px 0 0 !important;
+  font-size: 8px !important;
+}
+
+.nr-footer-premium .nr-newsletter-form {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: 10px 12px !important;
+  padding: 16px !important;
+  border-radius: 18px !important;
+}
+
+.nr-footer-premium .nr-newsletter-fields {
+  grid-column: 1 / -1 !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+.nr-footer-premium .nr-newsletter-field,
+.nr-footer-premium .nr-newsletter-field:last-child {
+  grid-column: auto !important;
+}
+
+.nr-footer-premium .nr-newsletter-field input,
+.nr-footer-premium .nr-newsletter-field select {
+  min-height: 44px !important;
+  height: 44px !important;
+  padding-inline: 12px !important;
+  border-radius: 11px !important;
+  font-size: 11px !important;
+}
+
+.nr-footer-premium .nr-newsletter-consent {
+  min-width: 0 !important;
+  align-self: center !important;
+  margin: 0 !important;
+  padding-inline-end: 6px !important;
+  font-size: 8.5px !important;
+  line-height: 1.5 !important;
+}
+
+.nr-footer-premium .nr-newsletter-submit {
+  min-width: 150px !important;
+  min-height: 44px !important;
+  height: 44px !important;
+  padding-inline: 18px !important;
+  border-radius: 11px !important;
+  font-size: 11px !important;
+}
+
+.nr-footer-premium .nr-newsletter-message {
+  grid-column: 1 / -1 !important;
+}
+
+/* ---------- Footer columns ---------- */
+
+.nr-footer-premium .nr-container.nr-footer-premium-content {
+  width: min(1280px, calc(100% - 56px)) !important;
+  display: grid !important;
+  grid-template-columns:
+    minmax(300px, 1.35fr)
+    minmax(190px, .8fr)
+    minmax(190px, .8fr)
+    minmax(170px, .65fr) !important;
+  align-items: start !important;
+  justify-items: stretch !important;
+  column-gap: 46px !important;
+  row-gap: 24px !important;
+  padding: 38px 0 30px !important;
+  margin-inline: auto !important;
+  text-align: start !important;
+}
+
+.nr-footer-premium .nr-footer-brand,
+.nr-footer-premium .nr-footer-column,
+.nr-footer-premium .nr-footer-contact,
+.nr-footer-premium .nr-footer-links {
+  min-width: 0 !important;
+  align-items: flex-start !important;
+  text-align: start !important;
+}
+
+.nr-footer-premium .nr-footer-brand {
+  gap: 13px !important;
+}
+
+.nr-footer-premium .nr-footer-brand-head {
+  display: grid !important;
+  grid-template-columns: 78px minmax(0, 1fr) !important;
+  align-items: start !important;
+  gap: 14px !important;
+}
+
+.nr-footer-premium .nr-footer-brand-head img {
+  width: 78px !important;
+  height: 78px !important;
+  padding: 7px !important;
+  border-radius: 15px !important;
+}
+
+.nr-footer-premium .nr-footer-brand-head strong {
+  margin-top: 2px !important;
+  font-size: 16px !important;
+}
+
+.nr-footer-premium .nr-footer-brand-head p {
+  max-width: 330px !important;
+  margin-top: 5px !important;
+  font-size: 9px !important;
+  line-height: 1.65 !important;
+}
+
+.nr-footer-premium .nr-footer-column-title {
+  margin-bottom: 12px !important;
+  font-size: 10px !important;
+}
+
+.nr-footer-premium .nr-footer-contact {
+  gap: 8px !important;
+}
+
+.nr-footer-premium .nr-footer-contact a,
+.nr-footer-premium .nr-footer-contact-static,
+.nr-footer-premium .nr-footer-links a {
+  font-size: 9px !important;
+}
+
+.nr-footer-premium .nr-footer-contact svg,
+.nr-footer-premium .nr-footer-contact-static svg {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+.nr-footer-premium .nr-footer-social {
+  gap: 6px !important;
+  margin-top: 0 !important;
+}
+
+.nr-footer-premium .nr-footer-social a {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 9px !important;
+}
+
+.nr-footer-premium .nr-footer-links {
+  gap: 8px !important;
+}
+
+.nr-footer-premium .nr-container.nr-footer-bottom {
+  width: min(1280px, calc(100% - 56px)) !important;
+  min-height: 52px !important;
+  margin-inline: auto !important;
+  padding: 0 !important;
+  font-size: 8px !important;
+}
+
+/* ---------- Tablet ---------- */
+
+@media (max-width: 1050px) {
+  .nr-footer-premium .nr-container.nr-newsletter-premium-shell {
+    grid-template-columns: 1fr !important;
+    gap: 22px !important;
+  }
+
+  .nr-footer-premium .nr-newsletter-copy {
+    max-width: 650px !important;
+    margin-inline: auto !important;
+    text-align: center !important;
+  }
+
+  .nr-footer-premium .nr-newsletter-copy h2,
+  .nr-footer-premium .nr-newsletter-copy p {
+    margin-inline: auto !important;
+  }
+
+  .nr-footer-premium .nr-newsletter-trust {
+    justify-content: center !important;
+  }
+
+  .nr-footer-premium .nr-container.nr-footer-premium-content {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 28px 42px !important;
+  }
+}
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 680px) {
+  .nr-footer-premium .nr-newsletter-premium {
+    padding: 38px 0 34px !important;
+  }
+
+  .nr-footer-premium .nr-container.nr-newsletter-premium-shell {
+    width: min(100% - 22px, 540px) !important;
+    padding: 20px 14px !important;
+    border-radius: 21px !important;
+  }
+
+  .nr-footer-premium .nr-newsletter-copy h2 {
+    font-size: clamp(27px, 8.8vw, 36px) !important;
+  }
+
+  .nr-footer-premium .nr-newsletter-fields {
+    grid-template-columns: 1fr !important;
+  }
+
+  .nr-footer-premium .nr-newsletter-form {
+    grid-template-columns: 1fr !important;
+    padding: 13px !important;
+  }
+
+  .nr-footer-premium .nr-newsletter-consent {
+    padding: 2px 0 !important;
+  }
+
+  .nr-footer-premium .nr-newsletter-submit {
+    width: 100% !important;
+  }
+
+  .nr-footer-premium .nr-container.nr-footer-premium-content {
+    width: min(100% - 22px, 540px) !important;
+    grid-template-columns: 1fr !important;
+    gap: 22px !important;
+    padding: 30px 0 24px !important;
+  }
+
+  .nr-footer-premium .nr-footer-brand-head {
+    grid-template-columns: 68px minmax(0, 1fr) !important;
+  }
+
+  .nr-footer-premium .nr-footer-brand-head img {
+    width: 68px !important;
+    height: 68px !important;
+  }
+
+  .nr-footer-premium .nr-container.nr-footer-bottom {
+    width: min(100% - 22px, 540px) !important;
+    min-height: 68px !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    text-align: center !important;
+  }
+}
+
+
+/* =========================================================
+   NOURAPP — MOBILE FOOTER BALANCE FIX
+   Fixes narrow RTL column and excessive vertical height
+========================================================= */
+
+@media (max-width: 680px) {
+  .nr-footer-premium .nr-container.nr-footer-premium-content {
+    width: min(100% - 24px, 560px) !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 18px 14px !important;
+    padding: 26px 0 22px !important;
+    margin-inline: auto !important;
+    align-items: start !important;
+    justify-items: stretch !important;
+  }
+
+  .nr-footer-premium .nr-footer-brand {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    align-items: stretch !important;
+  }
+
+  .nr-footer-premium .nr-footer-brand-head {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: 66px minmax(0, 1fr) !important;
+    align-items: center !important;
+    gap: 12px !important;
+  }
+
+  .nr-footer-premium .nr-footer-brand-head img {
+    width: 66px !important;
+    height: 66px !important;
+    flex-basis: 66px !important;
+  }
+
+  .nr-footer-premium .nr-footer-brand-head > div {
+    min-width: 0 !important;
+  }
+
+  .nr-footer-premium .nr-footer-brand-head strong {
+    font-size: 15px !important;
+  }
+
+  .nr-footer-premium .nr-footer-brand-head p {
+    max-width: none !important;
+    margin: 4px 0 0 !important;
+    font-size: 9px !important;
+    line-height: 1.55 !important;
+  }
+
+  .nr-footer-premium .nr-footer-column {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 14px !important;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 14px;
+    background: rgba(255,255,255,.025);
+  }
+
+  .nr-footer-premium .nr-footer-column-title {
+    margin-bottom: 10px !important;
+    font-size: 10px !important;
+  }
+
+  .nr-footer-premium .nr-footer-contact,
+  .nr-footer-premium .nr-footer-links {
+    width: 100% !important;
+    gap: 8px !important;
+  }
+
+  .nr-footer-premium .nr-footer-contact a,
+  .nr-footer-premium .nr-footer-contact-static,
+  .nr-footer-premium .nr-footer-links a {
+    width: 100% !important;
+    max-width: 100% !important;
+    justify-content: flex-start !important;
+    gap: 7px !important;
+    font-size: 9px !important;
+    line-height: 1.45 !important;
+    overflow-wrap: anywhere;
+  }
+
+  html[dir="rtl"] .nr-footer-premium .nr-footer-contact a,
+  html[dir="rtl"] .nr-footer-premium .nr-footer-contact-static,
+  html[dir="rtl"] .nr-footer-premium .nr-footer-links a {
+    text-align: right !important;
+  }
+
+  html[dir="ltr"] .nr-footer-premium .nr-footer-contact a,
+  html[dir="ltr"] .nr-footer-premium .nr-footer-contact-static,
+  html[dir="ltr"] .nr-footer-premium .nr-footer-links a {
+    text-align: left !important;
+  }
+
+  .nr-footer-premium .nr-footer-social {
+    justify-content: flex-start !important;
+    width: 100% !important;
+  }
+
+  .nr-footer-premium .nr-container.nr-footer-bottom {
+    width: min(100% - 24px, 560px) !important;
+    min-height: 64px !important;
+    padding: 12px 0 !important;
+    font-size: 8px !important;
+  }
+}
+
+@media (max-width: 430px) {
+  .nr-footer-premium .nr-container.nr-footer-premium-content {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .nr-footer-premium .nr-footer-brand {
+    grid-column: auto !important;
+  }
+
+  .nr-footer-premium .nr-footer-column {
+    padding: 12px !important;
+  }
+
+  .nr-footer-premium .nr-footer-brand-head {
+    grid-template-columns: 60px minmax(0, 1fr) !important;
+  }
+
+  .nr-footer-premium .nr-footer-brand-head img {
+    width: 60px !important;
+    height: 60px !important;
+    flex-basis: 60px !important;
+  }
+}

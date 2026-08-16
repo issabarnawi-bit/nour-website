@@ -98,8 +98,8 @@ const countries = [
     ar: "الولايات المتحدة",
     en: "United States",
   },
-   {
-    code: "SU",
+  {
+    code: "SD",
     ar: "السودان",
     en: "Sudan",
   },
@@ -114,7 +114,7 @@ export default function NewsletterSubscribeForm({
     useState<FormState>({
       fullName: "",
       email: "",
-      countryCode: "SA",
+      countryCode: "",
       consentGiven: false,
     });
 
@@ -174,7 +174,7 @@ export default function NewsletterSubscribeForm({
       setFormState({
         fullName: "",
         email: "",
-        countryCode: "SA",
+        countryCode: "",
         consentGiven: false,
       });
     } catch (error) {
@@ -266,6 +266,12 @@ export default function NewsletterSubscribeForm({
             }}
             required
           >
+            <option value="" disabled>
+              {isArabic
+                ? "اختر الدولة"
+                : "Select country"}
+            </option>
+
             {countries.map((country) => (
               <option
                 key={country.code}

@@ -72,6 +72,16 @@ export default function Journey({ t, language }: Props) {
           </h2>
 
           <p>{t.journeyText}</p>
+
+          <div className="nr-journey-heading-meta" aria-hidden="true">
+            <span>{isArabic ? "اختيار" : "Choose"}</span>
+            <i />
+            <span>{isArabic ? "مقارنة" : "Compare"}</span>
+            <i />
+            <span>{isArabic ? "تأكيد" : "Confirm"}</span>
+            <i />
+            <span>{isArabic ? "متابعة" : "Support"}</span>
+          </div>
         </motion.header>
 
         <motion.div
@@ -98,9 +108,14 @@ export default function Journey({ t, language }: Props) {
                   {getJourneyIcon(index)}
                 </span>
 
-                <span className="nr-journey-step-number">
-                  {step.number}
-                </span>
+                <div className="nr-journey-step-meta">
+                  <small>
+                    {isArabic ? "الخطوة" : "Step"}
+                  </small>
+                  <span className="nr-journey-step-number">
+                    {step.number}
+                  </span>
+                </div>
               </div>
 
               <h3>{step.title}</h3>
@@ -125,7 +140,7 @@ export default function Journey({ t, language }: Props) {
         .nr-journey-premium {
           position: relative;
           overflow: hidden;
-          padding: 106px 0;
+          padding: 94px 0 100px;
           background:
             radial-gradient(
               circle at 8% 20%,
@@ -139,8 +154,8 @@ export default function Journey({ t, language }: Props) {
             ),
             linear-gradient(
               180deg,
-              color-mix(in srgb, var(--nr-soft) 88%, #ffffff),
-              color-mix(in srgb, var(--nr-bg) 94%, #eef6ff)
+              color-mix(in srgb, var(--nr-soft) 84%, #ffffff),
+              color-mix(in srgb, var(--nr-bg) 96%, #eef6ff)
             );
           scroll-margin-top: 105px;
         }
@@ -199,8 +214,8 @@ export default function Journey({ t, language }: Props) {
         }
 
         .nr-journey-heading {
-          max-width: 820px;
-          margin: 0 auto 48px;
+          max-width: 880px;
+          margin: 0 auto 40px;
           text-align: center;
         }
 
@@ -233,7 +248,7 @@ export default function Journey({ t, language }: Props) {
         .nr-journey-heading h2 {
           margin: 18px 0 14px;
           color: var(--nr-text);
-          font-size: clamp(38px, 4.7vw, 59px);
+          font-size: clamp(36px, 4.5vw, 56px);
           line-height: 1.2;
           letter-spacing: -0.025em;
           text-wrap: balance;
@@ -247,18 +262,35 @@ export default function Journey({ t, language }: Props) {
           line-height: 1.88;
         }
 
+        .nr-journey-heading-meta {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 9px;
+          margin-top: 18px;
+          color: color-mix(in srgb, var(--nr-muted) 78%, transparent);
+          font-size: 10px;
+          font-weight: 800;
+        }
+
+        .nr-journey-heading-meta i {
+          width: 18px;
+          height: 1px;
+          background: color-mix(in srgb, var(--nr-blue) 28%, transparent);
+        }
+
         .nr-journey-timeline {
           position: relative;
           display: grid;
           grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 20px;
+          gap: 18px;
         }
 
         .nr-journey-line {
           position: absolute;
-          top: 51px;
-          inset-inline: 6%;
-          height: 3px;
+          top: 50px;
+          inset-inline: 7%;
+          height: 2px;
           border-radius: 999px;
           background:
             linear-gradient(
@@ -273,11 +305,11 @@ export default function Journey({ t, language }: Props) {
         .nr-journey-step-card {
           position: relative;
           z-index: 2;
-          min-height: 285px;
+          min-height: 258px;
           overflow: visible;
-          padding: 24px;
+          padding: 22px;
           border: 1px solid var(--nr-border);
-          border-radius: 25px;
+          border-radius: 24px;
           background:
             linear-gradient(
               145deg,
@@ -297,10 +329,10 @@ export default function Journey({ t, language }: Props) {
         .nr-journey-step-card::before {
           content: "";
           position: absolute;
-          width: 170px;
-          height: 170px;
-          inset-inline-end: -95px;
-          bottom: -105px;
+          width: 150px;
+          height: 150px;
+          inset-inline-end: -84px;
+          bottom: -92px;
           border-radius: 50%;
           background: rgba(23, 111, 232, 0.11);
           transition:
@@ -326,16 +358,16 @@ export default function Journey({ t, language }: Props) {
           align-items: center;
           justify-content: space-between;
           gap: 14px;
-          margin-bottom: 30px;
+          margin-bottom: 24px;
         }
 
         .nr-journey-step-icon {
-          width: 56px;
-          height: 56px;
+          width: 54px;
+          height: 54px;
           display: grid;
           place-items: center;
           border: 1px solid rgba(23, 111, 232, 0.16);
-          border-radius: 18px;
+          border-radius: 17px;
           color: var(--nr-blue);
           background: color-mix(
             in srgb,
@@ -364,9 +396,28 @@ export default function Journey({ t, language }: Props) {
           height: 27px;
         }
 
+        .nr-journey-step-meta {
+          display: grid;
+          justify-items: end;
+          gap: 1px;
+        }
+
+        html[dir="ltr"] .nr-journey-step-meta {
+          justify-items: start;
+        }
+
+        .nr-journey-step-meta small {
+          color: color-mix(in srgb, var(--nr-muted) 66%, transparent);
+          font-size: 8px;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: .08em;
+        }
+
         .nr-journey-step-number {
           color: var(--nr-gold);
-          font-size: 28px;
+          font-size: 26px;
+          line-height: 1;
           font-weight: 900;
           letter-spacing: 0.04em;
         }
@@ -376,7 +427,7 @@ export default function Journey({ t, language }: Props) {
           z-index: 2;
           margin: 0 0 10px;
           color: var(--nr-text);
-          font-size: 20px;
+          font-size: 19px;
           line-height: 1.45;
         }
 
@@ -384,17 +435,21 @@ export default function Journey({ t, language }: Props) {
           position: relative;
           z-index: 2;
           margin: 0;
+          overflow: hidden;
           color: var(--nr-muted);
-          font-size: 13px;
-          line-height: 1.82;
+          font-size: 12px;
+          line-height: 1.75;
+          display: -webkit-box;
+          -webkit-line-clamp: 4;
+          -webkit-box-orient: vertical;
         }
 
         .nr-journey-step-line {
           position: absolute;
-          inset-inline-start: 24px;
-          bottom: 22px;
+          inset-inline-start: 22px;
+          bottom: 18px;
           z-index: 2;
-          width: 42px;
+          width: 38px;
           height: 3px;
           border-radius: 999px;
           background: var(--nr-gold);
@@ -407,11 +462,11 @@ export default function Journey({ t, language }: Props) {
 
         .nr-journey-connector {
           position: absolute;
-          top: 33px;
-          inset-inline-end: -28px;
+          top: 31px;
+          inset-inline-end: -26px;
           z-index: 4;
-          width: 36px;
-          height: 36px;
+          width: 32px;
+          height: 32px;
           display: grid;
           place-items: center;
           border: 1px solid rgba(23, 111, 232, 0.16);
@@ -468,19 +523,18 @@ export default function Journey({ t, language }: Props) {
             display: none;
           }
 
-          .nr-journey-step-card:nth-child(odd)
-            .nr-journey-connector {
+          .nr-journey-connector {
             display: none;
           }
         }
 
         @media (max-width: 620px) {
           .nr-journey-premium {
-            padding: 76px 0;
+            padding: 68px 0 72px;
           }
 
           .nr-journey-heading {
-            margin-bottom: 32px;
+            margin-bottom: 28px;
           }
 
           .nr-journey-heading h2 {
@@ -491,14 +545,24 @@ export default function Journey({ t, language }: Props) {
             font-size: 14px;
           }
 
+          .nr-journey-heading-meta {
+            gap: 6px;
+            margin-top: 14px;
+            font-size: 9px;
+          }
+
+          .nr-journey-heading-meta i {
+            width: 10px;
+          }
+
           .nr-journey-timeline {
             grid-template-columns: 1fr;
             gap: 14px;
           }
 
           .nr-journey-step-card {
-            min-height: 245px;
-            padding: 23px;
+            min-height: 210px;
+            padding: 20px;
           }
 
           .nr-journey-connector {
@@ -506,7 +570,31 @@ export default function Journey({ t, language }: Props) {
           }
 
           .nr-journey-step-line {
-            inset-inline-start: 23px;
+            inset-inline-start: 20px;
+          }
+        }
+
+        @media (max-width: 430px) {
+          .nr-journey-heading h2 {
+            font-size: clamp(31px, 9.5vw, 38px);
+          }
+
+          .nr-journey-step-card {
+            min-height: 198px;
+          }
+
+          .nr-journey-step-icon {
+            width: 48px;
+            height: 48px;
+          }
+
+          .nr-journey-step-icon svg {
+            width: 24px;
+            height: 24px;
+          }
+
+          .nr-journey-step-card h3 {
+            font-size: 18px;
           }
         }
 

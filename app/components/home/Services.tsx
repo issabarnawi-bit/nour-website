@@ -23,6 +23,7 @@ type Service = {
   badgeAr?: string;
   badgeEn?: string;
   paymentMethods?: string[];
+  featured?: boolean;
 };
 
 const services: Service[] = [
@@ -39,6 +40,7 @@ const services: Service[] = [
     accent: "blue",
     badgeAr: "الأكثر طلبًا",
     badgeEn: "Most popular",
+    featured: true,
   },
   {
     titleAr: "خدمات التأشيرات",
@@ -53,6 +55,7 @@ const services: Service[] = [
     accent: "gold",
     badgeAr: "إجراءات مبسطة",
     badgeEn: "Simplified",
+    featured: true,
   },
   {
     titleAr: "حجوزات الفنادق",
@@ -174,14 +177,14 @@ export default function Services({
             lang={isArabic ? "ar" : "en"}
           >
             {isArabic
-              ? "كل ما تحتاجه لرحلة عمرة منظمة في مكان واحد"
-              : "Everything you need for an organized Umrah journey in one place"}
+              ? "رحلة عمرة متكاملة، من التخطيط حتى العودة"
+              : "A complete Umrah journey, from planning to return"}
           </h2>
 
           <p>
             {isArabic
-              ? "نجمع البرامج والتأشيرات والسكن والنقل والمساندة ضمن تجربة رقمية واضحة، لتسهيل التخطيط وتقليل الخطوات المتفرقة."
-              : "We bring programs, visas, accommodation, transport, and support into one clear digital experience, simplifying planning and reducing fragmented steps."}
+              ? "برامج، تأشيرات، سكن، نقل، إرشاد ودفع ضمن تجربة رقمية واحدة تساعدك على اتخاذ القرار ومتابعة تفاصيل رحلتك بسهولة."
+              : "Programs, visas, accommodation, transport, guidance, and payments in one digital experience that helps you decide and manage your journey with ease."}
           </p>
         </motion.header>
 
@@ -195,7 +198,9 @@ export default function Services({
           {services.map((service, index) => (
             <motion.article
               key={service.titleEn}
-              className={`nr-service-card nr-service-card-${service.accent}`}
+              className={`nr-service-card nr-service-card-${service.accent} ${
+                service.featured ? "is-featured" : ""
+              }`}
               variants={cardVariants}
               whileHover={{
                 y: -10,
@@ -207,6 +212,8 @@ export default function Services({
                   {isArabic ? service.badgeAr : service.badgeEn}
                 </span>
               )}
+
+              <span className="nr-service-card-orb" aria-hidden="true" />
 
               <div className="nr-service-card-head">
                 <motion.span
@@ -248,7 +255,9 @@ export default function Services({
                     ? "#programs"
                     : service.icon === "payment"
                       ? "#payments"
-                      : "#journey"
+                      : service.icon === "hotel"
+                        ? "#programs"
+                        : "#journey"
                 }
                 aria-label={isArabic ? service.labelAr : service.labelEn}
               >
@@ -266,7 +275,7 @@ export default function Services({
         .nr-services-premium {
           position: relative;
           overflow: hidden;
-          padding: 104px 0;
+          padding: 96px 0 104px;
           background:
             radial-gradient(
               circle at 10% 18%,
@@ -280,8 +289,8 @@ export default function Services({
             ),
             linear-gradient(
               180deg,
-              color-mix(in srgb, var(--nr-bg) 94%, #eef6ff),
-              color-mix(in srgb, var(--nr-soft) 90%, #ffffff)
+              color-mix(in srgb, var(--nr-bg) 96%, #eef6ff),
+              color-mix(in srgb, var(--nr-soft) 84%, #ffffff)
             );
           scroll-margin-top: 105px;
         }
@@ -340,8 +349,8 @@ export default function Services({
         }
 
         .nr-services-heading {
-          max-width: 860px;
-          margin: 0 auto 46px;
+          max-width: 900px;
+          margin: 0 auto 40px;
           text-align: center;
         }
 
@@ -374,7 +383,7 @@ export default function Services({
         .nr-services-heading h2 {
           margin: 18px 0 14px;
           color: var(--nr-text);
-          font-size: clamp(38px, 4.7vw, 59px);
+          font-size: clamp(36px, 4.4vw, 56px);
           line-height: 1.2;
           letter-spacing: -0.025em;
           text-wrap: balance;
@@ -390,17 +399,21 @@ export default function Services({
 
         .nr-services-grid {
           display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 18px;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 16px;
+        }
+
+        .nr-service-card.is-featured {
+          grid-column: span 2;
         }
 
         .nr-service-card {
           position: relative;
-          min-height: 305px;
+          min-height: 292px;
           overflow: hidden;
-          padding: 26px;
+          padding: 25px;
           border: 1px solid var(--nr-border);
-          border-radius: 26px;
+          border-radius: 28px;
           background:
             linear-gradient(
               145deg,
@@ -415,6 +428,26 @@ export default function Services({
           transition:
             border-color 0.25s ease,
             box-shadow 0.25s ease;
+        }
+
+        .nr-service-card-orb {
+          position: absolute;
+          width: 120px;
+          height: 120px;
+          top: -46px;
+          inset-inline-end: -38px;
+          border-radius: 50%;
+          background: color-mix(in srgb, currentColor 11%, transparent);
+          filter: blur(1px);
+          pointer-events: none;
+        }
+
+        .nr-service-card.is-featured .nr-service-card-orb {
+          width: 190px;
+          height: 190px;
+          top: -80px;
+          inset-inline-end: -55px;
+          opacity: .9;
         }
 
         .nr-service-card::before {
@@ -445,6 +478,31 @@ export default function Services({
               currentColor 9%,
               transparent
             );
+        }
+
+        .nr-service-card.is-featured {
+          min-height: 320px;
+          padding: 30px;
+        }
+
+        .nr-service-card.is-featured h3 {
+          font-size: 25px;
+        }
+
+        .nr-service-card.is-featured > p {
+          max-width: 640px;
+          font-size: 14px;
+        }
+
+        .nr-service-card.is-featured .nr-service-icon {
+          width: 66px;
+          height: 66px;
+          border-radius: 20px;
+        }
+
+        .nr-service-card.is-featured .nr-service-icon svg {
+          width: 31px;
+          height: 31px;
         }
 
         .nr-service-card-blue {
@@ -484,18 +542,18 @@ export default function Services({
           align-items: center;
           justify-content: space-between;
           gap: 14px;
-          margin-bottom: 29px;
-          padding-top: 18px;
+          margin-bottom: 23px;
+          padding-top: 14px;
         }
 
         .nr-service-icon {
-          width: 58px;
-          height: 58px;
+          width: 56px;
+          height: 56px;
           display: grid;
           place-items: center;
           border: 1px solid
             color-mix(in srgb, currentColor 18%, transparent);
-          border-radius: 18px;
+          border-radius: 17px;
           color: currentColor;
           background: color-mix(
             in srgb,
@@ -530,7 +588,7 @@ export default function Services({
             var(--nr-muted) 34%,
             transparent
           );
-          font-size: 28px;
+          font-size: 24px;
           font-weight: 900;
           letter-spacing: 0.04em;
         }
@@ -540,7 +598,7 @@ export default function Services({
           z-index: 2;
           margin: 0 0 11px;
           color: var(--nr-text);
-          font-size: 21px;
+          font-size: 20px;
           line-height: 1.45;
         }
 
@@ -548,9 +606,13 @@ export default function Services({
           position: relative;
           z-index: 2;
           margin: 0;
+          overflow: hidden;
           color: var(--nr-muted);
-          font-size: 13px;
-          line-height: 1.82;
+          font-size: 12px;
+          line-height: 1.78;
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
         }
 
         .nr-payment-methods {
@@ -559,8 +621,8 @@ export default function Services({
           display: flex;
           flex-wrap: wrap;
           gap: 6px;
-          margin-top: 16px;
-          padding-bottom: 66px;
+          margin-top: 13px;
+          padding-bottom: 58px;
         }
 
         .nr-payment-methods span {
@@ -578,17 +640,17 @@ export default function Services({
 
         .nr-service-link {
           position: absolute;
-          inset-inline-start: 26px;
-          bottom: 24px;
+          inset-inline-start: 25px;
+          bottom: 22px;
           z-index: 2;
           display: inline-flex;
           align-items: center;
           justify-content: center;
           gap: 8px;
-          min-height: 38px;
-          padding-inline: 14px;
+          min-height: 40px;
+          padding-inline: 15px;
           border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
-          border-radius: 12px;
+          border-radius: 13px;
           color: currentColor;
           background: color-mix(in srgb, currentColor 7%, var(--nr-card));
           font-size: 12px;
@@ -644,8 +706,8 @@ export default function Services({
           background:
             linear-gradient(
               145deg,
-              rgba(255, 255, 255, 0.07),
-              rgba(255, 255, 255, 0.035)
+              rgba(255, 255, 255, 0.075),
+              rgba(255, 255, 255, 0.038)
             );
           border-color: rgba(255, 255, 255, 0.1);
           box-shadow:
@@ -653,15 +715,19 @@ export default function Services({
             inset 0 1px 0 rgba(255, 255, 255, 0.035);
         }
 
-        @media (max-width: 980px) {
+        @media (max-width: 1100px) {
           .nr-services-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .nr-service-card.is-featured {
+            grid-column: span 1;
           }
         }
 
         @media (max-width: 620px) {
           .nr-services-premium {
-            padding: 76px 0;
+            padding: 68px 0 72px;
           }
 
           .nr-services-heading {
@@ -682,8 +748,21 @@ export default function Services({
           }
 
           .nr-service-card {
-            min-height: 280px;
-            padding: 23px;
+            min-height: 255px;
+            padding: 22px;
+          }
+
+          .nr-service-card.is-featured {
+            min-height: 270px;
+            padding: 22px;
+          }
+
+          .nr-service-card.is-featured h3 {
+            font-size: 21px;
+          }
+
+          .nr-service-card.is-featured > p {
+            font-size: 12px;
           }
 
           .nr-service-card-head {
