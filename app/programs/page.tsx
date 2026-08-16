@@ -7,10 +7,12 @@ import { useQuery } from "@tanstack/react-query";
 import {
   ArrowLeft,
   CalendarDays,
+  ChevronDown,
   MapPin,
   Moon,
   Plane,
   Search,
+  SlidersHorizontal,
   Sparkles,
 } from "lucide-react";
 
@@ -239,6 +241,12 @@ export default function PublicProgramsPage() {
     useState("");
   const [countryFilter, setCountryFilter] =
     useState("all");
+  const [durationFilter, setDurationFilter] =
+    useState("all");
+  const [flightFilter, setFlightFilter] =
+    useState("all");
+  const [sortBy, setSortBy] =
+    useState("featured");
 
   const supabase = useMemo(
     () => createClient(),
@@ -284,7 +292,7 @@ export default function PublicProgramsPage() {
     const search =
       searchValue.trim().toLowerCase();
 
-    return programs.filter((program) => {
+    const filtered = programs.filter((program) => {
       const title = isArabic
         ? program.titleAr
         : program.titleEn;
@@ -299,32 +307,76 @@ export default function PublicProgramsPage() {
 
       const matchesSearch =
         !search ||
-        title
-          .toLowerCase()
-          .includes(search) ||
-        summary
-          .toLowerCase()
-          .includes(search) ||
-        country
-          .toLowerCase()
-          .includes(search);
+        title.toLowerCase().includes(search) ||
+        summary.toLowerCase().includes(search) ||
+        country.toLowerCase().includes(search);
 
       const matchesCountry =
         countryFilter === "all" ||
         program.countryId === countryFilter;
 
+      const matchesDuration =
+        durationFilter === "all" ||
+        (durationFilter === "short" &&
+          program.durationDays <= 5) ||
+        (durationFilter === "medium" &&
+          program.durationDays >= 6 &&
+          program.durationDays <= 9) ||
+        (durationFilter === "long" &&
+          program.durationDays >= 10);
+
+      const matchesFlight =
+        flightFilter === "all" ||
+        program.flightInclusion === flightFilter;
+
       return (
         matchesSearch &&
-        matchesCountry
+        matchesCountry &&
+        matchesDuration &&
+        matchesFlight
       );
+    });
+
+    return [...filtered].sort((a, b) => {
+      if (sortBy === "price-low") {
+        return a.basePrice - b.basePrice;
+      }
+
+      if (sortBy === "price-high") {
+        return b.basePrice - a.basePrice;
+      }
+
+      if (sortBy === "duration-short") {
+        return a.durationDays - b.durationDays;
+      }
+
+      if (sortBy === "newest") {
+        return b.id.localeCompare(a.id);
+      }
+
+      if (a.isFeatured !== b.isFeatured) {
+        return a.isFeatured ? -1 : 1;
+      }
+
+      return 0;
     });
   }, [
     programs,
     searchValue,
     countryFilter,
+    durationFilter,
+    flightFilter,
+    sortBy,
     isArabic,
   ]);
 
+  const clearFilters = () => {
+    setSearchValue("");
+    setCountryFilter("all");
+    setDurationFilter("all");
+    setFlightFilter("all");
+    setSortBy("featured");
+  };
   return (
     <main
       className="nr-all-programs"
@@ -351,76 +403,201 @@ export default function PublicProgramsPage() {
 
           <h1>
             {isArabic
-              ? "اختر البرنامج المناسب لرحلتك"
-              : "Choose the right program for your journey"}
+              ? "اعثر على برنامج العمرة المناسب لك"
+              : "Find the Umrah program that fits you"}
           </h1>
 
           <p>
             {isArabic
-              ? "تصفح برامج العمرة المنشورة في نور آب، وقارن المدة والإقامة والسعر الأساسي ثم افتح تفاصيل البرنامج قبل المتابعة عبر التطبيق."
-              : "Browse published Umrah programs on NourApp, compare duration, accommodation and base price, then review full details before continuing in the app."}
+              ? "قارن البرامج حسب الدولة والمدة والطيران والسعر، ثم افتح التفاصيل الكاملة واختر رحلتك بثقة."
+              : "Compare programs by country, duration, flights, and price, then review the full details and choose with confidence."}
           </p>
         </div>
       </section>
 
       <section className="nr-all-programs-content">
         <div className="nr-all-programs-container">
-          <div className="nr-all-programs-toolbar">
-            <label className="nr-all-programs-search">
-              <Search size={18} />
+          <div className="nr-all-programs-marketbar">
+            <div className="nr-all-programs-search-wrap">
+              <label className="nr-all-programs-search">
+                <Search size={18} />
 
-              <input
-                type="search"
-                value={searchValue}
-                onChange={(event) =>
-                  setSearchValue(
-                    event.target.value,
-                  )
-                }
-                placeholder={
-                  isArabic
-                    ? "ابحث عن برنامج أو دولة..."
-                    : "Search program or country..."
-                }
-              />
-            </label>
+                <input
+                  type="search"
+                  value={searchValue}
+                  onChange={(event) =>
+                    setSearchValue(
+                      event.target.value,
+                    )
+                  }
+                  placeholder={
+                    isArabic
+                      ? "ابحث عن برنامج أو دولة..."
+                      : "Search program or country..."
+                  }
+                />
+              </label>
 
-            <select
-              value={countryFilter}
-              onChange={(event) =>
-                setCountryFilter(
-                  event.target.value,
-                )
-              }
-              aria-label={
-                isArabic
-                  ? "تصفية حسب الدولة"
-                  : "Filter by country"
-              }
-            >
-              <option value="all">
-                {isArabic
-                  ? "جميع الدول"
-                  : "All Countries"}
-              </option>
+              <button
+                type="button"
+                className="nr-all-programs-filter-chip is-mobile-filter"
+              >
+                <SlidersHorizontal size={16} />
+                {isArabic ? "الفلاتر" : "Filters"}
+              </button>
+            </div>
 
-              {countries.map((country) => (
-                <option
-                  key={country.id}
-                  value={country.id}
+            <div className="nr-all-programs-filters">
+              <label className="nr-all-programs-select">
+                <span>
+                  <MapPin size={14} />
+                  {isArabic ? "الدولة" : "Country"}
+                </span>
+
+                <select
+                  value={countryFilter}
+                  onChange={(event) =>
+                    setCountryFilter(
+                      event.target.value,
+                    )
+                  }
                 >
-                  {country.name}
-                </option>
-              ))}
-            </select>
+                  <option value="all">
+                    {isArabic
+                      ? "جميع الدول"
+                      : "All Countries"}
+                  </option>
+
+                  {countries.map((country) => (
+                    <option
+                      key={country.id}
+                      value={country.id}
+                    >
+                      {country.name}
+                    </option>
+                  ))}
+                </select>
+
+                <ChevronDown size={14} />
+              </label>
+
+              <label className="nr-all-programs-select">
+                <span>
+                  <CalendarDays size={14} />
+                  {isArabic ? "المدة" : "Duration"}
+                </span>
+
+                <select
+                  value={durationFilter}
+                  onChange={(event) =>
+                    setDurationFilter(
+                      event.target.value,
+                    )
+                  }
+                >
+                  <option value="all">
+                    {isArabic ? "كل المدد" : "Any duration"}
+                  </option>
+                  <option value="short">
+                    {isArabic ? "حتى 5 أيام" : "Up to 5 days"}
+                  </option>
+                  <option value="medium">
+                    {isArabic ? "6 - 9 أيام" : "6 - 9 days"}
+                  </option>
+                  <option value="long">
+                    {isArabic ? "10 أيام فأكثر" : "10+ days"}
+                  </option>
+                </select>
+
+                <ChevronDown size={14} />
+              </label>
+
+              <label className="nr-all-programs-select">
+                <span>
+                  <Plane size={14} />
+                  {isArabic ? "الطيران" : "Flights"}
+                </span>
+
+                <select
+                  value={flightFilter}
+                  onChange={(event) =>
+                    setFlightFilter(
+                      event.target.value,
+                    )
+                  }
+                >
+                  <option value="all">
+                    {isArabic ? "كل الخيارات" : "Any option"}
+                  </option>
+                  <option value="included">
+                    {isArabic ? "مشمول" : "Included"}
+                  </option>
+                  <option value="excluded">
+                    {isArabic ? "غير مشمول" : "Excluded"}
+                  </option>
+                  <option value="dynamic">
+                    {isArabic ? "ديناميكي" : "Dynamic"}
+                  </option>
+                </select>
+
+                <ChevronDown size={14} />
+              </label>
+
+              <label className="nr-all-programs-select is-sort">
+                <span>
+                  <SlidersHorizontal size={14} />
+                  {isArabic ? "الترتيب" : "Sort"}
+                </span>
+
+                <select
+                  value={sortBy}
+                  onChange={(event) =>
+                    setSortBy(
+                      event.target.value,
+                    )
+                  }
+                >
+                  <option value="featured">
+                    {isArabic ? "المميز أولًا" : "Featured first"}
+                  </option>
+                  <option value="price-low">
+                    {isArabic ? "السعر: الأقل أولًا" : "Price: low to high"}
+                  </option>
+                  <option value="price-high">
+                    {isArabic ? "السعر: الأعلى أولًا" : "Price: high to low"}
+                  </option>
+                  <option value="duration-short">
+                    {isArabic ? "الأقصر مدة" : "Shortest duration"}
+                  </option>
+                </select>
+
+                <ChevronDown size={14} />
+              </label>
+            </div>
           </div>
 
           <div className="nr-all-programs-result-row">
-            <strong>
-              {isArabic
-                ? `${visiblePrograms.length} برنامج`
-                : `${visiblePrograms.length} programs`}
-            </strong>
+            <div>
+              <strong>
+                {isArabic
+                  ? `${visiblePrograms.length} برنامج`
+                  : `${visiblePrograms.length} programs`}
+              </strong>
+
+              <span>
+                {isArabic
+                  ? "نتائج متاحة حسب اختياراتك"
+                  : "results available for your filters"}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="nr-all-programs-clear"
+            >
+              {isArabic ? "إعادة الضبط" : "Reset"}
+            </button>
           </div>
 
           {isLoading ? (
@@ -513,12 +690,33 @@ export default function PublicProgramsPage() {
                           </div>
                         )}
 
+                        <span
+                          className="nr-all-programs-image-overlay"
+                          aria-hidden="true"
+                        />
+
+                        <div className="nr-all-programs-image-meta">
+                          <span>
+                            <MapPin size={13} />
+                            {country ||
+                              (isArabic
+                                ? "برنامج عمرة"
+                                : "Umrah program")}
+                          </span>
+
+                          <span>
+                            <CalendarDays size={13} />
+                            {program.durationDays}{" "}
+                            {isArabic ? "أيام" : "days"}
+                          </span>
+                        </div>
+
                         {program.isFeatured ? (
                           <span className="nr-all-programs-featured">
                             <Sparkles size={13} />
                             {isArabic
-                              ? "مميز"
-                              : "Featured"}
+                              ? "مختار"
+                              : "Selected"}
                           </span>
                         ) : null}
                       </Link>
@@ -686,25 +884,31 @@ export default function PublicProgramsPage() {
           padding: 32px 0 72px;
         }
 
-        .nr-all-programs-toolbar {
+        .nr-all-programs-marketbar {
           display: grid;
-          grid-template-columns: minmax(0, 1fr) 230px;
           gap: 12px;
           padding: 14px;
           border: 1px solid #dce5f0;
-          border-radius: 18px;
-          background: #fff;
-          box-shadow: 0 14px 40px rgba(20, 59, 102, 0.06);
+          border-radius: 22px;
+          background: rgba(255, 255, 255, 0.96);
+          box-shadow: 0 18px 48px rgba(20, 59, 102, 0.07);
+        }
+
+        .nr-all-programs-search-wrap {
+          display: flex;
+          gap: 10px;
+          align-items: center;
         }
 
         .nr-all-programs-search {
-          min-height: 48px;
+          min-height: 44px;
+          flex: 1;
           display: flex;
           align-items: center;
           gap: 9px;
-          padding-inline: 13px;
+          padding-inline: 14px;
           border: 1px solid #dce5f0;
-          border-radius: 12px;
+          border-radius: 14px;
           background: #f8fafd;
         }
 
@@ -722,33 +926,117 @@ export default function PublicProgramsPage() {
           font: inherit;
         }
 
-        .nr-all-programs-toolbar select {
-          min-height: 48px;
-          padding-inline: 13px;
+        .nr-all-programs-filters {
+          display: grid;
+          grid-template-columns:
+            repeat(4, minmax(0, 1fr));
+          gap: 10px;
+        }
+
+        .nr-all-programs-select {
+          position: relative;
+          min-height: 58px;
+          display: flex;
+          align-items: center;
+          padding: 8px 38px 8px 12px;
           border: 1px solid #dce5f0;
-          border-radius: 12px;
-          outline: 0;
-          color: #14253d;
+          border-radius: 14px;
           background: #f8fafd;
+        }
+
+        [dir="rtl"] .nr-all-programs-select {
+          padding: 8px 12px 8px 38px;
+        }
+
+        .nr-all-programs-select > span {
+          position: absolute;
+          top: 7px;
+          inset-inline-start: 11px;
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          color: #7d8da2;
+          font-size: 9px;
+          font-weight: 900;
+          pointer-events: none;
+        }
+
+        .nr-all-programs-select > span svg {
+          color: #176fe8;
+        }
+
+        .nr-all-programs-select > svg {
+          position: absolute;
+          inset-inline-end: 12px;
+          bottom: 14px;
+          color: #8796aa;
+          pointer-events: none;
+        }
+
+        .nr-all-programs-select select {
+          width: 100%;
+          margin-top: 12px;
+          border: 0;
+          outline: 0;
+          appearance: none;
+          color: #14253d;
+          background: transparent;
           font: inherit;
+          font-size: 11px;
+          font-weight: 800;
+          cursor: pointer;
+        }
+
+        .nr-all-programs-filter-chip {
+          display: none;
         }
 
         .nr-all-programs-result-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 14px;
           margin: 26px 0 14px;
           color: #61738a;
           font-size: 12px;
         }
 
+        .nr-all-programs-result-row > div {
+          display: flex;
+          align-items: baseline;
+          gap: 8px;
+        }
+
+        .nr-all-programs-result-row strong {
+          color: #17304f;
+          font-size: 15px;
+        }
+
+        .nr-all-programs-result-row span {
+          color: #8a98aa;
+          font-size: 10px;
+        }
+
+        .nr-all-programs-clear {
+          border: 0;
+          color: #176fe8;
+          background: transparent;
+          font: inherit;
+          font-size: 10px;
+          font-weight: 900;
+          cursor: pointer;
+        }
+
         .nr-all-programs-grid {
           display: grid;
           grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 18px;
+          gap: 20px;
         }
 
         .nr-all-programs-card {
           overflow: hidden;
           border: 1px solid #dce5f0;
-          border-radius: 18px;
+          border-radius: 24px;
           background: #fff;
           box-shadow: 0 18px 48px rgba(20, 59, 102, 0.07);
           transition:
@@ -763,7 +1051,7 @@ export default function PublicProgramsPage() {
 
         .nr-all-programs-image {
           position: relative;
-          height: 210px;
+          height: 230px;
           display: block;
           overflow: hidden;
           background: #e7edf5;
@@ -792,6 +1080,46 @@ export default function PublicProgramsPage() {
           height: 42px;
         }
 
+        .nr-all-programs-image-overlay {
+          position: absolute;
+          inset: 0;
+          background:
+            linear-gradient(
+              180deg,
+              rgba(5, 18, 35, 0.03) 0%,
+              rgba(5, 18, 35, 0.05) 44%,
+              rgba(5, 18, 35, 0.7) 100%
+            );
+          pointer-events: none;
+        }
+
+        .nr-all-programs-image-meta {
+          position: absolute;
+          inset-inline: 14px;
+          bottom: 13px;
+          z-index: 2;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 8px;
+          color: #fff;
+        }
+
+        .nr-all-programs-image-meta span {
+          min-width: 0;
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          padding: 6px 9px;
+          border: 1px solid rgba(255,255,255,.18);
+          border-radius: 999px;
+          background: rgba(8, 27, 51, .42);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          font-size: 9px;
+          font-weight: 900;
+        }
+
         .nr-all-programs-featured {
           position: absolute;
           top: 14px;
@@ -810,7 +1138,7 @@ export default function PublicProgramsPage() {
         }
 
         .nr-all-programs-card-body {
-          padding: 17px;
+          padding: 19px;
         }
 
         .nr-all-programs-country {
@@ -849,7 +1177,7 @@ export default function PublicProgramsPage() {
           display: flex;
           flex-wrap: wrap;
           gap: 7px;
-          margin-top: 16px;
+          margin-top: 14px;
         }
 
         .nr-all-programs-meta span {
@@ -875,7 +1203,7 @@ export default function PublicProgramsPage() {
           align-items: flex-end;
           justify-content: space-between;
           gap: 12px;
-          margin-top: 20px;
+          margin-top: 17px;
           padding-top: 16px;
           border-top: 1px solid #edf1f6;
         }
@@ -909,7 +1237,7 @@ export default function PublicProgramsPage() {
           padding-inline: 13px;
           border-radius: 10px;
           color: #fff;
-          background: #176fe8;
+          background: linear-gradient(135deg, #176fe8, #0d58be);
           text-decoration: none;
           font-size: 10px;
           font-weight: 900;
@@ -956,6 +1284,49 @@ export default function PublicProgramsPage() {
         }
 
 
+        html[data-theme="dark"] .nr-all-programs {
+          color: #f4f8ff;
+          background: #07182c;
+        }
+
+        html[data-theme="dark"] .nr-all-programs-content {
+          background: #07182c;
+        }
+
+        html[data-theme="dark"] .nr-all-programs-marketbar,
+        html[data-theme="dark"] .nr-all-programs-card {
+          border-color: rgba(255,255,255,.1);
+          background: #0c223d;
+          box-shadow: 0 18px 48px rgba(0,0,0,.22);
+        }
+
+        html[data-theme="dark"] .nr-all-programs-search,
+        html[data-theme="dark"] .nr-all-programs-select,
+        html[data-theme="dark"] .nr-all-programs-meta span {
+          border-color: rgba(255,255,255,.08);
+          background: rgba(255,255,255,.04);
+        }
+
+        html[data-theme="dark"] .nr-all-programs-search input,
+        html[data-theme="dark"] .nr-all-programs-select select,
+        html[data-theme="dark"] .nr-all-programs-card h2 a,
+        html[data-theme="dark"] .nr-all-programs-result-row strong,
+        html[data-theme="dark"] .nr-all-programs-state strong {
+          color: #f4f8ff;
+        }
+
+        html[data-theme="dark"] .nr-all-programs-card-body > p,
+        html[data-theme="dark"] .nr-all-programs-result-row,
+        html[data-theme="dark"] .nr-all-programs-result-row span,
+        html[data-theme="dark"] .nr-all-programs-meta span,
+        html[data-theme="dark"] .nr-all-programs-card-footer small {
+          color: #a8b6c8;
+        }
+
+        html[data-theme="dark"] .nr-all-programs-card-footer {
+          border-top-color: rgba(255,255,255,.08);
+        }
+
         @media (min-width: 1500px) {
           .nr-all-programs-container {
             width: min(1460px, calc(100% - 72px));
@@ -999,8 +1370,8 @@ export default function PublicProgramsPage() {
             margin-bottom: 34px;
           }
 
-          .nr-all-programs-toolbar {
-            grid-template-columns: 1fr;
+          .nr-all-programs-filters {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
           }
 
           .nr-all-programs-grid {
@@ -1009,6 +1380,26 @@ export default function PublicProgramsPage() {
 
           .nr-all-programs-image {
             height: 225px;
+          }
+        }
+
+        @media (max-width: 700px) {
+          .nr-all-programs-marketbar {
+            padding: 11px;
+          }
+
+          .nr-all-programs-filters {
+            grid-template-columns: 1fr;
+          }
+
+          .nr-all-programs-result-row {
+            align-items: flex-start;
+          }
+
+          .nr-all-programs-result-row > div {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 3px;
           }
         }
 

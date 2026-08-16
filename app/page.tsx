@@ -11,16 +11,15 @@ import { useLanguage } from "../src/core/i18n";
 import SiteEnhancements from "./components/SiteEnhancements";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
+
 import Hero from "./components/home/Hero";
-import Statistics from "./components/home/NourStatistics";
-import WhyNour from "./components/home/WhyNour";
-import Goals from "./components/home/Goals";
-import About from "./components/home/About";
-import Services from "./components/home/Services";
 import ProgramsPreview from "./components/home/ProgramsPreview";
-import TrustMetrics from "./components/home/TrustMetrics";
+import Services from "./components/home/Services";
+import NourWorldMap from "./components/home/why-nour/NourWorldMap";
 import Journey from "./components/home/Journey";
 import Showcase from "./components/home/Showcase";
+import WhyNour from "./components/home/WhyNour";
+import Statistics from "./components/home/NourStatistics";
 import Payments from "./components/home/Payments";
 import CTA from "./components/home/CTA";
 
@@ -191,13 +190,21 @@ export default function Home() {
       />
 
       <Hero t={t} />
-      <Statistics language={language} />
-      <WhyNour language={language} />
-      <Goals t={t} />
-      <About t={t} />
-      <Services language={language} />
-      <ProgramsPreview language={language} />
-      <TrustMetrics language={language} />
+
+      <ProgramsPreview
+        language={language}
+      />
+
+      <Services
+        language={language}
+      />
+
+      <div id="world-map">
+        <NourWorldMap
+          language={language}
+        />
+      </div>
+
       <Journey
         t={t}
         language={language}
@@ -212,11 +219,25 @@ export default function Home() {
         }
       />
 
-      <Payments language={language} />
+      <div id="about">
+        <WhyNour
+          language={language}
+        />
+      </div>
+
+      <Statistics
+        language={language}
+      />
+
+      <Payments
+        language={language}
+      />
+
       <CTA
         t={t}
         language={language}
       />
+
       <Footer
         t={t}
         language={language}

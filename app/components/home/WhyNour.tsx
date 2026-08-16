@@ -9,7 +9,6 @@ import {
 } from "framer-motion";
 import type { MouseEvent, ReactNode } from "react";
 import type { Language } from "../../data/home";
-import NourWorldMap from "./why-nour/NourWorldMap";
 
 type Props = {
   language: Language;
@@ -68,70 +67,48 @@ export default function WhyNourApp({ language }: Props) {
 
   const reasons: Reason[] = [
     {
-      id: "trust",
-      titleAr: "موثوقية في كل خطوة",
-      titleEn: "Trust at every step",
+      id: "clarity",
+      titleAr: "وضوح في كل خطوة",
+      titleEn: "Clarity at every step",
       descriptionAr:
-        "تجربة واضحة وآمنة تساعدك على اتخاذ القرار ومتابعة تفاصيل رحلتك بثقة.",
+        "اطّلع على تفاصيل البرنامج والخدمات وما يشمله السعر قبل اتخاذ القرار، لتبدأ رحلتك بصورة أوضح وأكثر ثقة.",
       descriptionEn:
-        "A clear and secure experience that helps you make decisions and follow every journey detail with confidence.",
+        "Review program details, included services, and pricing before deciding, so you can begin your journey with greater clarity and confidence.",
       icon: <ShieldIcon />,
       accent: "blue",
     },
     {
-      id: "speed",
-      titleAr: "تجربة أسرع وأسهل",
-      titleEn: "Faster and easier",
+      id: "integrated",
+      titleAr: "تجربة متكاملة",
+      titleEn: "One integrated experience",
       descriptionAr:
-        "استعرض الخدمات والبرامج وانتقل بين خطوات الرحلة من مكان واحد دون تعقيد.",
+        "برنامج العمرة، السكن، النقل، التأشيرة والإرشاد في تجربة رقمية واحدة مصممة لتسهيل رحلتك.",
       descriptionEn:
-        "Explore services and programs, then move through your journey from one simple place.",
-      icon: <BoltIcon />,
-      accent: "gold",
+        "Umrah programs, accommodation, transport, visas, and guidance brought together in one digital experience.",
+      icon: <PhoneIcon />,
+      accent: "violet",
     },
     {
       id: "payments",
       titleAr: "دفع آمن ومرن",
       titleEn: "Secure flexible payments",
       descriptionAr:
-        "وسائل دفع متعددة وتجربة تحفظ خصوصيتك وتمنحك وضوحًا أكبر قبل إتمام الطلب.",
+        "خيارات دفع متعددة وواضحة ضمن تجربة تحافظ على خصوصيتك وتمنحك معلومات كاملة قبل إتمام الطلب.",
       descriptionEn:
-        "Multiple payment options with a privacy-focused experience and clear order details.",
+        "Multiple clear payment options in a privacy-focused experience, with the information you need before completing your order.",
       icon: <WalletIcon />,
-      accent: "cyan",
+      accent: "gold",
     },
     {
       id: "support",
-      titleAr: "دعم متواصل",
+      titleAr: "دعم ومساندة مستمرة",
       titleEn: "Continuous support",
       descriptionAr:
-        "مساندة قبل الرحلة وأثناءها للإجابة عن الاستفسارات ومتابعة الاحتياجات.",
+        "مساندة قبل الرحلة وأثناءها لمتابعة احتياجاتك والإجابة عن استفساراتك في الوقت الذي تحتاج فيه إلى الدعم.",
       descriptionEn:
-        "Support before and during the journey to answer questions and follow your needs.",
+        "Support before and during your journey to follow your needs and answer questions when you need assistance.",
       icon: <HeadsetIcon />,
       accent: "green",
-    },
-    {
-      id: "digital",
-      titleAr: "تجربة رقمية متكاملة",
-      titleEn: "Integrated digital journey",
-      descriptionAr:
-        "كل ما تحتاجه للعمرة في واجهة حديثة تجمع المعلومات والخدمات والمتابعة.",
-      descriptionEn:
-        "Everything needed for Umrah in a modern experience combining information, services, and tracking.",
-      icon: <PhoneIcon />,
-      accent: "violet",
-    },
-    {
-      id: "network",
-      titleAr: "شبكة خدمات قابلة للتوسع",
-      titleEn: "A growing service network",
-      descriptionAr:
-        "منصة مصممة لدعم خدمات متعددة وشركاء أكثر مع توسع  نور آب مستقبلًا.",
-      descriptionEn:
-        "A platform designed to support more services and partners as NourApp continues to grow.",
-      icon: <GlobeIcon />,
-      accent: "rose",
     },
   ];
 
@@ -195,7 +172,6 @@ export default function WhyNourApp({ language }: Props) {
           </p>
         </motion.header>
 
-        <NourWorldMap language={language} />
 
         <motion.div
           className="nr-why-grid"
@@ -265,7 +241,7 @@ export default function WhyNourApp({ language }: Props) {
         .nr-why-premium {
           position: relative;
           overflow: hidden;
-          padding: 108px 0;
+          padding: 88px 0 82px;
           background:
             radial-gradient(
               circle at 10% 14%,
@@ -339,8 +315,8 @@ export default function WhyNourApp({ language }: Props) {
         }
 
         .nr-why-heading {
-          max-width: 850px;
-          margin: 0 auto 48px;
+          max-width: 820px;
+          margin: 0 auto 38px;
           text-align: center;
         }
 
@@ -373,8 +349,8 @@ export default function WhyNourApp({ language }: Props) {
         .nr-why-heading h2 {
           margin: 18px 0 15px;
           color: var(--nr-text);
-          font-size: clamp(36px, 4.5vw, 58px);
-          line-height: 1.22;
+          font-size: clamp(34px, 4vw, 52px);
+          line-height: 1.18;
           letter-spacing: -0.025em;
           text-wrap: balance;
           unicode-bidi: plaintext;
@@ -390,17 +366,19 @@ export default function WhyNourApp({ language }: Props) {
 
         .nr-why-grid {
           display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 20px;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 18px;
+          max-width: 1120px;
+          margin-inline: auto;
         }
 
         .nr-why-card {
           position: relative;
-          min-height: 280px;
+          min-height: 255px;
           overflow: hidden;
-          padding: 27px;
+          padding: 28px;
           border: 1px solid var(--nr-border);
-          border-radius: 26px;
+          border-radius: 30px;
           background:
             linear-gradient(
               145deg,
@@ -483,17 +461,17 @@ export default function WhyNourApp({ language }: Props) {
           align-items: center;
           justify-content: space-between;
           gap: 15px;
-          margin-bottom: 26px;
+          margin-bottom: 22px;
         }
 
         .nr-why-icon {
-          width: 58px;
-          height: 58px;
+          width: 64px;
+          height: 64px;
           display: grid;
           place-items: center;
           border: 1px solid
             color-mix(in srgb, currentColor 18%, transparent);
-          border-radius: 18px;
+          border-radius: 20px;
           color: currentColor;
           background: color-mix(
             in srgb,
@@ -518,8 +496,8 @@ export default function WhyNourApp({ language }: Props) {
         }
 
         .nr-why-icon svg {
-          width: 28px;
-          height: 28px;
+          width: 31px;
+          height: 31px;
         }
 
         .nr-why-number {
@@ -538,7 +516,7 @@ export default function WhyNourApp({ language }: Props) {
           z-index: 2;
           margin: 0 0 10px;
           color: var(--nr-text);
-          font-size: 21px;
+          font-size: 23px;
           line-height: 1.45;
         }
 
@@ -547,13 +525,13 @@ export default function WhyNourApp({ language }: Props) {
           z-index: 2;
           margin: 0;
           color: var(--nr-muted);
-          font-size: 13px;
+          font-size: 14px;
           line-height: 1.85;
         }
 
         .nr-why-line {
           position: absolute;
-          inset-inline-start: 27px;
+          inset-inline-start: 28px;
           bottom: 23px;
           z-index: 2;
           width: 42px;
@@ -595,15 +573,15 @@ export default function WhyNourApp({ language }: Props) {
             inset 0 1px 0 rgba(255, 255, 255, 0.035);
         }
 
-        @media (max-width: 980px) {
+        @media (max-width: 700px) {
           .nr-why-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-template-columns: 1fr;
           }
         }
 
         @media (max-width: 620px) {
           .nr-why-premium {
-            padding: 76px 0;
+            padding: 64px 0 60px;
           }
 
           .nr-why-heading {
@@ -624,8 +602,9 @@ export default function WhyNourApp({ language }: Props) {
           }
 
           .nr-why-card {
-            min-height: 245px;
-            padding: 23px;
+            min-height: 215px;
+            padding: 22px;
+            border-radius: 22px;
           }
 
           .nr-why-line {
@@ -674,19 +653,6 @@ function ShieldIcon() {
   );
 }
 
-function BoltIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.9"
-    >
-      <path d="m13 2-8 12h7l-1 8 8-12h-7l1-8Z" />
-    </svg>
-  );
-}
-
 function WalletIcon() {
   return (
     <svg
@@ -726,20 +692,6 @@ function PhoneIcon() {
     >
       <rect x="7" y="2.5" width="10" height="19" rx="2.5" />
       <path d="M10 6h4M11 18h2" />
-    </svg>
-  );
-}
-
-function GlobeIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.9"
-    >
-      <circle cx="12" cy="12" r="9" />
-      <path d="M3 12h18M12 3c2.2 2.5 3.3 5.5 3.3 9S14.2 18.5 12 21M12 3C9.8 5.5 8.7 8.5 8.7 12S9.8 18.5 12 21" />
     </svg>
   );
 }

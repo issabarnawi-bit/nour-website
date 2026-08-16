@@ -37,15 +37,49 @@ export default function Header({
   onMenuClose,
 }: Props) {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isHeaderHidden, setIsHeaderHidden] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 24);
+    let lastScrollY = window.scrollY;
+    let ticking = false;
 
-    handleScroll();
+    const updateHeader = () => {
+      const currentScrollY = window.scrollY;
+      const delta = currentScrollY - lastScrollY;
+
+      setIsScrolled(currentScrollY > 24);
+
+      // Always keep the header visible near the top of the page.
+      if (currentScrollY <= 90) {
+        setIsHeaderHidden(false);
+      } else if (!menuOpen) {
+        // Ignore tiny scroll movements to prevent jitter.
+        if (delta > 6) {
+          setIsHeaderHidden(true);
+        } else if (delta < -6) {
+          setIsHeaderHidden(false);
+        }
+      } else {
+        // Never hide the header while the mobile menu is open.
+        setIsHeaderHidden(false);
+      }
+
+      lastScrollY = currentScrollY;
+      ticking = false;
+    };
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(updateHeader);
+        ticking = true;
+      }
+    };
+
+    updateHeader();
     window.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [menuOpen]);
 
   useEffect(() => {
     const closeMenuOnDesktop = () => {
@@ -58,6 +92,12 @@ export default function Header({
     return () => window.removeEventListener("resize", closeMenuOnDesktop);
   }, [menuOpen, onMenuClose]);
 
+  useEffect(() => {
+    if (menuOpen) {
+      setIsHeaderHidden(false);
+    }
+  }, [menuOpen]);
+
   const navClass = (id: SectionId) =>
     activeSection === id ? "is-active" : undefined;
 
@@ -68,7 +108,9 @@ export default function Header({
   return (
     <>
       <header
-        className={`nr-v2-header ${isScrolled ? "is-scrolled" : ""}`}
+        className={`nr-v2-header ${isScrolled ? "is-scrolled" : ""} ${
+          isHeaderHidden ? "is-hidden" : ""
+        }`}
       >
         <div className="nr-v2-topbar">
           <div className="nr-container nr-v2-topbar-inner">
@@ -282,13 +324,20 @@ export default function Header({
           top: 0;
           z-index: 1000;
           width: 100%;
+          transform: translateY(0);
+          will-change: transform;
           transition:
             box-shadow 0.25s ease,
-            transform 0.25s ease;
+            transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         .nr-v2-header.is-scrolled {
           box-shadow: 0 16px 44px rgba(9, 45, 92, 0.12);
+        }
+
+        .nr-v2-header.is-hidden {
+          transform: translateY(-100%);
+          box-shadow: none;
         }
 
         .nr-v2-topbar {
@@ -753,6 +802,10 @@ export default function Header({
         }
 
         @media (prefers-reduced-motion: reduce) {
+          .nr-v2-header {
+            transition: none !important;
+          }
+
           .nr-v2-header *,
           .nr-v2-header *::before,
           .nr-v2-header *::after {

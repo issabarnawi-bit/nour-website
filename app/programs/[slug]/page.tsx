@@ -13,6 +13,7 @@ import {
   CalendarDays,
   CheckCircle2,
   Clock3,
+  ChevronDown,
   MapPin,
   Moon,
   Plane,
@@ -254,7 +255,7 @@ export default function PublicProgramDetailsPage() {
             : "This program does not exist or is not published."}
         </p>
 
-        <Link href="/#programs">
+        <Link href="/programs">
           {isArabic
             ? "عرض البرامج"
             : "View Programs"}
@@ -328,7 +329,7 @@ export default function PublicProgramDetailsPage() {
 
         <div className="nr-program-details-container nr-program-details-hero-content">
           <Link
-            href="/#programs"
+            href="/programs"
             className="nr-program-details-back"
           >
             <ArrowLeft size={17} />
@@ -344,8 +345,8 @@ export default function PublicProgramDetailsPage() {
                 <span className="nr-program-details-badge">
                   <Sparkles size={14} />
                   {isArabic
-                    ? "برنامج مميز"
-                    : "Featured Program"}
+                    ? "برنامج مختار"
+                    : "Selected Program"}
                 </span>
               ) : null}
 
@@ -385,6 +386,9 @@ export default function PublicProgramDetailsPage() {
               </span>
 
               <span className="is-price">
+                <small>
+                  {isArabic ? "من" : "From"}
+                </small>
                 <strong>
                   {formatNumber(
                     program.basePrice,
@@ -398,9 +402,36 @@ export default function PublicProgramDetailsPage() {
         </div>
       </section>
 
+      <nav
+        className="nr-program-details-subnav"
+        aria-label={
+          isArabic
+            ? "أقسام تفاصيل البرنامج"
+            : "Program detail sections"
+        }
+      >
+        <div className="nr-program-details-container nr-program-details-subnav-inner">
+          <a href="#overview">
+            {isArabic ? "نظرة عامة" : "Overview"}
+          </a>
+          <a href="#hotels">
+            {isArabic ? "الإقامة" : "Hotels"}
+          </a>
+          <a href="#flights">
+            {isArabic ? "الطيران" : "Flights"}
+          </a>
+          <a href="#transport">
+            {isArabic ? "النقل" : "Transport"}
+          </a>
+          <a href="#visas">
+            {isArabic ? "التأشيرة" : "Visa"}
+          </a>
+        </div>
+      </nav>
+
       <div className="nr-program-details-container nr-program-details-layout">
         <div className="nr-program-details-main">
-          <section className="nr-program-details-section">
+          <section id="overview" className="nr-program-details-section nr-program-details-overview">
             <span className="nr-program-details-kicker">
               {isArabic
                 ? "عن البرنامج"
@@ -455,7 +486,7 @@ export default function PublicProgramDetailsPage() {
             </div>
           </section>
 
-          <section className="nr-program-details-section">
+          <section id="hotels" className="nr-program-details-section">
             <span className="nr-program-details-kicker">
               {isArabic
                 ? "الإقامة"
@@ -663,7 +694,7 @@ export default function PublicProgramDetailsPage() {
             )}
           </section>
 
-          <section className="nr-program-details-section">
+          <section id="transport" className="nr-program-details-section">
             <span className="nr-program-details-kicker">
               {isArabic
                 ? "النقل"
@@ -857,7 +888,7 @@ export default function PublicProgramDetailsPage() {
             )}
           </section>
 
-          <section className="nr-program-details-section">
+          <section id="visas" className="nr-program-details-section">
             <span className="nr-program-details-kicker">
               {isArabic
                 ? "التأشيرة"
@@ -1060,7 +1091,7 @@ export default function PublicProgramDetailsPage() {
             )}
           </section>
 
-          <section className="nr-program-details-section">
+          <section id="flights" className="nr-program-details-section">
             <span className="nr-program-details-kicker">
               {isArabic
                 ? "الطيران"
@@ -1328,9 +1359,20 @@ export default function PublicProgramDetailsPage() {
 
           <p>
             {isArabic
-              ? "الحجز وإتمام الطلب والدفع يتم عبر تطبيق نور آب."
-              : "Booking, checkout and payment are completed through the NourApp application."}
+              ? "راجع تفاصيل البرنامج أولًا، ثم أكمل الحجز والدفع بأمان عبر تطبيق نور آب."
+              : "Review the program details first, then complete booking and payment securely in NourApp."}
           </p>
+
+          <div className="nr-program-details-booking-trust">
+            <span>
+              <ShieldCheck size={15} />
+              {isArabic ? "دفع آمن" : "Secure payment"}
+            </span>
+            <span>
+              <CheckCircle2 size={15} />
+              {isArabic ? "تفاصيل واضحة" : "Clear details"}
+            </span>
+          </div>
 
           <a
             href={appDeepLink}
@@ -1364,7 +1406,7 @@ export default function PublicProgramDetailsPage() {
 
         .nr-program-details-hero {
           position: relative;
-          min-height: 540px;
+          min-height: 580px;
           overflow: hidden;
           background:
             radial-gradient(circle at 20% 20%, rgba(23, 111, 232, 0.28), transparent 36%),
@@ -1373,6 +1415,7 @@ export default function PublicProgramDetailsPage() {
 
         .nr-program-details-cover {
           object-fit: cover;
+          object-position: center 58%;
         }
 
         .nr-program-details-overlay {
@@ -1381,14 +1424,14 @@ export default function PublicProgramDetailsPage() {
           background:
             linear-gradient(
               90deg,
-              rgba(4, 18, 34, 0.95),
-              rgba(4, 18, 34, 0.58) 55%,
-              rgba(4, 18, 34, 0.28)
+              rgba(4, 18, 34, 0.38) 0%,
+              rgba(4, 18, 34, 0.58) 45%,
+              rgba(4, 18, 34, 0.94) 100%
             ),
             linear-gradient(
               0deg,
-              rgba(4, 18, 34, 0.82),
-              transparent 55%
+              rgba(4, 18, 34, 0.72),
+              transparent 58%
             );
         }
 
@@ -1396,30 +1439,30 @@ export default function PublicProgramDetailsPage() {
           background:
             linear-gradient(
               270deg,
-              rgba(4, 18, 34, 0.95),
-              rgba(4, 18, 34, 0.58) 55%,
-              rgba(4, 18, 34, 0.28)
+              rgba(4, 18, 34, 0.38) 0%,
+              rgba(4, 18, 34, 0.58) 45%,
+              rgba(4, 18, 34, 0.94) 100%
             ),
             linear-gradient(
               0deg,
-              rgba(4, 18, 34, 0.82),
-              transparent 55%
+              rgba(4, 18, 34, 0.72),
+              transparent 58%
             );
         }
 
         .nr-program-details-hero-content {
           position: relative;
           z-index: 2;
-          min-height: 540px;
+          min-height: 580px;
           display: flex;
           flex-direction: column;
           justify-content: center;
-          padding-block: 84px 58px;
+          padding-block: 96px 64px;
         }
 
         .nr-program-details-back {
           position: absolute;
-          top: 34px;
+          top: 42px;
           inset-inline-start: 0;
           display: inline-flex;
           align-items: center;
@@ -1443,7 +1486,7 @@ export default function PublicProgramDetailsPage() {
         }
 
         .nr-program-details-copy {
-          max-width: 760px;
+          max-width: 900px;
           color: #fff;
         }
 
@@ -1479,25 +1522,25 @@ export default function PublicProgramDetailsPage() {
         }
 
         .nr-program-details-copy h1 {
-          margin: 18px 0 14px;
-          font-size: clamp(40px, 4.6vw, 62px);
-          line-height: 1.08;
+          margin: 18px 0 12px;
+          font-size: clamp(48px, 5.5vw, 76px);
+          line-height: 1.04;
           letter-spacing: -0.035em;
         }
 
         .nr-program-details-copy > p {
-          max-width: 700px;
+          max-width: 760px;
           margin: 0;
-          color: rgba(255, 255, 255, 0.76);
-          font-size: 15px;
-          line-height: 1.95;
+          color: rgba(255, 255, 255, 0.78);
+          font-size: 16px;
+          line-height: 1.9;
         }
 
         .nr-program-details-facts {
           display: flex;
           flex-wrap: wrap;
           gap: 10px;
-          margin-top: 24px;
+          margin-top: 20px;
         }
 
         .nr-program-details-facts span {
@@ -1507,15 +1550,23 @@ export default function PublicProgramDetailsPage() {
           gap: 7px;
           padding-inline: 15px;
           border: 1px solid rgba(255, 255, 255, 0.13);
-          border-radius: 13px;
-          background: rgba(255, 255, 255, 0.09);
+          border-radius: 14px;
+          background: rgba(255, 255, 255, 0.11);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
           backdrop-filter: blur(14px);
         }
 
         .nr-program-details-facts span.is-price {
+          gap: 6px;
           color: #1c3558;
           border-color: rgba(255, 195, 19, 0.52);
           background: #ffc313;
+        }
+
+        .nr-program-details-facts .is-price small {
+          font-size: 9px;
+          font-weight: 900;
+          opacity: 0.72;
         }
 
         .nr-program-details-facts svg {
@@ -1525,6 +1576,66 @@ export default function PublicProgramDetailsPage() {
 
         .nr-program-details-facts .is-price svg {
           color: #1c3558;
+        }
+
+
+        .nr-program-details-subnav {
+          position: sticky;
+          top: 0;
+          z-index: 20;
+          border-bottom: 1px solid rgba(23, 111, 232, 0.10);
+          background: rgba(255, 255, 255, 0.94);
+          box-shadow: 0 8px 30px rgba(20, 59, 102, 0.04);
+          backdrop-filter: blur(18px);
+          -webkit-backdrop-filter: blur(18px);
+        }
+
+        .nr-program-details-subnav-inner {
+          min-height: 58px;
+          display: flex;
+          align-items: center;
+          gap: 7px;
+          overflow-x: auto;
+          scrollbar-width: none;
+        }
+
+        .nr-program-details-subnav-inner::-webkit-scrollbar {
+          display: none;
+        }
+
+        .nr-program-details-subnav a {
+          flex: 0 0 auto;
+          min-height: 34px;
+          display: inline-flex;
+          align-items: center;
+          padding-inline: 12px;
+          border-radius: 999px;
+          color: #62758c;
+          text-decoration: none;
+          font-size: 10px;
+          font-weight: 900;
+          transition:
+            color 160ms ease,
+            background 160ms ease;
+        }
+
+        .nr-program-details-subnav a:hover {
+          color: #176fe8;
+          background: rgba(23, 111, 232, 0.08);
+        }
+
+        .nr-program-details-section {
+          scroll-margin-top: 82px;
+        }
+
+        .nr-program-details-overview {
+          background:
+            radial-gradient(
+              circle at 92% 8%,
+              rgba(23, 111, 232, 0.06),
+              transparent 28%
+            ),
+            #fff;
         }
 
         .nr-program-details-layout {
@@ -1542,9 +1653,9 @@ export default function PublicProgramDetailsPage() {
         .nr-program-details-section {
           padding: 24px;
           border: 1px solid #dce5f0;
-          border-radius: 20px;
+          border-radius: 24px;
           background: #fff;
-          box-shadow: 0 18px 55px rgba(20, 59, 102, 0.07);
+          box-shadow: 0 20px 60px rgba(20, 59, 102, 0.07);
         }
 
         .nr-program-details-kicker {
@@ -1601,7 +1712,7 @@ export default function PublicProgramDetailsPage() {
         .nr-program-details-hotel {
           overflow: hidden;
           border: 1px solid #dce5f0;
-          border-radius: 20px;
+          border-radius: 24px;
           background: #fff;
         }
 
@@ -2387,6 +2498,33 @@ export default function PublicProgramDetailsPage() {
           color: #ffc313;
         }
 
+
+        .nr-program-details-booking-trust {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 8px;
+          margin-top: 14px;
+        }
+
+        .nr-program-details-booking-trust span {
+          min-height: 38px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          padding-inline: 8px;
+          border: 1px solid rgba(255,255,255,.08);
+          border-radius: 10px;
+          color: rgba(255,255,255,.75);
+          background: rgba(255,255,255,.05);
+          font-size: 9px;
+          font-weight: 800;
+        }
+
+        .nr-program-details-booking-trust svg {
+          color: #ffc313;
+        }
+
         .nr-program-details-booking p {
           color: rgba(255, 255, 255, 0.67);
           font-size: 12px;
@@ -2469,6 +2607,71 @@ export default function PublicProgramDetailsPage() {
         }
 
 
+
+        html[data-theme="dark"] .nr-program-details {
+          background: #07182c;
+          color: #f4f8ff;
+        }
+
+        html[data-theme="dark"] .nr-program-details-subnav {
+          border-bottom-color: rgba(255,255,255,.08);
+          background: rgba(7, 24, 44, .9);
+        }
+
+        html[data-theme="dark"] .nr-program-details-subnav a {
+          color: #a9b8c9;
+        }
+
+        html[data-theme="dark"] .nr-program-details-section,
+        html[data-theme="dark"] .nr-program-details-hotel,
+        html[data-theme="dark"] .nr-program-flight-public-card,
+        html[data-theme="dark"] .nr-program-transport-public-card,
+        html[data-theme="dark"] .nr-program-visa-public-card {
+          border-color: rgba(255,255,255,.09);
+          background: #0c223d;
+          box-shadow: 0 18px 55px rgba(0,0,0,.2);
+        }
+
+        html[data-theme="dark"] .nr-program-details-overview {
+          background:
+            radial-gradient(circle at 92% 8%, rgba(23,111,232,.12), transparent 28%),
+            #0c223d;
+        }
+
+        html[data-theme="dark"] .nr-program-details-section h2,
+        html[data-theme="dark"] .nr-program-details-hotel-heading h3,
+        html[data-theme="dark"] .nr-program-flight-public-header h3,
+        html[data-theme="dark"] .nr-program-transport-public-header h3,
+        html[data-theme="dark"] .nr-program-visa-public-header h3,
+        html[data-theme="dark"] .nr-program-flight-route strong,
+        html[data-theme="dark"] .nr-program-transport-route strong,
+        html[data-theme="dark"] .nr-program-visa-requirements-heading {
+          color: #f4f8ff;
+        }
+
+        html[data-theme="dark"] .nr-program-details-description,
+        html[data-theme="dark"] .nr-program-details-hotel-body > p,
+        html[data-theme="dark"] .nr-program-flight-public-notes,
+        html[data-theme="dark"] .nr-program-transport-notes,
+        html[data-theme="dark"] .nr-program-visa-description,
+        html[data-theme="dark"] .nr-program-visa-notes {
+          color: #a9b8c9;
+        }
+
+        html[data-theme="dark"] .nr-program-details-trust > div,
+        html[data-theme="dark"] .nr-program-details-hotel-meta span,
+        html[data-theme="dark"] .nr-program-flight-route,
+        html[data-theme="dark"] .nr-program-flight-meta span,
+        html[data-theme="dark"] .nr-program-transport-route,
+        html[data-theme="dark"] .nr-program-transport-meta span,
+        html[data-theme="dark"] .nr-program-visa-meta span,
+        html[data-theme="dark"] .nr-program-flight-number,
+        html[data-theme="dark"] .nr-program-details-empty {
+          border-color: rgba(255,255,255,.07);
+          background: rgba(255,255,255,.045);
+          color: #a9b8c9;
+        }
+
         @media (min-width: 1500px) {
           .nr-program-details-container {
             width: min(1460px, calc(100% - 72px));
@@ -2513,13 +2716,25 @@ export default function PublicProgramDetailsPage() {
         }
 
         @media (max-width: 720px) {
+          .nr-program-details-subnav-inner {
+            min-height: 54px;
+            gap: 5px;
+          }
+
+          .nr-program-details-subnav a {
+            min-height: 32px;
+            padding-inline: 10px;
+          }
+
+
           .nr-program-details-hero,
           .nr-program-details-hero-content {
-            min-height: 575px;
+            min-height: 545px;
           }
 
           .nr-program-details-copy h1 {
-            font-size: 42px;
+            font-size: 40px;
+            line-height: 1.08;
           }
 
           .nr-program-details-layout {
@@ -2570,7 +2785,8 @@ export default function PublicProgramDetailsPage() {
           }
 
           .nr-program-details-copy h1 {
-            font-size: 36px;
+            font-size: 34px;
+            line-height: 1.1;
           }
 
           .nr-program-details-copy > p {

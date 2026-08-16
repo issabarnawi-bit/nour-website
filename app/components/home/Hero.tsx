@@ -53,6 +53,18 @@ export default function Hero({ t }: Props) {
         mouseY.set(0);
       }}
     >
+      <motion.div
+        className="nr-premium-haram-bg"
+        aria-hidden="true"
+        initial={{ scale: 1.06, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{
+          duration: 1.35,
+          ease: [0.22, 1, 0.36, 1],
+        }}
+      />
+
+      <div className="nr-premium-haram-overlay" aria-hidden="true" />
       <div className="nr-premium-grid" aria-hidden="true" />
       <motion.div className="nr-premium-glow nr-premium-glow-blue" style={{ x: glowX, y: glowY }} />
       <motion.div className="nr-premium-glow nr-premium-glow-gold" style={{ x: backX, y: backY }} />
@@ -264,17 +276,54 @@ export default function Hero({ t }: Props) {
           overflow: hidden;
           isolation: isolate;
           color: #fff;
+          background: #0b65d7;
+        }
+
+        .nr-premium-haram-bg {
+          position: absolute;
+          inset: 0;
+          z-index: -5;
           background:
-            radial-gradient(circle at 12% 18%, rgba(58, 219, 255, 0.16), transparent 24%),
-            radial-gradient(circle at 84% 18%, rgba(255, 195, 19, 0.13), transparent 22%),
-            linear-gradient(135deg, #0757bd 0%, #0f70e5 46%, #258ff1 72%, #68c3ff 100%);
+            url("/images/site/hero-haram-bg.jpg")
+            center 54% / cover no-repeat;
+          transform-origin: center;
+          filter:
+            saturate(.94)
+            contrast(1.04)
+            brightness(.86);
+          pointer-events: none;
+        }
+
+        .nr-premium-haram-overlay {
+          position: absolute;
+          inset: 0;
+          z-index: -4;
+          pointer-events: none;
+          background:
+            linear-gradient(
+              90deg,
+              rgba(4, 73, 164, .92) 0%,
+              rgba(9, 101, 210, .84) 38%,
+              rgba(21, 126, 230, .78) 66%,
+              rgba(52, 169, 235, .72) 100%
+            ),
+            radial-gradient(
+              circle at 24% 48%,
+              rgba(1, 31, 74, .20),
+              transparent 34%
+            ),
+            radial-gradient(
+              circle at 86% 82%,
+              rgba(255, 195, 19, .12),
+              transparent 28%
+            );
         }
 
         .nr-premium-grid {
           position: absolute;
           inset: 0;
           z-index: -1;
-          opacity: 0.17;
+          opacity: 0.09;
           background-image:
             linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px),
             linear-gradient(90deg, rgba(255,255,255,.08) 1px, transparent 1px);
@@ -291,7 +340,7 @@ export default function Hero({ t }: Props) {
         }
 
         .nr-premium-glow-blue {
-          width: 360px;
+          width: 320px;
           height: 360px;
           top: -160px;
           inset-inline-start: -120px;
@@ -659,6 +708,24 @@ export default function Hero({ t }: Props) {
         }
 
         @media (max-width: 768px) {
+          .nr-premium-haram-bg {
+            background-position: 42% center;
+            filter:
+              saturate(.9)
+              contrast(1.02)
+              brightness(.80);
+          }
+
+          .nr-premium-haram-overlay {
+            background:
+              linear-gradient(
+                180deg,
+                rgba(7, 86, 190, .90) 0%,
+                rgba(15, 112, 224, .82) 50%,
+                rgba(40, 151, 234, .80) 100%
+              );
+          }
+
   .nr-premium-hero {
     min-height: auto !important;
     overflow: hidden !important;

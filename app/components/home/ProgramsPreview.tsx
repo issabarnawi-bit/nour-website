@@ -369,23 +369,24 @@ export default function ProgramsPreview({
           }}
         >
           <span className="nr-programs-kicker">
+            <span className="nr-programs-kicker-dot" aria-hidden="true" />
             {isArabic
-              ? "برامج مختارة"
-              : "Featured Programs"}
+              ? "برامج مختارة بعناية"
+              : "Curated Umrah programs"}
           </span>
 
           <div className="nr-programs-heading-row">
             <div>
               <h2 id="nr-programs-title">
                 {isArabic
-                  ? "اختر البرنامج المناسب لرحلتك"
-                  : "Choose the right program for your journey"}
+                  ? "رحلتك تبدأ من البرنامج المناسب"
+                  : "Your journey starts with the right program"}
               </h2>
 
               <p>
                 {isArabic
-                  ? "تصفح برامج العمرة المنشورة في نور آب، واختر البرنامج المناسب ثم استعرض تفاصيله قبل المتابعة عبر التطبيق."
-                  : "Browse published Umrah programs on NourApp, choose the right option, and review its details before continuing in the app."}
+                  ? "استكشف برامج عمرة مختارة، قارن المدة والسعر والدولة، ثم افتح التفاصيل الكاملة قبل المتابعة عبر تطبيق نور آب."
+                  : "Explore selected Umrah programs, compare duration, price, and country, then open the full details before continuing in NourApp."}
               </p>
             </div>
 
@@ -519,6 +520,23 @@ export default function ProgramsPreview({
                           aria-hidden="true"
                         />
 
+                        <div className="nr-program-image-meta">
+                          <span>
+                            <LocationIcon />
+                            {countryName ||
+                              (isArabic
+                                ? "برنامج عمرة"
+                                : "Umrah program")}
+                          </span>
+                          <span>
+                            <CalendarIcon />
+                            {formatDuration(
+                              program.durationDays,
+                              language,
+                            )}
+                          </span>
+                        </div>
+
                         {program.isFeatured ? (
                           <span className="nr-program-badge">
                             {isArabic
@@ -560,8 +578,9 @@ export default function ProgramsPreview({
                         </div>
 
                         {program.isFeatured ? (
-                          <span className="nr-program-rating">
-                            ★
+                          <span className="nr-program-featured-mark">
+                            <SparkIcon />
+                            {isArabic ? "مختار" : "Selected"}
                           </span>
                         ) : null}
                       </div>
@@ -576,29 +595,41 @@ export default function ProgramsPreview({
                       <div className="nr-program-features">
                         <span>
                           <CalendarIcon />
-
-                          {formatDuration(
-                            program.durationDays,
-                            language,
-                          )}
+                          <b>
+                            {formatDuration(
+                              program.durationDays,
+                              language,
+                            )}
+                          </b>
+                          <small>
+                            {isArabic ? "المدة" : "Duration"}
+                          </small>
                         </span>
 
                         <span>
                           <NightIcon />
-
-                          {formatNights(
-                            program.durationNights,
-                            language,
-                          )}
+                          <b>
+                            {formatNights(
+                              program.durationNights,
+                              language,
+                            )}
+                          </b>
+                          <small>
+                            {isArabic ? "الإقامة" : "Stay"}
+                          </small>
                         </span>
 
                         <span>
                           <LocationIcon />
-
-                          {countryName ||
-                            (isArabic
-                              ? "غير محدد"
-                              : "Not specified")}
+                          <b>
+                            {countryName ||
+                              (isArabic
+                                ? "غير محدد"
+                                : "Not specified")}
+                          </b>
+                          <small>
+                            {isArabic ? "الدولة" : "Country"}
+                          </small>
                         </span>
                       </div>
 
@@ -630,9 +661,7 @@ export default function ProgramsPreview({
                         <div className="nr-program-actions">
                           <a
                             className="nr-program-details"
-                            href={
-                              detailsUrl
-                            }
+                            href={detailsUrl}
                           >
                             {isArabic
                               ? "التفاصيل"
@@ -641,20 +670,16 @@ export default function ProgramsPreview({
 
                           <a
                             className="nr-program-primary"
-                            href={
-                              detailsUrl
-                            }
+                            href={detailsUrl}
                           >
                             <span>
                               {isArabic
-                                ? "عرض البرنامج"
-                                : "View Program"}
+                                ? "استكشف البرنامج"
+                                : "Explore program"}
                             </span>
 
                             <ArrowIcon
-                              language={
-                                language
-                              }
+                              language={language}
                             />
                           </a>
                         </div>
@@ -697,13 +722,23 @@ export default function ProgramsPreview({
         .nr-programs-preview {
           position: relative;
           overflow: hidden;
-          padding: 108px 0;
+          padding: 96px 0 104px;
           background:
+            radial-gradient(
+              circle at 12% 8%,
+              rgba(23, 111, 232, 0.09),
+              transparent 24%
+            ),
+            radial-gradient(
+              circle at 88% 92%,
+              rgba(255, 195, 19, 0.08),
+              transparent 24%
+            ),
             linear-gradient(
               180deg,
               color-mix(
                 in srgb,
-                var(--nr-soft) 65%,
+                var(--nr-soft) 72%,
                 transparent
               ),
               var(--nr-bg)
@@ -793,7 +828,7 @@ export default function ProgramsPreview({
 
         .nr-programs-orb-two {
           width: 330px;
-          height: 330px;
+          height: 275px;
           right: -170px;
           bottom: -180px;
           background:
@@ -812,6 +847,7 @@ export default function ProgramsPreview({
         .nr-programs-kicker {
           display: inline-flex;
           align-items: center;
+          gap: 8px;
           min-height: 34px;
           padding-inline: 14px;
           border: 1px solid
@@ -831,6 +867,14 @@ export default function ProgramsPreview({
             );
           font-size: 12px;
           font-weight: 900;
+        }
+
+        .nr-programs-kicker-dot {
+          width: 7px;
+          height: 7px;
+          border-radius: 999px;
+          background: var(--nr-gold);
+          box-shadow: 0 0 0 5px rgba(255, 195, 19, 0.12);
         }
 
         .nr-programs-heading-row {
@@ -932,7 +976,7 @@ export default function ProgramsPreview({
           overflow: hidden;
           border: 1px solid
             var(--nr-border);
-          border-radius: 27px;
+          border-radius: 30px;
           background:
             var(--nr-card);
           box-shadow:
@@ -976,7 +1020,7 @@ export default function ProgramsPreview({
 
         .nr-program-media {
           position: relative;
-          height: 310px;
+          height: 330px;
           overflow: hidden;
           background: #dbe8f8;
         }
@@ -1074,6 +1118,39 @@ export default function ProgramsPreview({
             );
         }
 
+        .nr-program-image-meta {
+          position: absolute;
+          inset-inline-start: 17px;
+          inset-inline-end: 17px;
+          bottom: 16px;
+          z-index: 3;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 10px;
+          color: #fff;
+        }
+
+        .nr-program-image-meta span {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          min-width: 0;
+          padding: 7px 10px;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: 999px;
+          background: rgba(7, 27, 58, 0.42);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          font-size: 10px;
+          font-weight: 900;
+        }
+
+        .nr-program-image-meta svg {
+          width: 14px;
+          height: 14px;
+        }
+
         .nr-program-badge {
           position: absolute;
           top: 17px;
@@ -1102,7 +1179,7 @@ export default function ProgramsPreview({
         .nr-program-index {
           position: absolute;
           inset-inline-end: 17px;
-          bottom: 13px;
+          top: 16px;
           z-index: 2;
           color:
             rgba(
@@ -1111,13 +1188,13 @@ export default function ProgramsPreview({
               255,
               0.82
             );
-          font-size: 31px;
+          font-size: 22px;
           font-weight: 900;
           letter-spacing: 0.04em;
         }
 
         .nr-program-body {
-          padding: 23px;
+          padding: 20px 21px 19px;
         }
 
         .nr-program-title-row {
@@ -1138,7 +1215,7 @@ export default function ProgramsPreview({
         .nr-program-title-row h3 {
           margin: 0;
           color: var(--nr-text);
-          font-size: 21px;
+          font-size: 19px;
           line-height: 1.4;
         }
 
@@ -1147,32 +1224,37 @@ export default function ProgramsPreview({
           text-decoration: none;
         }
 
-        .nr-program-rating {
+        .nr-program-featured-mark {
           flex: 0 0 auto;
-          min-width: 29px;
-          min-height: 29px;
+          min-height: 30px;
           display: inline-flex;
           align-items: center;
-          justify-content: center;
+          gap: 6px;
+          padding-inline: 10px;
           border-radius: 999px;
-          color: #735800;
-          background:
-            rgba(
-              255,
-              195,
-              19,
-              0.15
-            );
-          font-size: 12px;
+          color: #7a5d00;
+          background: rgba(255, 195, 19, 0.14);
+          border: 1px solid rgba(255, 195, 19, 0.24);
+          font-size: 10px;
           font-weight: 900;
+          white-space: nowrap;
+        }
+
+        .nr-program-featured-mark svg {
+          width: 13px;
+          height: 13px;
         }
 
         .nr-program-description {
-          min-height: 58px;
-          margin: 13px 0 17px;
+          min-height: 46px;
+          margin: 10px 0 14px;
+          overflow: hidden;
           color: var(--nr-muted);
-          font-size: 13px;
-          line-height: 1.75;
+          font-size: 12px;
+          line-height: 1.7;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
         }
 
         .nr-program-features {
@@ -1192,17 +1274,31 @@ export default function ProgramsPreview({
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          gap: 6px;
-          padding: 8px 5px;
+          gap: 5px;
+          padding: 7px 5px;
           border: 1px solid
             var(--nr-border);
           border-radius: 13px;
           color: var(--nr-muted);
           background:
             var(--nr-soft);
-          font-size: 10px;
-          font-weight: 800;
           text-align: center;
+        }
+
+        .nr-program-features b {
+          max-width: 100%;
+          overflow: hidden;
+          color: var(--nr-text);
+          font-size: 10px;
+          font-weight: 900;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .nr-program-features small {
+          color: var(--nr-muted);
+          font-size: 9px;
+          font-weight: 800;
         }
 
         .nr-program-features svg {
@@ -1213,7 +1309,7 @@ export default function ProgramsPreview({
 
         .nr-program-divider {
           height: 1px;
-          margin: 20px 0;
+          margin: 15px 0;
           background:
             var(--nr-border);
         }
@@ -1237,7 +1333,7 @@ export default function ProgramsPreview({
         .nr-program-price strong {
           display: block;
           color: var(--nr-text);
-          font-size: 34px;
+          font-size: 32px;
           font-weight: 900;
           line-height: 1;
         }
@@ -1259,7 +1355,7 @@ export default function ProgramsPreview({
 
         .nr-program-details,
         .nr-program-primary {
-          min-height: 41px;
+          min-height: 38px;
           display: inline-flex;
           align-items: center;
           justify-content: center;
@@ -1286,11 +1382,11 @@ export default function ProgramsPreview({
         }
 
         .nr-program-primary {
-          gap: 6px;
-          padding-inline: 13px;
+          gap: 7px;
+          padding-inline: 15px;
           color: #fff;
           background:
-            var(--nr-blue);
+            linear-gradient(135deg, var(--nr-blue), #0b59c6);
           box-shadow:
             0 11px 25px
             rgba(
@@ -1399,7 +1495,7 @@ export default function ProgramsPreview({
           }
 
           .nr-program-media {
-            height: 270px;
+            height: 245px;
           }
         }
 
@@ -1558,6 +1654,25 @@ function InfoIcon() {
       <path
         d="M12 11v5M12 8h.01"
         strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+
+function SparkIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      aria-hidden="true"
+    >
+      <path
+        d="m12 3 1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3Z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );

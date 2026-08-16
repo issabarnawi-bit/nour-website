@@ -643,6 +643,49 @@ export default function Statistics({
               );
           }
         }
+          .nr-statistics-haram {
+  padding-block: 52px 60px;
+}
+
+.nr-statistics-haram .nr-statistics-heading {
+  max-width: 94%;
+  margin-inline: auto;
+  margin-bottom: 26px;
+  text-align: center;
+}
+
+.nr-statistics-haram .nr-statistics-heading h2 {
+  font-size: clamp(28px, 8vw, 38px);
+  line-height: 1.2;
+}
+
+.nr-statistics-haram .nr-statistics-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+.nr-statistics-haram .nr-statistic-card {
+  min-height: 175px !important;
+  padding: 18px 14px !important;
+  border-radius: 18px !important;
+}
+
+.nr-statistics-haram .nr-statistic-value {
+  margin-top: 22px !important;
+  font-size: clamp(34px, 9vw, 46px) !important;
+  line-height: 1 !important;
+}
+
+.nr-statistics-haram .nr-statistic-card h3 {
+  margin-top: 20px !important;
+  font-size: 14px !important;
+}
+
+.nr-statistics-haram .nr-statistic-card p {
+  margin-top: 6px !important;
+  font-size: 9px !important;
+  line-height: 1.5 !important;
+}
 
         @media (
           prefers-reduced-motion: reduce
