@@ -72,28 +72,56 @@ export default function Hero({ t }: Props) {
             {t.heroEyebrow}
           </motion.span>
 
-          <motion.h1 variants={fadeItem}>
+          <motion.h1
+            initial={{
+              opacity: 0,
+              x: isArabic ? 120 : -120,
+              filter: "blur(6px)",
+            }}
+            animate={{
+              opacity: 1,
+              x: 0,
+              filter: "blur(0px)",
+            }}
+            transition={{
+              duration: 0.78,
+              delay: 0.12,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+          >
             {isArabic ? (
               <>
-                رفيقك الذكي لرحلة عمرة
-                <span> أكثر راحة وأمانًا</span>
+                رفيقك الذكي لعمرة أسهل
+                <span> وأكثر طمأنينة</span>
               </>            ) : (
               <>
-                Your smart companion for a
-                <span> smoother Umrah journey</span>
+                Your smart companion for an easier
+                <span> Umrah journey with peace of mind</span>
               </>
             )}
           </motion.h1>
 
           <motion.p variants={fadeItem}>
             {isArabic
-              ? "جميع خدمات العمرة في تجربة رقمية واحدة، من استعراض البرامج واختيار الخدمات وحتى متابعة تفاصيل الرحلة بسهولة وثقة."
-              : "Discover programs, compare services, and follow your journey through one clear, secure, and integrated digital experience."}
+              ? "من اختيار البرنامج إلى متابعة تفاصيل رحلتك، تجمع نور آب خدمات العمرة في تجربة رقمية واضحة ومتكاملة."
+              : "From choosing your program to following your journey, NourApp brings Umrah services together in one clear and integrated digital experience."}
           </motion.p>
+
+          <motion.div className="nr-premium-service-line" variants={fadeItem}>
+            <span>{isArabic ? "تأشيرة" : "Visa"}</span>
+            <i />
+            <span>{isArabic ? "سكن" : "Hotels"}</span>
+            <i />
+            <span>{isArabic ? "نقل" : "Transport"}</span>
+            <i />
+            <span>{isArabic ? "إرشاد" : "Guidance"}</span>
+            <i />
+            <span>{isArabic ? "متابعة الرحلة" : "Journey tracking"}</span>
+          </motion.div>
 
           <motion.div className="nr-premium-actions" variants={fadeItem}>
             <a className="nr-premium-primary" href="#programs">
-              <span>{isArabic ? "ابدأ رحلتك" : "Start your journey"}</span>
+              <span>{isArabic ? "استعرض برامج العمرة" : "Explore Umrah programs"}</span>
               <ArrowIcon isArabic={isArabic} />
             </a>
             <a className="nr-premium-secondary" href="#features">
@@ -104,25 +132,23 @@ export default function Hero({ t }: Props) {
 
           <motion.div className="nr-premium-trust" variants={fadeItem}>
             <div>
-              <span className="nr-premium-stars">★★★★★</span>
-              <strong>{isArabic ? "تجربة رقمية موثوقة" : "A trusted digital experience"}</strong>
+              <strong>{isArabic ? "خدمات متكاملة" : "Integrated services"}</strong>
+              <small>{isArabic ? "من البرنامج إلى المتابعة" : "From program to follow-up"}</small>
             </div>
             <span className="nr-premium-trust-divider" />
             <div>
               <strong>24/7</strong>
-              <small>{isArabic ? "دعم متواصل" : "Continuous support"}</small>
+              <small>{isArabic ? "دعم ومتابعة" : "Support & follow-up"}</small>
             </div>
             <span className="nr-premium-trust-divider" />
             <div>
-              <strong>{isArabic ? "آمن" : "Secure"}</strong>
-              <small>{isArabic ? "دفع وخصوصية" : "Payments & privacy"}</small>
+              <strong>{isArabic ? "دفع آمن" : "Secure payments"}</strong>
+              <small>{isArabic ? "حماية وخصوصية" : "Protection & privacy"}</small>
             </div>
             <span className="nr-premium-trust-divider" />
             <div>
               <strong>{isArabic ? "تكلفة مرنة" : "Flexible pricing"}</strong>
-              <small>
-                {isArabic ? "خيارات تناسب ميزانيتك" : "Options for your budget"}
-              </small>
+              <small>{isArabic ? "خيارات تناسب ميزانيتك" : "Options for your budget"}</small>
             </div>
           </motion.div>
         </motion.div>
@@ -135,23 +161,97 @@ export default function Hero({ t }: Props) {
         >
           <motion.div className="nr-premium-device-glow" style={{ x: glowX, y: glowY }} />
 
-          <motion.div className="nr-premium-phone-back-wrap" style={{ x: backX, y: backY }}>
-            <Image src="/images/site/rotated-right.png" alt="" width={630} height={630} priority className="nr-premium-phone-back" />
+          <motion.div
+            className="nr-premium-phone-back-parallax"
+            style={{ x: backX, y: backY }}
+          >
+            <motion.div
+              className="nr-premium-phone-back-wrap"
+              initial={{
+                opacity: 0,
+                x: isArabic ? -100 : 100,
+                y: 28,
+                scale: 0.86,
+                rotate: isArabic ? -12 : 12,
+              }}
+              animate={{
+                opacity: 1,
+                x: 0,
+                y: 0,
+                scale: 1,
+                rotate: isArabic ? -7 : 7,
+              }}
+              transition={{
+                duration: 0.9,
+                delay: 0.22,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+            >
+              <Image
+                src="/images/site/rotated-right.png"
+                alt=""
+                width={630}
+                height={630}
+                priority
+                className="nr-premium-phone-back"
+              />
+            </motion.div>
           </motion.div>
 
           <motion.div
-            className="nr-premium-phone-front-wrap"
+            className="nr-premium-phone-front-parallax"
             style={{ x: phoneX, y: phoneY }}
-            animate={{ y: [0, -18, 0], rotate: [-2, 2, -2] }}
-            transition={{ duration: 5.8, repeat: Infinity, ease: "easeInOut" }}
           >
-            <Image src="/images/site/front-view.png" alt={isArabic ? "واجهة تطبيق  نور آب" : "NourApp app interface"} width={420} height={720} priority className="nr-premium-phone-front" />
+            <motion.div
+              className="nr-premium-phone-front-wrap"
+              initial={{
+                opacity: 0,
+                y: 80,
+                scale: 0.86,
+                rotate: isArabic ? -8 : 8,
+              }}
+              animate={{
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                rotate: 0,
+              }}
+              transition={{
+                type: "spring",
+                stiffness: 72,
+                damping: 16,
+                mass: 0.9,
+                delay: 0.42,
+              }}
+            >
+              <motion.div
+                className="nr-premium-phone-front-float"
+                animate={{
+                  y: [0, -6, 0],
+                  rotate: [-0.35, 0.35, -0.35],
+                }}
+                transition={{
+                  duration: 7.4,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 1.15,
+                }}
+              >
+                <Image
+                  src="/images/site/front-view.png"
+                  alt={isArabic ? "واجهة تطبيق نور آب" : "NourApp app interface"}
+                  width={420}
+                  height={720}
+                  priority
+                  className="nr-premium-phone-front"
+                />
+              </motion.div>
+            </motion.div>
           </motion.div>
 
           <FloatingCard className="nr-floating-card nr-floating-card-booking" delay={0.55} icon={<CheckIcon />} title={isArabic ? "تم تأكيد الحجز" : "Booking confirmed"} subtitle={isArabic ? "البرنامج جاهز" : "Program ready"} />
           <FloatingCard className="nr-floating-card nr-floating-card-hotel" delay={0.72} icon={<HotelIcon />} title={isArabic ? "الفندق محجوز" : "Hotel reserved"} subtitle={isArabic ? "قريب من الحرم" : "Near the Haram"} />
           <FloatingCard className="nr-floating-card nr-floating-card-visa" delay={0.88} icon={<VisaIcon />} title={isArabic ? "التأشيرة جاهزة" : "Visa ready"} subtitle={isArabic ? "تحديث فوري" : "Instant update"} />
-          <FloatingCard className="nr-floating-card nr-floating-card-rating" delay={1.02} icon={<StarIcon />} title="4.9 / 5" subtitle={isArabic ? "تقييم التجربة" : "Experience rating"} />
         </motion.div>
       </div>
 
@@ -209,16 +309,18 @@ export default function Hero({ t }: Props) {
         .nr-premium-hero-grid {
           position: relative;
           z-index: 2;
-          width: min(1240px, calc(100% - 40px));
+          width: min(1380px, calc(100% - 32px));
           display: grid;
-          grid-template-columns: minmax(0, 1fr) minmax(460px, .95fr);
+          grid-template-columns: minmax(0, 1.3fr) minmax(390px, .7fr);
           align-items: center;
-          gap: 48px;
-          padding-block: 88px 84px;
+          gap: 34px;
+          padding-block: 48px 68px;
         }
 
         .nr-premium-copy {
-          max-width: 720px;
+          max-width: 1040px;
+          align-self: start;
+          padding-top: 18px;
         }
 
         .nr-premium-kicker {
@@ -243,26 +345,72 @@ export default function Hero({ t }: Props) {
         }
 
         .nr-premium-copy h1 {
-          max-width: 730px;
-          margin: 23px 0 19px;
-          font-size: clamp(42px, 5.3vw, 72px);
+          max-width: 1040px;
+          margin: 18px 0 16px;
+          font-size: clamp(36px, 4vw, 56px);
           font-weight: 900;
-          line-height: 1.05;
-          letter-spacing: -0.035em;
+          line-height: 1.22;
+          letter-spacing: 0;
+          overflow: visible;
         }
 
-        .nr-premium-copy h1 span {
+        html[dir="rtl"] .nr-premium-copy h1 {
+          letter-spacing: 0;
+          word-spacing: 0.025em;
+          text-align: right;
+        }
+
+        html[dir="rtl"] .nr-premium-title-line {
+          text-wrap: pretty;
+        }
+
+        .nr-premium-title-line {
           display: block;
+          width: 100%;
+          padding-block: 0.12em;
+          line-height: 1.27;
+          text-wrap: balance;
+          overflow: visible;
+        }
+
+        .nr-premium-title-line + .nr-premium-title-line {
+          margin-top: 0.035em;
+        }
+
+        .nr-premium-title-line-main {
+          color: #fff;
+        }
+
+        .nr-premium-title-line-accent {
           color: #ffc313;
           text-shadow: 0 12px 30px rgba(255,195,19,.18);
         }
 
         .nr-premium-copy > p {
-          max-width: 690px;
+          max-width: 860px;
           margin: 0;
           color: rgba(255,255,255,.82);
           font-size: 18px;
           line-height: 1.9;
+        }
+
+        .nr-premium-service-line {
+          display: flex;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 10px;
+          margin-top: 22px;
+          color: rgba(255,255,255,.88);
+          font-size: 12px;
+          font-weight: 800;
+        }
+
+        .nr-premium-service-line i {
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: #ffc313;
+          box-shadow: 0 0 12px rgba(255,195,19,.55);
         }
 
         .nr-premium-actions {
@@ -339,13 +487,6 @@ export default function Hero({ t }: Props) {
           font-size: 10px;
         }
 
-        .nr-premium-stars {
-          display: block;
-          margin-bottom: 4px;
-          color: #ffc313;
-          font-size: 13px;
-        }
-
         .nr-premium-trust-divider {
           width: 1px;
           height: 34px;
@@ -354,43 +495,58 @@ export default function Hero({ t }: Props) {
 
         .nr-premium-visual {
           position: relative;
-          min-height: 620px;
+          min-height: 610px;
+          isolation: isolate;
         }
 
         .nr-premium-device-glow {
           position: absolute;
-          width: 470px;
-          height: 470px;
-          top: 70px;
+          width: 430px;
+          height: 430px;
+          top: 92px;
           left: 50%;
           transform: translateX(-50%);
           border-radius: 50%;
-          background: rgba(255,255,255,.35);
-          filter: blur(60px);
-          opacity: .7;
+          background: rgba(255,255,255,.26);
+          filter: blur(58px);
+          opacity: .66;
           pointer-events: none;
         }
 
-        .nr-premium-phone-back-wrap,
-        .nr-premium-phone-front-wrap {
+        .nr-premium-phone-back-parallax,
+        .nr-premium-phone-front-parallax {
           position: absolute;
+          will-change: transform;
         }
 
-        .nr-premium-phone-back-wrap {
-          width: 570px;
-          top: -8px;
-          inset-inline-end: -64px;
+        /* Premium composition:
+           back phone is smaller and clearly separated,
+           front phone is the visual focus. */
+        .nr-premium-phone-back-parallax {
+          width: 430px;
+          top: 28px;
+          inset-inline-end: 34px;
+          z-index: 1;
         }
 
-        .nr-premium-phone-front-wrap {
-          width: 350px;
-          bottom: -24px;
-          inset-inline-start: 8px;
+        .nr-premium-phone-front-parallax {
+          width: 305px;
+          top: 142px;
+          inset-inline-start: 26px;
           z-index: 3;
+        }
+
+        .nr-premium-phone-back-wrap,
+        .nr-premium-phone-front-wrap,
+        .nr-premium-phone-front-float {
+          width: 100%;
+          transform-origin: 50% 72%;
+          will-change: transform, opacity;
         }
 
         .nr-premium-phone-back,
         .nr-premium-phone-front {
+          display: block;
           width: 100%;
           height: auto;
           object-fit: contain;
@@ -398,40 +554,44 @@ export default function Hero({ t }: Props) {
 
         .nr-premium-phone-back {
           filter:
-            drop-shadow(0 30px 60px rgba(0,0,0,.2))
-            drop-shadow(0 0 65px rgba(37,143,241,.2));
+            drop-shadow(0 26px 52px rgba(0,0,0,.18))
+            drop-shadow(0 0 48px rgba(37,143,241,.14));
         }
 
         .nr-premium-phone-front {
           filter:
-            drop-shadow(0 35px 70px rgba(0,0,0,.28))
-            drop-shadow(0 0 80px rgba(37,143,241,.25));
+            drop-shadow(0 34px 64px rgba(0,0,0,.25))
+            drop-shadow(0 0 58px rgba(37,143,241,.18));
         }
 
         .nr-floating-card {
           position: absolute;
-          z-index: 5;
+          z-index: 6;
           min-width: 175px;
           display: flex;
           align-items: center;
           gap: 11px;
           padding: 12px 14px;
-          border: 1px solid rgba(255,255,255,.42);
+          border: 1px solid rgba(255,255,255,.48);
           border-radius: 17px;
           color: #16365d;
-          background: rgba(255,255,255,.9);
+          background: rgba(255,255,255,.94);
           box-shadow:
-            0 22px 48px rgba(18,67,130,.2),
-            inset 0 1px 0 rgba(255,255,255,.8);
+            0 20px 44px rgba(18,67,130,.18),
+            inset 0 1px 0 rgba(255,255,255,.9);
           backdrop-filter: blur(18px);
-          transition: box-shadow .25s ease, border-color .25s ease;
+          transition:
+            transform .22s ease,
+            box-shadow .22s ease,
+            border-color .22s ease;
         }
 
         .nr-floating-card:hover {
+          transform: translateY(-3px);
           border-color: rgba(255,195,19,.7);
           box-shadow:
-            0 27px 58px rgba(18,67,130,.28),
-            0 0 30px rgba(255,195,19,.12);
+            0 25px 54px rgba(18,67,130,.24),
+            0 0 28px rgba(255,195,19,.1);
         }
 
         .nr-floating-card-icon {
@@ -466,23 +626,18 @@ export default function Hero({ t }: Props) {
         }
 
         .nr-floating-card-booking {
-          top: 78px;
-          inset-inline-start: -30px;
+          top: 62px;
+          inset-inline-start: -4px;
         }
 
         .nr-floating-card-hotel {
-          top: 210px;
-          inset-inline-end: -35px;
+          top: 286px;
+          inset-inline-end: -6px;
         }
 
         .nr-floating-card-visa {
-          bottom: 108px;
-          inset-inline-end: -5px;
-        }
-
-        .nr-floating-card-rating {
-          bottom: 22px;
-          inset-inline-start: -38px;
+          bottom: 36px;
+          inset-inline-start: 8px;
         }
 
         @media (max-width: 1020px) {
@@ -493,7 +648,7 @@ export default function Hero({ t }: Props) {
           .nr-premium-hero-grid {
             grid-template-columns: 1fr;
             gap: 30px;
-            padding-block: 72px 64px;
+            padding-block: 54px 56px;
           }
 
           .nr-premium-visual {
@@ -513,7 +668,7 @@ export default function Hero({ t }: Props) {
     width: calc(100% - 24px) !important;
     grid-template-columns: minmax(0, 1fr) !important;
     gap: 8px !important;
-    padding: 34px 0 18px !important;
+    padding: 24px 0 18px !important;
   }
 
   .nr-premium-copy {
@@ -529,9 +684,19 @@ export default function Hero({ t }: Props) {
   .nr-premium-copy h1 {
     max-width: 100% !important;
     margin: 17px auto 13px !important;
-    font-size: clamp(32px, 9.8vw, 42px) !important;
-    line-height: 1.04 !important;
+    font-size: clamp(29px, 8.4vw, 38px) !important;
+    line-height: 1.18 !important;
+    letter-spacing: 0 !important;
     text-wrap: balance;
+  }
+
+  .nr-premium-title-line {
+    line-height: 1.24 !important;
+    padding-block: .09em !important;
+  }
+
+  .nr-premium-title-line + .nr-premium-title-line {
+    margin-top: .035em !important;
   }
 
   .nr-premium-copy > p {
@@ -539,6 +704,13 @@ export default function Hero({ t }: Props) {
     margin-inline: auto !important;
     font-size: 13px !important;
     line-height: 1.7 !important;
+  }
+
+  .nr-premium-service-line {
+    justify-content: center !important;
+    gap: 8px !important;
+    margin-top: 16px !important;
+    font-size: 10px !important;
   }
 
   .nr-premium-actions {
@@ -588,57 +760,54 @@ export default function Hero({ t }: Props) {
     line-height: 1.25 !important;
   }
 
-  .nr-premium-stars {
-    font-size: 9px !important;
-    white-space: nowrap !important;
-  }
-
   .nr-premium-visual {
     position: relative !important;
     width: 100% !important;
-    height: 430px !important;
-    min-height: 430px !important;
-    margin-top: 0 !important;
-    overflow: hidden !important;
+    height: 440px !important;
+    min-height: 440px !important;
+    margin-top: 2px !important;
+    overflow: visible !important;
   }
 
   .nr-premium-device-glow {
-    width: 280px !important;
-    height: 280px !important;
-    top: 75px !important;
+    width: 270px !important;
+    height: 270px !important;
+    top: 84px !important;
     left: 50% !important;
-    opacity: 0.4 !important;
+    opacity: .4 !important;
     transform: translateX(-50%) !important;
   }
 
-  .nr-premium-phone-back-wrap {
-    width: 245px !important;
-    top: 70px !important;
+  .nr-premium-phone-back-parallax {
+    width: 225px !important;
+    top: 76px !important;
     left: 50% !important;
     right: auto !important;
-    inset-inline-start: auto !important;
-    inset-inline-end: auto !important;
-    transform: translateX(-62%) rotate(-7deg) !important;
+    inset-inline: auto !important;
+    transform: translateX(-78%) !important;
   }
 
-  .nr-premium-phone-front-wrap {
-    width: 150px !important;
+  .nr-premium-phone-front-parallax {
+    width: 152px !important;
+    top: 142px !important;
+    bottom: auto !important;
     left: 50% !important;
     right: auto !important;
-    bottom: 34px !important;
-    inset-inline-start: auto !important;
-    transform: translateX(5%) !important;
+    inset-inline: auto !important;
+    transform: translateX(8%) !important;
   }
 
-  html[dir="ltr"] .nr-premium-phone-back-wrap,
-  html[dir="ltr"] .nr-premium-phone-front-wrap {
-    left: 50% !important;
-    right: auto !important;
+  html[dir="ltr"] .nr-premium-phone-back-parallax {
+    transform: translateX(-22%) !important;
+  }
+
+  html[dir="ltr"] .nr-premium-phone-front-parallax {
+    transform: translateX(-108%) !important;
   }
 
   .nr-floating-card {
     display: flex !important;
-    width: 132px !important;
+    width: 128px !important;
     min-width: 0 !important;
     gap: 7px !important;
     padding: 8px 9px !important;
@@ -669,65 +838,59 @@ export default function Hero({ t }: Props) {
   }
 
   .nr-floating-card-booking {
-    top: 32px !important;
-    right: 4px !important;
+    top: 26px !important;
+    right: 8px !important;
     left: auto !important;
   }
 
   .nr-floating-card-hotel {
-    top: 160px !important;
-    left: 4px !important;
+    top: 196px !important;
+    left: 8px !important;
     right: auto !important;
   }
 
   .nr-floating-card-visa {
-    bottom: 58px !important;
-    left: 4px !important;
+    bottom: 26px !important;
+    left: 18px !important;
     right: auto !important;
   }
 
-  .nr-floating-card-rating {
-    right: 4px !important;
-    left: auto !important;
-    bottom: 10px !important;
-  }
-
   html[dir="ltr"] .nr-floating-card-booking {
-    left: 4px !important;
+    left: 8px !important;
     right: auto !important;
   }
 
   html[dir="ltr"] .nr-floating-card-hotel {
-    right: 4px !important;
+    right: 8px !important;
     left: auto !important;
   }
 
   html[dir="ltr"] .nr-floating-card-visa {
-    right: 4px !important;
+    right: 18px !important;
     left: auto !important;
   }
 
-  html[dir="ltr"] .nr-floating-card-rating {
-    left: 4px !important;
-    right: auto !important;
-  }
 }
        @media (max-width: 390px) {
   .nr-premium-copy h1 {
-    font-size: 31px !important;
+    font-size: 27px !important;
+  }
+
+  .nr-premium-title-line {
+    line-height: 1.26 !important;
   }
 
   .nr-premium-visual {
-    height: 400px !important;
-    min-height: 400px !important;
+    height: 410px !important;
+    min-height: 410px !important;
   }
 
-  .nr-premium-phone-back-wrap {
-    width: 220px !important;
+  .nr-premium-phone-back-parallax {
+    width: 205px !important;
   }
 
-  .nr-premium-phone-front-wrap {
-    width: 138px !important;
+  .nr-premium-phone-front-parallax {
+    width: 140px !important;
   }
 
   .nr-floating-card {
@@ -738,6 +901,12 @@ export default function Hero({ t }: Props) {
     top: 150px !important;
   }
 }
+
+        @media (prefers-reduced-motion: reduce) {
+          .nr-premium-phone-front-float {
+            transform: none !important;
+          }
+        }
 
       `}</style>
     </section>
@@ -764,4 +933,3 @@ function PlayIcon(){return <svg viewBox="0 0 24 24" fill="none" stroke="currentC
 function CheckIcon(){return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m5 12 4 4L19 6"/></svg>}
 function HotelIcon(){return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9"><path d="M4 21V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16"/><path d="M2 21h20M8 7h2M14 7h2M10 21v-5h4v5"/></svg>}
 function VisaIcon(){return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 8h8M8 12h5M8 16h7"/></svg>}
-function StarIcon(){return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z"/></svg>}

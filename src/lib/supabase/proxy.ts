@@ -64,21 +64,53 @@ export async function updateSession(
   const isAdminRoute =
     pathname.startsWith("/admin");
 
-  const isLoginRoute =
-    pathname === "/login";
+  const isAdminLoginRoute =
+    pathname === "/admin/login";
 
-  if (!claims && isAdminRoute) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/login";
+  const isAdminInviteRoute =
+    pathname === "/admin/invite";
 
-    return NextResponse.redirect(redirectUrl);
+  const isPublicAdminRoute =
+    isAdminLoginRoute ||
+    isAdminInviteRoute;
+
+  // حماية جميع صفحات الإدارة
+  // باستثناء تسجيل الدخول وتفعيل الدعوة
+  if (
+    !claims &&
+    isAdminRoute &&
+    !isPublicAdminRoute
+  ) {
+    const redirectUrl =
+      request.nextUrl.clone();
+
+    redirectUrl.pathname =
+      "/admin/login";
+
+    redirectUrl.search = "";
+
+    return NextResponse.redirect(
+      redirectUrl,
+    );
   }
 
-  if (claims && isLoginRoute) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/admin/dashboard";
+  // إذا كان المستخدم مسجلًا بالفعل
+  // ودخل صفحة تسجيل الدخول
+  if (
+    claims &&
+    isAdminLoginRoute
+  ) {
+    const redirectUrl =
+      request.nextUrl.clone();
 
-    return NextResponse.redirect(redirectUrl);
+    redirectUrl.pathname =
+      "/admin/dashboard";
+
+    redirectUrl.search = "";
+
+    return NextResponse.redirect(
+      redirectUrl,
+    );
   }
 
   return response;

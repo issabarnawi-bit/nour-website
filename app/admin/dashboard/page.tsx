@@ -1,17 +1,18 @@
 "use client";
 
 import { useMemo } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import {
   Activity,
   ArrowUpRight,
+  BriefcaseBusiness,
   CalendarDays,
   Globe2,
   ImagePlus,
   PlusCircle,
   Settings2,
+  Handshake,
   UserCheck,
   Users,
 } from "lucide-react";
@@ -170,6 +171,43 @@ export default function AdminDashboardPage() {
     refetchOnWindowFocus: true,
   });
 
+  const {
+    data: applicationCounts,
+    isLoading: isApplicationsLoading,
+    isError: isApplicationsError,
+  } = useQuery({
+    queryKey: ["admin", "applications", "new-counts"],
+    queryFn: async () => {
+      const [jobsResult, partnersResult] = await Promise.all([
+        supabase
+          .from("job_applications")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "new")
+          .is("deleted_at", null),
+        supabase
+          .from("partner_applications")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "new")
+          .is("deleted_at", null),
+      ]);
+
+      if (jobsResult.error) {
+        throw new Error(jobsResult.error.message);
+      }
+
+      if (partnersResult.error) {
+        throw new Error(partnersResult.error.message);
+      }
+
+      return {
+        jobApplications: jobsResult.count ?? 0,
+        partnerApplications: partnersResult.count ?? 0,
+      };
+    },
+    staleTime: 30 * 1000,
+    refetchOnWindowFocus: true,
+  });
+
   const today = new Intl.DateTimeFormat(isArabic ? "ar-SA" : "en-US", {
     weekday: "long",
     day: "numeric",
@@ -180,6 +218,15 @@ export default function AdminDashboardPage() {
   const formatNumber = (value?: number) => {
     if (isAnalyticsLoading) return "...";
     if (isAnalyticsError) return "—";
+
+    return new Intl.NumberFormat(isArabic ? "ar-SA" : "en-US").format(
+      value ?? 0,
+    );
+  };
+
+  const formatApplicationNumber = (value?: number) => {
+    if (isApplicationsLoading) return "...";
+    if (isApplicationsError) return "—";
 
     return new Intl.NumberFormat(isArabic ? "ar-SA" : "en-US").format(
       value ?? 0,
@@ -223,6 +270,24 @@ export default function AdminDashboardPage() {
       icon: UserCheck,
       href: "/admin/subscribers",
     },
+    {
+      title: isArabic ? "طلبات انضمام جديدة" : "New join applications",
+      value: formatApplicationNumber(applicationCounts?.jobApplications),
+      description: isArabic
+        ? "طلبات جديدة بانتظار المراجعة"
+        : "New applications awaiting review",
+      icon: BriefcaseBusiness,
+      href: "/admin/applications",
+    },
+    {
+      title: isArabic ? "طلبات شراكة جديدة" : "New partner applications",
+      value: formatApplicationNumber(applicationCounts?.partnerApplications),
+      description: isArabic
+        ? "طلبات شراكة جديدة بانتظار المراجعة"
+        : "New partnership requests awaiting review",
+      icon: Handshake,
+      href: "/admin/partners",
+    },
   ];
 
   const quickActions: QuickAction[] = [
@@ -256,56 +321,16 @@ export default function AdminDashboardPage() {
 
   return (
     <section className="nr-dashboard nr-portal-dashboard">
-      <div className="nr-portal-grid">
-        <article className="nr-portal-welcome">
-          <div className="nr-portal-avatar">
-            <Image
-              src="/images/nour-logo.jpg"
-              alt="NourApp"
-              width={56}
-              height={56}
-              priority
-            />
-          </div>
+      <div className="nr-dashboard-date-bar">
+        <div>
+          <span className="nr-dashboard-kicker">{t.management}</span>
+          <h1>{t.welcome}</h1>
+        </div>
 
-          <div className="nr-portal-welcome-copy">
-            <span className="nr-dashboard-kicker">{t.management}</span>
-            <h1>{t.welcome}</h1>
-            <p>{t.welcomeText}</p>
-
-            <div className="nr-portal-date">
-              <span aria-hidden={true}>◷</span>
-              <span>{today}</span>
-            </div>
-          </div>
-
-          <Link href="/admin/programs" className="nr-portal-primary-action">
-            {t.managePrograms}
-          </Link>
-        </article>
-
-        <article className="nr-portal-highlight">
-          <div>
-            <span className="nr-dashboard-kicker">{t.shortcut}</span>
-            <h2>{t.startManaging}</h2>
-            <p>{t.startManagingText}</p>
-
-            <Link href="/admin/programs" className="nr-portal-text-link">
-              {t.goToPrograms}
-              <span aria-hidden={true}>{arrow}</span>
-            </Link>
-          </div>
-
-          <div className="nr-portal-highlight-illustration">
-            <Image
-              src="/images/nour-logo.jpg"
-              alt="NourApp"
-              width={118}
-              height={118}
-              priority
-            />
-          </div>
-        </article>
+        <div className="nr-portal-date">
+          <span aria-hidden={true}>◷</span>
+          <span>{today}</span>
+        </div>
       </div>
 
       <div className="nr-portal-stats">
@@ -489,6 +514,68 @@ export default function AdminDashboardPage() {
           </Link>
         </div>
       </section>
+
+      <style jsx>{`
+        .nr-dashboard-date-bar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 24px;
+          margin-bottom: 22px;
+          padding: 4px 2px;
+        }
+
+        .nr-dashboard-date-bar h1 {
+          margin: 7px 0 0;
+          color: inherit;
+          font-size: clamp(28px, 3vw, 38px);
+          line-height: 1.25;
+        }
+
+        .nr-portal-stats {
+          grid-template-columns: repeat(6, minmax(0, 1fr));
+        }
+
+        .nr-dashboard-date-bar .nr-portal-date {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          min-height: 44px;
+          padding: 0 16px;
+          border: 1px solid var(--admin-border, rgba(148, 163, 184, 0.18));
+          border-radius: 14px;
+          background: var(--admin-card, rgba(255, 255, 255, 0.04));
+          color: var(--admin-text-muted, #93a4bd);
+          font-size: 13px;
+          font-weight: 800;
+          white-space: nowrap;
+        }
+
+        @media (max-width: 1500px) {
+          .nr-portal-stats {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+          }
+        }
+
+        @media (max-width: 900px) {
+          .nr-portal-stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+        }
+
+        @media (max-width: 720px) {
+          .nr-dashboard-date-bar {
+            align-items: flex-start;
+            flex-direction: column;
+          }
+        }
+
+        @media (max-width: 560px) {
+          .nr-portal-stats {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
     </section>
   );
 }

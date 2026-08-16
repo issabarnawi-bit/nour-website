@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import type {
@@ -61,6 +62,8 @@ export default function Header({
     activeSection === id ? "is-active" : undefined;
 
   const startLabel = language === "ar" ? "ابدأ رحلتك" : "Start your journey";
+  const partnerLabel = language === "ar" ? "كن شريك نور" : "Partner with Nour";
+  const joinLabel = language === "ar" ? "انضم لنا" : "Join us";
 
   return (
     <>
@@ -129,6 +132,14 @@ export default function Header({
                   {item.label}
                 </a>
               ))}
+
+              <Link href="/become-a-partner" className="nr-v2-route-link">
+                {partnerLabel}
+              </Link>
+
+              <Link href="/join-us" className="nr-v2-route-link">
+                {joinLabel}
+              </Link>
             </nav>
 
             <div className="nr-v2-actions">
@@ -214,6 +225,24 @@ export default function Header({
                     <ArrowIcon language={language} />
                   </a>
                 ))}
+
+                <Link
+                  href="/become-a-partner"
+                  className="nr-v2-mobile-route-link"
+                  onClick={onMenuClose}
+                >
+                  <span>{partnerLabel}</span>
+                  <ArrowIcon language={language} />
+                </Link>
+
+                <Link
+                  href="/join-us"
+                  className="nr-v2-mobile-route-link"
+                  onClick={onMenuClose}
+                >
+                  <span>{joinLabel}</span>
+                  <ArrowIcon language={language} />
+                </Link>
 
                 <div className="nr-v2-mobile-controls">
                   <button type="button" onClick={onLanguageChange}>
@@ -403,6 +432,14 @@ export default function Header({
           width: 100%;
         }
 
+        .nr-v2-desktop-nav .nr-v2-route-link {
+          color: #0b4ead;
+        }
+
+        .nr-v2-desktop-nav .nr-v2-route-link:last-child {
+          color: #8a6500;
+        }
+
         .nr-v2-actions {
           flex: 0 0 auto;
           gap: 8px;
@@ -479,7 +516,8 @@ export default function Header({
 
         .nr-v2-primary-action svg,
         .nr-v2-mobile-cta svg,
-        .nr-v2-mobile-nav > a svg {
+        .nr-v2-mobile-nav > a svg,
+        .nr-v2-mobile-route-link svg {
           width: 17px;
           height: 17px;
           transition: transform 0.2s ease;
@@ -559,6 +597,16 @@ export default function Header({
             background 0.2s ease;
         }
 
+        .nr-v2-mobile-route-link {
+          border: 1px solid color-mix(in srgb, #176fe8 18%, var(--nr-border));
+          background: color-mix(in srgb, #176fe8 5%, var(--nr-card));
+        }
+
+        .nr-v2-mobile-route-link + .nr-v2-mobile-route-link {
+          border-color: color-mix(in srgb, #ffc313 30%, var(--nr-border));
+          background: color-mix(in srgb, #ffc313 7%, var(--nr-card));
+        }
+
         .nr-v2-mobile-nav > a:hover,
         .nr-v2-mobile-nav > a.is-active {
           color: #176fe8;
@@ -623,7 +671,7 @@ export default function Header({
           }
         }
 
-        @media (max-width: 980px) {
+        @media (max-width: 1180px) {
           .nr-v2-desktop-nav,
           .nr-v2-primary-action {
             display: none;

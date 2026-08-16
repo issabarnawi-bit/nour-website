@@ -5,11 +5,13 @@ import Link from "next/link";
 
 import {
   BarChart3,
+  BriefcaseBusiness,
   BusFront,
   CircleGauge,
   FileCheck2,
   FolderOpen,
   Globe2,
+  Handshake,
   Hotel,
   Images,
   Settings,
@@ -63,6 +65,22 @@ export default function Sidebar() {
       label: language === "ar" ? "التأشيرات" : "Visas",
       href: "/admin/visas",
       icon: FileCheck2,
+    },
+    {
+      label:
+        language === "ar"
+          ? "طلبات الانضمام"
+          : "Join Applications",
+      href: "/admin/applications",
+      icon: BriefcaseBusiness,
+    },
+    {
+      label:
+        language === "ar"
+          ? "طلبات الشراكة"
+          : "Partner Applications",
+      href: "/admin/partners",
+      icon: Handshake,
     },
     {
       label: t.sidebar.media,

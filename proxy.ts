@@ -2,10 +2,12 @@ import type { NextRequest } from "next/server";
 
 import { updateSession } from "./src/lib/supabase/proxy";
 
-export async function proxy(request: NextRequest) {
+export async function proxy(
+  request: NextRequest,
+) {
   return updateSession(request);
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/login"],
+  matcher: ["/admin/:path*"],
 };

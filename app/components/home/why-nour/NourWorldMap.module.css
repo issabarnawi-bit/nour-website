@@ -1,207 +1,94 @@
 .panel {
   display: grid;
-  grid-template-columns:
-    minmax(340px, 0.72fr)
-    minmax(0, 1.55fr);
-  gap: 30px;
-  align-items: center;
-
-  margin: 0 0 24px;
-  padding: 30px;
-
-  overflow: hidden;
-
-  border-radius: 30px;
-  color: #fff;
-
-  background:
-    radial-gradient(
-      circle at 15% 10%,
-      rgba(23, 111, 232, 0.25),
-      transparent 28%
-    ),
-    radial-gradient(
-      circle at 90% 88%,
-      rgba(255, 195, 19, 0.09),
-      transparent 24%
-    ),
-    linear-gradient(
-      145deg,
-      #07182d 0%,
-      #0a2748 55%,
-      #0d315a 100%
-    );
-
-  box-shadow:
-    0 32px 82px rgba(7, 28, 54, 0.24);
+  gap: 26px;
+  margin: 0 0 28px;
+  color: var(--nr-text, #15233b);
 }
 
-/* =========================================================
-   COPY
-========================================================= */
-
-.copy {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-
-  min-width: 0;
-
-  padding: 8px 4px;
+.sectionIntro {
+  width: min(820px, 100%);
+  margin-inline: auto;
+  text-align: center;
 }
 
 .eyebrow {
   display: inline-flex;
-  width: fit-content;
-  min-height: 30px;
-
+  min-height: 32px;
   align-items: center;
-
-  padding-inline: 11px;
-
-  border: 1px solid rgba(133, 194, 255, 0.2);
+  padding-inline: 12px;
+  border: 1px solid rgba(23, 111, 232, 0.14);
   border-radius: 999px;
-
-  color: #9fd0ff;
-  background: rgba(255, 255, 255, 0.05);
-
-  font-size: 10px;
+  color: #176fe8;
+  background: rgba(23, 111, 232, 0.055);
+  font-size: 9px;
   font-weight: 900;
 }
 
-.copy h3 {
-  margin: 16px 0 11px;
-
-  color: #fff;
-
-  font-size: clamp(28px, 3.1vw, 46px);
-  line-height: 1.2;
-
+.sectionIntro h3 {
+  margin: 15px auto 10px;
+  color: var(--nr-text, #15233b);
+  font-size: clamp(34px, 4.1vw, 56px);
+  line-height: 1.12;
   text-wrap: balance;
 }
 
-.copy > p {
-  margin: 0;
-
-  color: rgba(255, 255, 255, 0.65);
-
+.sectionIntro p {
+  max-width: 700px;
+  margin: 0 auto;
+  color: var(--nr-muted, #6d7b91);
   font-size: 13px;
-  line-height: 1.85;
+  line-height: 1.8;
+}
+
+:global(html[data-theme="dark"]) .sectionIntro h3,
+:global(html.dark) .sectionIntro h3,
+:global(body.dark) .sectionIntro h3,
+:global(.nr-dark) .sectionIntro h3 {
+  color: #f1f5f9;
+}
+
+:global(html[data-theme="dark"]) .sectionIntro p,
+:global(html.dark) .sectionIntro p,
+:global(body.dark) .sectionIntro p,
+:global(.nr-dark) .sectionIntro p {
+  color: #a9b6c9;
+}
+
+:global(html[data-theme="dark"]) .eyebrow,
+:global(html.dark) .eyebrow,
+:global(body.dark) .eyebrow,
+:global(.nr-dark) .eyebrow {
+  color: #79b8ff;
+  border-color: rgba(121, 184, 255, 0.22);
+  background: rgba(75, 145, 241, 0.08);
 }
 
 /* =========================================================
-   METRICS
+   MAP EXPERIENCE
 ========================================================= */
 
-.metrics {
+.mapExperience {
+  position: relative;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-
-  gap: 8px;
-  margin-top: 23px;
-}
-
-.metrics div {
-  display: grid;
-
-  min-height: 72px;
-
-  place-items: center;
-  align-content: center;
-
-  gap: 4px;
-  padding: 9px;
-
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 15px;
-
-  background: rgba(255, 255, 255, 0.04);
-
-  text-align: center;
-}
-
-.metrics strong {
-  color: #ffc313;
-  font-size: 21px;
-}
-
-.metrics span {
-  color: rgba(255, 255, 255, 0.56);
-  font-size: 8px;
-}
-
-/* =========================================================
-   CTA
-========================================================= */
-
-.cta {
-  display: inline-flex;
-
-  width: fit-content;
-  min-height: 49px;
-
-  align-items: center;
-  justify-content: center;
-
+  grid-template-columns: 1fr;
   gap: 10px;
-
-  margin-top: 21px;
-  padding-inline: 19px;
-
-  border-radius: 14px;
-
-  color: #14365e;
-  background: #ffc313;
-
-  box-shadow:
-    0 16px 36px rgba(255, 195, 19, 0.19);
-
-  font-size: 12px;
-  font-weight: 900;
-
-  text-decoration: none;
-
-  transition:
-    transform 0.22s ease,
-    box-shadow 0.22s ease;
-}
-
-.cta:hover {
-  transform: translateY(-3px);
-
-  box-shadow:
-    0 22px 46px rgba(255, 195, 19, 0.27);
-}
-
-.cta svg {
-  width: 17px;
-  height: 17px;
-}
-
-/* =========================================================
-   MAP AREA
-========================================================= */
-
-.mapArea {
-  min-width: 0;
-
   padding: 16px;
-
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
-
-  background: rgba(255, 255, 255, 0.035);
+  overflow: hidden;
+  border: 1px solid rgba(23, 111, 232, 0.09);
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 82% 16%, rgba(42,169,233,.12), transparent 30%),
+    linear-gradient(145deg, #07182d 0%, #0a2748 54%, #0c315b 100%);
+  box-shadow: 0 28px 74px rgba(7, 28, 54, 0.18);
 }
 
 .mapHeader {
   display: flex;
-
   align-items: center;
   justify-content: space-between;
-
   gap: 14px;
-
-  margin-bottom: 12px;
+  margin: 2px 2px 12px;
+  color: #fff;
 }
 
 .mapHeader small,
@@ -210,33 +97,25 @@
 }
 
 .mapHeader small {
-  color: rgba(255, 255, 255, 0.48);
+  color: rgba(255,255,255,.48);
   font-size: 9px;
 }
 
 .mapHeader strong {
-  margin-top: 4px;
-
-  color: #fff;
-  font-size: 14px;
+  margin-top: 3px;
+  font-size: 13px;
 }
 
 .live {
   display: inline-flex;
-
   min-height: 29px;
-
   align-items: center;
-
   gap: 7px;
   padding-inline: 10px;
-
-  border: 1px solid rgba(38, 215, 149, 0.22);
+  border: 1px solid rgba(38,215,149,.22);
   border-radius: 999px;
-
   color: #8bf0c7;
-  background: rgba(38, 215, 149, 0.09);
-
+  background: rgba(38,215,149,.09);
   font-size: 9px;
   font-weight: 900;
 }
@@ -244,151 +123,156 @@
 .live i {
   width: 7px;
   height: 7px;
-
   border-radius: 50%;
-
   background: #26d795;
-
-  box-shadow:
-    0 0 0 5px rgba(38, 215, 149, 0.1);
+  box-shadow: 0 0 0 5px rgba(38,215,149,.1);
 }
-
-/* =========================================================
-   EQUIRECTANGULAR WORLD MAP
-========================================================= */
 
 .map {
   position: relative;
-
   width: 100%;
-
-  /*
-   * مهم جدًا:
-   * يجب الحفاظ على نسبة 2:1 في جميع المقاسات لأن مواضع الدول
-   * محسوبة مباشرة من latitude / longitude على خريطة Equirectangular.
-   */
-  aspect-ratio: 2 / 1;
-
-  min-height: 0;
-
+  aspect-ratio: 2.15 / 1;
   overflow: hidden;
-
-  border-radius: 20px;
-
-  background: #071a30;
-
+  border-radius: 24px;
+  background: #06192e;
   isolation: isolate;
+  overscroll-behavior: auto;
+  touch-action: pan-y;
+}
+
+.map::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 61% 55%, rgba(255,195,19,.075), transparent 18%),
+    linear-gradient(180deg, rgba(2,12,26,.02), rgba(2,12,26,.17));
+}
+
+.mapStage {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .realisticMap {
   position: absolute;
-
   inset: 0;
-
   z-index: 0;
-
   display: block;
-
   width: 100%;
   height: 100%;
-
-  /*
-   * الصورة نفسها يجب أن تكون Equirectangular بنسبة 2:1.
-   * fill هنا مقصود حتى تطابق الصورة نظام الإحداثيات بنسبة 100%.
-   */
   object-fit: fill;
-  object-position: center;
-
-  border-radius: inherit;
-
-  opacity: 0.9;
-
+  opacity: .91;
   pointer-events: none;
   user-select: none;
-}
-
-/*
- * طبقة داكنة خفيفة فوق الخريطة لتحسين وضوح النقاط والنصوص.
- */
-.map::after {
-  content: "";
-
-  position: absolute;
-
-  inset: 0;
-
-  z-index: 1;
-
-  pointer-events: none;
-
-  background:
-    radial-gradient(
-      circle at 62% 50%,
-      rgba(255, 195, 19, 0.055),
-      transparent 19%
-    ),
-    linear-gradient(
-      180deg,
-      rgba(4, 18, 34, 0.03),
-      rgba(4, 18, 34, 0.14)
-    );
-}
-
-/* الخريطة القديمة لم تعد مستخدمة */
-.world,
-.continents,
-.decorLines {
-  display: none;
+  filter: contrast(1.06) brightness(1.02);
 }
 
 /* =========================================================
-   GRID OVER MAP
-========================================================= */
-
-.decorGrid {
-  position: absolute;
-
-  inset: 0;
-
-  z-index: 2;
-
-  width: 100%;
-  height: 100%;
-
-  pointer-events: none;
-
-  fill: none;
-  stroke: rgba(255, 255, 255, 0.045);
-  stroke-width: 1;
-}
-
-/* =========================================================
-   ROUTES
+   ROUTES — NOUR BLUE → GOLD
 ========================================================= */
 
 .routes {
   position: absolute;
-
   inset: 0;
-
-  z-index: 3;
-
+  z-index: 4;
   width: 100%;
   height: 100%;
-
   overflow: visible;
-
   pointer-events: none;
 }
 
-.routes path {
+.routeBase,
+.routeBaseActive,
+.routeTraveler,
+.routeTravelerActive {
   fill: none;
-
-  stroke: rgba(95, 178, 255, 0.68);
-  stroke-width: 0.34;
-  stroke-dasharray: 1.4 1.4;
-
   vector-effect: non-scaling-stroke;
+}
+
+.routeBase {
+  stroke: url(#nourRouteGradient);
+  stroke-width: 1.2;
+  opacity: .42;
+}
+
+.routeBaseActive {
+  stroke: url(#nourRouteGradient);
+  stroke-width: 1.85;
+  opacity: .95;
+  filter: url(#nourRouteGlow);
+}
+
+.routeTraveler {
+  stroke: #7cc6ff;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  filter: url(#nourRouteGlow);
+}
+
+.routeTravelerActive {
+  stroke: #ffc313;
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  filter: url(#nourRouteGlow);
+}
+
+/* =========================================================
+   MAKKAH — VISUAL DESTINATION
+========================================================= */
+
+.makkahMarker {
+  position: absolute;
+  z-index: 10;
+  width: 30px;
+  height: 30px;
+  transform: translate(-50%, -50%);
+}
+
+.makkahPulse {
+  position: absolute;
+  inset: -12px;
+  border: 1px solid rgba(255,195,19,.68);
+  border-radius: 50%;
+  animation: makkahPulse 2.2s ease-out infinite;
+}
+
+.makkahCore {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #102f55;
+  background: #ffc313;
+  box-shadow:
+    0 0 0 9px rgba(255,195,19,.14),
+    0 0 34px rgba(255,195,19,.68);
+}
+
+.makkahCore svg {
+  width: 16px;
+  height: 16px;
+}
+
+.makkahMarker strong {
+  position: absolute;
+  top: 50%;
+  inset-inline-start: 40px;
+  width: max-content;
+  transform: translateY(-50%);
+  padding: 5px 8px;
+  border: 1px solid rgba(255,195,19,.34);
+  border-radius: 9px;
+  color: #ffc313;
+  background: rgba(4,20,39,.82);
+  backdrop-filter: blur(10px);
+  font-size: 9px;
 }
 
 /* =========================================================
@@ -397,103 +281,65 @@
 
 .point {
   position: absolute;
-
-  z-index: 6;
-
-  width: 18px;
-  height: 18px;
-
+  z-index: 7;
+  width: 16px;
+  height: 16px;
   padding: 0;
-
   transform: translate(-50%, -50%);
-
   border: 0;
   border-radius: 50%;
-
   background: #479eff;
-
   box-shadow:
-    0 0 0 8px rgba(71, 158, 255, 0.12),
-    0 0 25px rgba(71, 158, 255, 0.45);
-
+    0 0 0 7px rgba(71,158,255,.11),
+    0 0 24px rgba(71,158,255,.42);
   cursor: pointer;
-
   transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    opacity 0.2s ease;
+    transform .2s ease,
+    box-shadow .2s ease,
+    opacity .2s ease;
 }
 
-.point::before,
-.point::after {
+.point::before {
   content: "";
-
   position: absolute;
-
-  inset: -8px;
-
-  border: 1px solid rgba(92, 174, 255, 0.45);
+  inset: -7px;
+  border: 1px solid rgba(92,174,255,.44);
   border-radius: 50%;
-
-  animation: pulse 2.4s ease-out infinite;
-
-  pointer-events: none;
-}
-
-.point::after {
-  animation-delay: 1.2s;
+  animation: countryPulse 2.7s ease-out infinite;
 }
 
 .point > span {
   position: absolute;
-
-  inset: 5px;
-
+  inset: 4px;
   border-radius: 50%;
-
   background: #fff;
-
-  pointer-events: none;
 }
 
 .point > small {
   position: absolute;
-
   top: 50%;
-  inset-inline-start: 28px;
-
+  inset-inline-start: 25px;
   width: max-content;
-  max-width: 150px;
-
   transform: translateY(-50%);
-
-  padding: 4px 8px;
-
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 4px 7px;
+  border: 1px solid rgba(255,255,255,.13);
   border-radius: 8px;
-
   color: #fff;
-  background: rgba(4, 20, 39, 0.8);
-
+  background: rgba(4,20,39,.78);
   backdrop-filter: blur(8px);
-
-  font-size: 9px;
+  font-size: 8px;
   line-height: 1;
-
-  white-space: nowrap;
-
+  opacity: .74;
   pointer-events: none;
-
-  opacity: 0.84;
 }
 
 .point:hover,
 .activePoint {
-  z-index: 10;
-
-  transform:
-    translate(-50%, -50%)
-    scale(1.18);
+  z-index: 11;
+  transform: translate(-50%, -50%) scale(1.22);
+  box-shadow:
+    0 0 0 9px rgba(71,158,255,.15),
+    0 0 32px rgba(71,158,255,.68);
 }
 
 .point:hover > small,
@@ -501,153 +347,197 @@
   opacity: 1;
 }
 
-/* =========================================================
-   AVAILABLE / INACTIVE
-========================================================= */
-
-.availablePoint {
-  opacity: 1;
-}
-
 .inactivePoint {
-  opacity: 0.55;
-
-  filter: saturate(0.55);
+  opacity: .44;
+  filter: saturate(.55);
 }
 
-.inactivePoint::before,
-.inactivePoint::after {
+.inactivePoint::before {
   animation: none;
 }
 
 /* =========================================================
-   SAUDI / GOLD
+   FLOATING INFO PANEL
 ========================================================= */
 
-.goldPoint {
-  background: #ffc313;
-
-  box-shadow:
-    0 0 0 9px rgba(255, 195, 19, 0.15),
-    0 0 30px rgba(255, 195, 19, 0.55);
+.floatingPanel {
+  position: relative;
+  z-index: 14;
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(220px, .9fr) minmax(360px, 1.35fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 15px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 17px;
+  color: #fff;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(5, 26, 48, .90),
+      rgba(9, 45, 82, .72)
+    );
+  box-shadow: 0 14px 34px rgba(0,0,0,.14);
+  backdrop-filter: blur(16px);
 }
 
-.goldPoint::before,
-.goldPoint::after {
-  border-color: rgba(255, 195, 19, 0.5);
+.panelKicker {
+  display: inline-flex;
+  padding: 5px 8px;
+  border: 1px solid rgba(71,158,255,.2);
+  border-radius: 999px;
+  color: #95c8ff;
+  background: rgba(71,158,255,.08);
+  font-size: 7px;
+  font-weight: 900;
+}
+
+.floatingPanel h4 {
+  margin: 6px 0 3px;
+  color: #fff;
+  font-size: clamp(18px, 1.55vw, 24px);
+  line-height: 1.18;
+}
+
+.floatingPanel > p {
+  margin: 0;
+  color: rgba(255,255,255,.60);
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(84px, 1fr));
+  gap: 6px;
+  margin-top: 0;
+  min-width: 360px;
+}
+
+.metrics div {
+  display: grid;
+  min-height: 50px;
+  place-items: center;
+  align-content: center;
+  gap: 2px;
+  padding: 6px 7px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 11px;
+  background: rgba(255,255,255,.04);
+  text-align: center;
+}
+
+.metrics strong {
+  color: #ffc313;
+  font-size: 16px;
+}
+
+.metrics span {
+  color: rgba(255,255,255,.54);
+  font-size: 6.5px;
+}
+
+.cta {
+  display: inline-flex;
+  width: auto;
+  min-width: 170px;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin-top: 0;
+  padding-inline: 14px;
+  border-radius: 12px;
+  color: #13365e;
+  background: #ffc313;
+  box-shadow: 0 15px 34px rgba(255,195,19,.2);
+  font-size: 10px;
+  font-weight: 900;
+  text-decoration: none;
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease;
+}
+
+.cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 42px rgba(255,195,19,.28);
+}
+
+.cta svg {
+  width: 16px;
+  height: 16px;
 }
 
 /* =========================================================
    COUNTRY CARD
 ========================================================= */
 
-.card {
+.countryCard {
   position: absolute;
-
-  z-index: 9;
-
-  /*
-   * أصغر من النسخة السابقة حتى لا تغطي مساحة كبيرة من الخريطة.
-   */
-  width: min(245px, 38%);
-
-  padding: 12px;
-
-  transform: translate(-50%, -50%);
-
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 14px;
-
+  z-index: 18;
+  top: 18px;
+  inset-inline-start: 18px;
+  width: min(245px, 28%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 15px;
   color: #16365d;
-  background: rgba(255, 255, 255, 0.95);
-
-  box-shadow:
-    0 18px 42px rgba(0, 0, 0, 0.22);
-
+  background: rgba(255,255,255,.96);
+  box-shadow: 0 16px 42px rgba(0,0,0,.18);
   backdrop-filter: blur(16px);
 }
 
-.cardTop {
-  display: flex;
+.countryCard small,
+.countryCard strong {
+  display: block;
+}
 
-  align-items: center;
+.countryCard small {
+  color: #71869e;
+  font-size: 8px;
+}
 
-  gap: 9px;
+.countryCard strong {
+  margin-top: 2px;
+  color: #16365d;
+  font-size: 11px;
 }
 
 .pin {
   display: grid;
-
-  flex: 0 0 32px;
-
-  width: 32px;
-  height: 32px;
-
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
   place-items: center;
-
   border-radius: 10px;
-
   color: #0f68d5;
   background: #e9f3ff;
 }
 
 .pin svg {
-  width: 17px;
-  height: 17px;
+  width: 18px;
+  height: 18px;
 }
 
-.cardTop small,
-.cardTop strong {
-  display: block;
-}
-
-.cardTop small {
-  color: #71869e;
-  font-size: 8px;
-}
-
-.cardTop strong {
-  margin-top: 2px;
-
-  color: #16365d;
-  font-size: 11px;
-}
-
-.card p {
-  margin: 8px 0 0;
-
-  color: #667c94;
-
-  font-size: 8px;
-  line-height: 1.6;
-}
-
-/* =========================================================
-   STATE
-========================================================= */
-
-.mapState {
+.cardClose {
   position: absolute;
-
-  inset: 50% auto auto 50%;
-
-  z-index: 12;
-
-  transform: translate(-50%, -50%);
-
-  padding: 12px 16px;
-
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 12px;
-
-  color: rgba(255, 255, 255, 0.78);
-  background: rgba(4, 20, 39, 0.82);
-
-  backdrop-filter: blur(12px);
-
-  font-size: 11px;
-
-  text-align: center;
+  top: 6px;
+  inset-inline-end: 6px;
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: #71869e;
+  background: rgba(236,242,248,.9);
+  cursor: pointer;
 }
 
 /* =========================================================
@@ -656,14 +546,10 @@
 
 .locationTabs {
   display: flex;
-
   gap: 7px;
-
   overflow-x: auto;
-
-  margin-top: 12px;
-  padding-bottom: 2px;
-
+  margin-top: 4px;
+  padding: 0 2px 2px;
   scrollbar-width: none;
 }
 
@@ -673,67 +559,79 @@
 
 .locationTabs button {
   display: inline-flex;
-
   flex: 0 0 auto;
-
-  min-height: 30px;
-
+  min-height: 31px;
   align-items: center;
-
   gap: 6px;
-
   padding-inline: 11px;
-
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255,255,255,.1);
   border-radius: 999px;
-
-  color: rgba(255, 255, 255, 0.58);
-  background: rgba(255, 255, 255, 0.035);
-
+  color: rgba(255,255,255,.62);
+  background: rgba(255,255,255,.04);
   font: inherit;
   font-size: 9px;
   font-weight: 800;
-
   cursor: pointer;
 }
 
 .locationTabs button > span {
   display: inline-grid;
-
   min-width: 18px;
   height: 18px;
-
   place-items: center;
-
   padding-inline: 4px;
-
   border-radius: 999px;
-
   color: #ffc313;
-  background: rgba(255, 195, 19, 0.1);
-
+  background: rgba(255,195,19,.1);
   font-size: 8px;
 }
 
 .locationTabs .activeTab {
-  border-color: rgba(255, 195, 19, 0.42);
-
+  border-color: rgba(255,195,19,.4);
   color: #ffc313;
-  background: rgba(255, 195, 19, 0.09);
+  background: rgba(255,195,19,.08);
 }
 
 /* =========================================================
-   ANIMATION
+   STATE
 ========================================================= */
 
-@keyframes pulse {
-  0% {
-    transform: scale(0.55);
-    opacity: 0.85;
-  }
+.mapState {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  z-index: 25;
+  transform: translate(-50%, -50%);
+  padding: 11px 14px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 11px;
+  color: rgba(255,255,255,.78);
+  background: rgba(4,20,39,.82);
+  backdrop-filter: blur(12px);
+  font-size: 10px;
+}
 
+/* =========================================================
+   ANIMATIONS
+========================================================= */
+
+@keyframes countryPulse {
+  0% {
+    transform: scale(.58);
+    opacity: .82;
+  }
   100% {
     transform: scale(1.7);
+    opacity: 0;
+  }
+}
+
+@keyframes makkahPulse {
+  0% {
+    transform: scale(.65);
+    opacity: .95;
+  }
+  100% {
+    transform: scale(1.8);
     opacity: 0;
   }
 }
@@ -743,33 +641,22 @@
 ========================================================= */
 
 @media (max-width: 1050px) {
-  .panel {
-    grid-template-columns: 1fr;
-
-    gap: 22px;
-  }
-
-  .copy {
-    text-align: center;
-  }
-
-  .eyebrow,
-  .cta {
-    margin-inline: auto;
-  }
-
-  .copy > p {
-    max-width: 720px;
-
-    margin-inline: auto;
-  }
-
-  /*
-   * لا نغيّر نسبة الخريطة.
-   * مواضع latitude / longitude تعتمد على 2:1.
-   */
   .map {
     aspect-ratio: 2 / 1;
+  }
+
+  .floatingPanel {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    padding: 14px;
+  }
+
+  .metrics {
+    min-width: 0;
+  }
+
+  .cta {
+    width: 100%;
   }
 }
 
@@ -777,83 +664,77 @@
    MOBILE
 ========================================================= */
 
-@media (max-width: 650px) {
+@media (max-width: 760px) {
   .panel {
-    padding: 17px;
-
-    border-radius: 23px;
+    gap: 18px;
   }
 
-  .copy h3 {
-    font-size: clamp(27px, 9vw, 36px);
+  .sectionIntro h3 {
+    font-size: clamp(29px, 9vw, 40px);
   }
 
-  .metrics {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .metrics div {
-    min-height: 61px;
-
-    padding: 7px 4px;
-  }
-
-  .metrics strong {
-    font-size: 18px;
-  }
-
-  .metrics span {
-    font-size: 7px;
-  }
-
-  .cta {
-    width: 100%;
-  }
-
-  .mapArea {
+  .mapExperience {
     padding: 10px;
-
-    border-radius: 18px;
+    border-radius: 22px;
   }
 
   .mapHeader {
     align-items: flex-start;
   }
 
-  /*
-   * مهم:
-   * نبقي 2:1 حتى على الجوال كي لا تنزاح نقاط الدول.
-   */
+  .mapHeader strong {
+    font-size: 11px;
+  }
+
   .map {
-    aspect-ratio: 2 / 1;
+    aspect-ratio: 1.65 / 1;
+    min-height: 0;
+    overflow: hidden;
   }
 
-  .realisticMap {
-    object-fit: fill;
+  .mapStage {
+    height: 100%;
   }
 
-  .card {
-    width: min(210px, 58%);
+  .floatingPanel {
+    width: 100%;
+    padding: 15px;
+    border-radius: 17px;
+  }
 
-    padding: 10px;
+  .floatingPanel h4 {
+    font-size: 21px;
+  }
+
+  .metrics {
+    margin-top: 13px;
+  }
+
+  .metrics div {
+    min-height: 54px;
+  }
+
+  .countryCard {
+    top: 10px;
+    inset-inline-start: 10px;
+    width: min(210px, calc(100% - 20px));
   }
 
   .point {
-    width: 15px;
-    height: 15px;
+    width: 14px;
+    height: 14px;
   }
 
-  .point > span {
-    inset: 4px;
-  }
-
-  .point > small {
+  .point > small,
+  .makkahMarker strong {
     display: none;
   }
 
-  .locationTabs button {
-    min-height: 32px;
+  .makkahMarker {
+    width: 25px;
+    height: 25px;
   }
+
 }
 
 /* =========================================================
@@ -862,7 +743,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .point::before,
-  .point::after {
+  .makkahPulse {
     animation: none;
   }
 
@@ -870,330 +751,9 @@
   .point {
     transition: none;
   }
-}
 
-/* =========================================================
-   MAP ZOOM CONTROLS
-========================================================= */
-
-.mapStage {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-
-  width: 100%;
-  height: 100%;
-
-  transform-origin: 50% 50%;
-  transition: transform 0.28s ease;
-
-  will-change: transform;
-}
-
-.zoomControls {
-  position: absolute;
-
-  z-index: 20;
-
-  inset-inline-end: 14px;
-  bottom: 14px;
-
-  display: flex;
-  align-items: center;
-
-  gap: 7px;
-
-  padding: 7px;
-
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 14px;
-
-  background: rgba(4, 20, 39, 0.82);
-
-  box-shadow:
-    0 14px 36px rgba(0, 0, 0, 0.2);
-
-  backdrop-filter: blur(14px);
-}
-
-.zoomButton,
-.zoomReset {
-  display: inline-grid;
-  place-items: center;
-
-  height: 36px;
-
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 10px;
-
-  color: #fff;
-  background: rgba(255, 255, 255, 0.07);
-
-  font: inherit;
-  font-weight: 900;
-
-  cursor: pointer;
-
-  transition:
-    transform 0.18s ease,
-    background 0.18s ease,
-    border-color 0.18s ease,
-    opacity 0.18s ease;
-}
-
-.zoomButton {
-  width: 36px;
-
-  font-size: 20px;
-  line-height: 1;
-}
-
-.zoomReset {
-  min-width: 56px;
-
-  padding-inline: 9px;
-
-  color: #ffc313;
-
-  font-size: 9px;
-}
-
-.zoomButton:hover:not(:disabled),
-.zoomReset:hover:not(:disabled) {
-  transform: translateY(-1px);
-
-  border-color: rgba(71, 158, 255, 0.45);
-
-  background: rgba(71, 158, 255, 0.16);
-}
-
-.zoomButton:focus-visible,
-.zoomReset:focus-visible {
-  outline: 2px solid #79b8ff;
-  outline-offset: 2px;
-}
-
-.zoomButton:disabled,
-.zoomReset:disabled {
-  opacity: 0.36;
-  cursor: default;
-}
-
-@media (max-width: 650px) {
-  .zoomControls {
-    inset-inline-end: 8px;
-    bottom: 8px;
-
-    gap: 5px;
-    padding: 5px;
-
-    border-radius: 11px;
-  }
-
-  .zoomButton,
-  .zoomReset {
-    height: 32px;
-
-    border-radius: 8px;
-  }
-
-  .zoomButton {
-    width: 32px;
-    font-size: 18px;
-  }
-
-  .zoomReset {
-    min-width: 48px;
-    padding-inline: 7px;
-    font-size: 8px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .mapStage {
-    transition: none;
-  }
-}
-
-/* =========================================================
-   MAP ZOOM — MOUSE WHEEL + FINAL VISUAL TUNING
-========================================================= */
-
-.map {
-  overscroll-behavior: contain;
-}
-
-.mapStage {
-  transform-origin: 50% 50%;
-}
-
-.realisticMap {
-  filter:
-    contrast(1.06)
-    brightness(1.02);
-}
-
-.zoomHint {
-  position: absolute;
-
-  z-index: 19;
-
-  inset-inline-end: 14px;
-  bottom: 68px;
-
-  max-width: 190px;
-
-  padding: 7px 10px;
-
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  border-radius: 10px;
-
-  color: rgba(255, 255, 255, 0.76);
-  background: rgba(4, 20, 39, 0.66);
-
-  font-size: 9px;
-  font-weight: 700;
-  line-height: 1.5;
-
-  pointer-events: none;
-
-  backdrop-filter: blur(10px);
-}
-
-@media (max-width: 650px) {
-  .zoomHint {
+  .routeTraveler,
+  .routeTravelerActive {
     display: none;
-  }
-}
-
-/* =========================================================
-   COUNTRY CARD — COMPACT / NO OVERLAP
-========================================================= */
-
-.clickCard {
-  position: absolute;
-  z-index: 18;
-
-  top: 18px;
-  inset-inline-end: 18px;
-  bottom: auto;
-  left: auto;
-  right: auto;
-
-  width: min(330px, calc(100% - 36px));
-  max-width: 330px;
-  min-width: 0;
-
-  translate: none;
-
-  padding: 13px 14px 12px;
-
-  border-radius: 16px;
-
-  box-shadow:
-    0 16px 42px rgba(0, 0, 0, 0.18);
-
-  overflow: hidden;
-}
-
-.clickCard .cardTop {
-  gap: 10px;
-  padding-inline-end: 30px;
-}
-
-.clickCard .pin {
-  flex: 0 0 42px;
-  width: 42px;
-  height: 42px;
-}
-
-.clickCard .pin svg {
-  width: 22px;
-  height: 22px;
-}
-
-.clickCard .cardTop small {
-  font-size: 10px;
-}
-
-.clickCard .cardTop strong {
-  font-size: 15px;
-  line-height: 1.35;
-}
-
-.clickCard p {
-  margin: 8px 0 0;
-  font-size: 10px;
-  line-height: 1.6;
-}
-
-.cardClose {
-  position: absolute;
-  z-index: 2;
-
-  top: 9px;
-  inset-inline-end: 9px;
-
-  display: grid;
-  place-items: center;
-
-  width: 26px;
-  height: 26px;
-
-  padding: 0;
-
-  border: 1px solid rgba(21, 35, 59, 0.10);
-  border-radius: 999px;
-
-  color: #6d7b91;
-  background: rgba(255, 255, 255, 0.80);
-
-  font: inherit;
-  font-size: 16px;
-  line-height: 1;
-
-  cursor: pointer;
-}
-
-.cardClose:hover {
-  color: #15233b;
-  background: #ffffff;
-}
-
-.cardClose:focus-visible {
-  outline: 2px solid #79b8ff;
-  outline-offset: 2px;
-}
-
-/* Zoom controls stay isolated at the opposite lower corner */
-.zoomControls {
-  inset-inline-end: 14px;
-  bottom: 14px;
-}
-
-.zoomHint {
-  inset-inline-end: 14px;
-  bottom: 68px;
-}
-
-@media (max-width: 760px) {
-  .clickCard {
-    top: 10px;
-    inset-inline: 10px;
-
-    width: auto;
-    max-width: none;
-
-    padding: 12px 13px 11px;
-
-    border-radius: 14px;
-  }
-
-  .clickCard .cardTop strong {
-    font-size: 14px;
-  }
-
-  .clickCard p {
-    font-size: 9px;
   }
 }
