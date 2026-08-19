@@ -1266,3 +1266,148 @@
     width: 100%;
   }
 }
+
+.legal-admin-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.legal-admin-card {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  padding: 24px;
+
+  background: var(--admin-surface, #ffffff);
+
+  border: 1px solid
+    var(--admin-border, #e7eaf0);
+
+  border-radius: 20px;
+
+  box-shadow:
+    0 12px 30px
+    rgba(15, 23, 42, 0.05);
+}
+
+.legal-admin-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.legal-admin-card h2 {
+  margin: 8px 0 4px;
+
+  font-size: 22px;
+  line-height: 1.4;
+}
+
+.legal-admin-card p {
+  margin: 0;
+  color: var(--admin-muted, #667085);
+}
+
+.legal-admin-type {
+  display: inline-flex;
+
+  padding: 6px 10px;
+
+  border-radius: 999px;
+
+  background: #eef5ff;
+
+  color: #176fe8;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.legal-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 74px;
+
+  padding: 7px 10px;
+
+  border-radius: 999px;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.legal-status-draft {
+  background: #fff7e6;
+  color: #a15c00;
+}
+
+.legal-status-published {
+  background: #eaf8ef;
+  color: #18794e;
+}
+
+.legal-status-inactive {
+  background: #f2f4f7;
+  color: #667085;
+}
+
+.legal-admin-meta {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.legal-admin-meta > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  padding: 14px 16px;
+
+  background: var(
+    --admin-soft,
+    #f8fafc
+  );
+
+  border-radius: 14px;
+}
+
+.legal-admin-meta span {
+  color: var(--admin-muted, #667085);
+  font-size: 12px;
+}
+
+.legal-admin-meta strong {
+  font-size: 14px;
+}
+
+.legal-admin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  margin-top: auto;
+}
+
+@media (max-width: 900px) {
+  .legal-admin-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .legal-admin-card-top {
+    flex-direction: column;
+  }
+
+  .legal-admin-meta {
+    grid-template-columns: 1fr;
+  }
+}

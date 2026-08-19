@@ -14,6 +14,7 @@ import {
   Handshake,
   Hotel,
   Images,
+  Scale,
   Settings,
   Users,
 } from "lucide-react";
@@ -86,6 +87,14 @@ export default function Sidebar() {
       label: t.sidebar.media,
       href: "/admin/media",
       icon: Images,
+    },
+    {
+      label:
+        language === "ar"
+          ? "المحتوى القانوني"
+          : "Legal Content",
+      href: "/admin/legal",
+      icon: Scale,
     },
     {
       label: t.sidebar.users,

@@ -11,6 +11,7 @@ import {
   Globe2,
   ImagePlus,
   PlusCircle,
+  Scale,
   Settings2,
   Handshake,
   UserCheck,
@@ -48,6 +49,9 @@ const dashboardCopy = {
     uploadMediaDescription: "إضافة صور وملفات جديدة إلى المكتبة.",
     manageUsers: "إدارة المستخدمين",
     manageUsersDescription: "مراجعة المستخدمين والأدوار والصلاحيات.",
+    manageLegal: "المحتوى القانوني",
+    manageLegalDescription:
+      "تعديل سياسة الخصوصية والشروط والأحكام وإدارة الإصدارات.",
     notifications: "التنبيهات",
     latestNotifications: "آخر الإشعارات",
     programsUpdated: "تم تحديث وحدة البرامج",
@@ -105,6 +109,9 @@ const dashboardCopy = {
     uploadMediaDescription: "Add new images and files to the media library.",
     manageUsers: "Manage Users",
     manageUsersDescription: "Review users, roles, and permissions.",
+    manageLegal: "Legal Content",
+    manageLegalDescription:
+      "Edit the privacy policy, terms and conditions, and manage versions.",
     notifications: "Notifications",
     latestNotifications: "Latest Notifications",
     programsUpdated: "Programs Module Updated",
@@ -315,6 +322,12 @@ export default function AdminDashboardPage() {
       href: "/admin/users",
       icon: Settings2,
     },
+    {
+      title: t.manageLegal,
+      description: t.manageLegalDescription,
+      href: "/admin/legal",
+      icon: Scale,
+    },
   ];
 
   const arrow = isArabic ? "←" : "→";
@@ -510,6 +523,10 @@ export default function AdminDashboardPage() {
           </Link>
           <Link href="/admin/users">
             {t.usersPermissions}
+            <span>{arrow}</span>
+          </Link>
+          <Link href="/admin/legal">
+            {t.manageLegal}
             <span>{arrow}</span>
           </Link>
         </div>
