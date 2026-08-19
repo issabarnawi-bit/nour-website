@@ -1166,3 +1166,227 @@ html[data-theme="dark"] .NourApp-screen-carousel-glow {
     animation: none;
   }
 }
+/* =========================================================
+   NourApp — Mobile Responsive Stabilization
+   Keeps desktop styles unchanged and fixes the mobile layout
+========================================================= */
+
+@media (max-width: 920px) {
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: clip;
+  }
+
+  .nr-header {
+    width: 100%;
+  }
+
+  .nr-hero-grid,
+  .nr-showcase-grid {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .nr-phones,
+  .nr-showcase-devices,
+  .NourApp-screen-carousel {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 680px) {
+  /* Header */
+  .nr-header {
+    backdrop-filter: blur(14px);
+  }
+
+  .nr-nav {
+    min-width: 0;
+  }
+
+  .nr-controls {
+    gap: 8px;
+  }
+
+  .nr-controls button {
+    flex: 0 0 auto;
+  }
+
+  /* Hero */
+  .nr-hero {
+    min-height: auto;
+    overflow: hidden;
+  }
+
+  .nr-hero-grid {
+    padding-top: 78px;
+    padding-bottom: 52px;
+    row-gap: 34px;
+  }
+
+  .nr-hero-grid > div:first-child {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .nr-hero h1 {
+    max-width: 100%;
+    margin-inline: auto;
+    font-size: clamp(34px, 9.6vw, 46px);
+    line-height: 1.22;
+    letter-spacing: -0.35px;
+    overflow-wrap: anywhere;
+  }
+
+  .nr-hero p {
+    max-width: 100%;
+    margin-inline: auto;
+    font-size: 15px;
+    line-height: 1.85;
+  }
+
+  .nr-kicker {
+    max-width: 100%;
+    white-space: normal;
+  }
+
+  .nr-actions {
+    width: 100%;
+    gap: 10px;
+  }
+
+  .nr-actions a {
+    min-height: 48px;
+  }
+
+  /* Prevent decorative phone glows from forcing horizontal overflow */
+  .nr-phones::before,
+  .nr-phones::after {
+    left: 50%;
+    right: auto;
+    inset-inline-end: auto;
+    transform: translateX(-50%);
+  }
+
+  .nr-phones::before {
+    width: 300px;
+    height: 300px;
+    top: 35px;
+  }
+
+  .nr-phones::after {
+    width: 270px;
+    height: 270px;
+    top: 48px;
+  }
+
+  /* Content cards */
+  .nr-goals article,
+  .nr-feature-grid article,
+  .nr-journey-step,
+  .nr-payment-card,
+  .nr-payment-info-item {
+    min-height: 0;
+  }
+
+  .nr-goals article,
+  .nr-feature-grid article {
+    transform: none;
+  }
+
+  .nr-goals article:hover,
+  .nr-feature-grid article:hover,
+  .nr-journey-step:hover,
+  .nr-payment-card:hover {
+    transform: none;
+  }
+
+  /* Showcase phone */
+  .NourApp-screen-carousel {
+    min-height: 455px;
+    padding-inline: 0;
+  }
+
+  .NourApp-phone-frame,
+  html[dir="ltr"] .NourApp-phone-frame {
+    width: min(210px, 62vw);
+    max-width: 100%;
+  }
+
+  .NourApp-screen-carousel-glow {
+    width: min(270px, 78vw);
+    height: min(270px, 78vw);
+  }
+
+  /* Floating buttons: keep them clear of content and safe-area */
+  .modern-whatsapp,
+  .modern-back-top {
+    width: 48px;
+    height: 48px;
+    bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .modern-whatsapp {
+    right: 14px;
+  }
+
+  .modern-back-top {
+    left: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nr-hero-grid {
+    padding-top: 72px;
+    padding-bottom: 46px;
+  }
+
+  .nr-hero h1 {
+    font-size: clamp(32px, 9.2vw, 40px);
+    line-height: 1.2;
+  }
+
+  .nr-hero p {
+    font-size: 14.5px;
+    line-height: 1.8;
+  }
+
+  .nr-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .nr-actions a {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .NourApp-screen-carousel {
+    min-height: 430px;
+  }
+
+  .NourApp-phone-frame {
+    width: min(195px, 60vw);
+  }
+
+  .NourApp-screen-dots {
+    margin-top: 14px;
+  }
+}
+
+@media (max-width: 380px) {
+  .nr-hero h1 {
+    font-size: 31px;
+  }
+
+  .nr-hero-grid {
+    padding-top: 68px;
+  }
+
+  .modern-whatsapp,
+  .modern-back-top {
+    width: 44px;
+    height: 44px;
+  }
+}
