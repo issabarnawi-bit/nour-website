@@ -1,28 +1,41 @@
 import type { NextConfig } from "next";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const isDevelopment = process.env.NODE_ENV === "development";
 
 let supabaseOrigin = "";
+let supabaseWsOrigin = "";
 
 try {
   if (supabaseUrl) {
-    supabaseOrigin = new URL(supabaseUrl).origin;
+    const parsedSupabaseUrl = new URL(supabaseUrl);
+
+    supabaseOrigin = parsedSupabaseUrl.origin;
+    supabaseWsOrigin = parsedSupabaseUrl.origin.replace(
+      /^https:/,
+      "wss:"
+    );
   }
 } catch {
   supabaseOrigin = "";
+  supabaseWsOrigin = "";
 }
 
 const contentSecurityPolicy = `
   default-src 'self';
+
   base-uri 'self';
+
   form-action 'self';
+
   frame-ancestors 'none';
+
   object-src 'none';
 
   script-src
     'self'
     'unsafe-inline'
-    'unsafe-eval';
+    ${isDevelopment ? "'unsafe-eval'" : ""};
 
   style-src
     'self'
@@ -32,7 +45,9 @@ const contentSecurityPolicy = `
     'self'
     data:
     blob:
-    ${supabaseOrigin};
+    ${supabaseOrigin}
+    https://nourappglobal.com
+    https://www.nourappglobal.com;
 
   font-src
     'self'
@@ -41,8 +56,7 @@ const contentSecurityPolicy = `
   connect-src
     'self'
     ${supabaseOrigin}
-    wss://*.supabase.co
-    https://*.supabase.co;
+    ${supabaseWsOrigin};
 
   media-src
     'self'
