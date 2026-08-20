@@ -4,6 +4,24 @@ import {
   type NextRequest,
 } from "next/server";
 
+async function readMaintenanceMode(
+  supabase: ReturnType<typeof createServerClient>,
+): Promise<boolean> {
+  try {
+    const { data, error } = await supabase.rpc(
+      "get_maintenance_mode",
+    );
+
+    if (error) {
+      return false;
+    }
+
+    return data === true;
+  } catch {
+    return false;
+  }
+}
+
 export async function updateSession(
   request: NextRequest,
 ) {
@@ -15,7 +33,8 @@ export async function updateSession(
     process.env.NEXT_PUBLIC_SUPABASE_URL;
 
   const supabasePublishableKey =
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabasePublishableKey) {
     throw new Error(
@@ -55,10 +74,6 @@ export async function updateSession(
     },
   );
 
-  const { data: claimsData } =
-    await supabase.auth.getClaims();
-
-  const claims = claimsData?.claims ?? null;
   const pathname = request.nextUrl.pathname;
 
   const isAdminRoute =
@@ -74,11 +89,68 @@ export async function updateSession(
     isAdminLoginRoute ||
     isAdminInviteRoute;
 
-  // حماية جميع صفحات الإدارة
-  // باستثناء تسجيل الدخول وتفعيل الدعوة
+  const isMaintenanceRoute =
+    pathname === "/maintenance";
+
+  const isApiRoute =
+    pathname.startsWith("/api");
+
+  // تطبيق وضع الصيانة على الموقع العام فقط
+  if (
+    !isAdminRoute &&
+    !isMaintenanceRoute &&
+    !isApiRoute
+  ) {
+    const maintenanceMode =
+      await readMaintenanceMode(supabase);
+
+    if (maintenanceMode) {
+      const maintenanceUrl =
+        request.nextUrl.clone();
+
+      maintenanceUrl.pathname =
+        "/maintenance";
+
+      maintenanceUrl.search = "";
+
+      return NextResponse.rewrite(
+        maintenanceUrl,
+      );
+    }
+  }
+
+  // إذا انتهت الصيانة والمستخدم على صفحة الصيانة
+  if (isMaintenanceRoute) {
+    const maintenanceMode =
+      await readMaintenanceMode(supabase);
+
+    if (!maintenanceMode) {
+      const homeUrl =
+        request.nextUrl.clone();
+
+      homeUrl.pathname = "/";
+      homeUrl.search = "";
+
+      return NextResponse.redirect(
+        homeUrl,
+      );
+    }
+  }
+
+  // لا نحتاج فحص Auth للموقع العام
+  if (!isAdminRoute) {
+    return response;
+  }
+
+  const { data: claimsData } =
+    await supabase.auth.getClaims();
+
+  const claims =
+    claimsData?.claims ?? null;
+
+  // حماية صفحات الإدارة
   if (
     !claims &&
-    isAdminRoute &&
     !isPublicAdminRoute
   ) {
     const redirectUrl =
@@ -94,8 +166,7 @@ export async function updateSession(
     );
   }
 
-  // إذا كان المستخدم مسجلًا بالفعل
-  // ودخل صفحة تسجيل الدخول
+  // إذا كان المستخدم مسجلًا وفتح صفحة الدخول
   if (
     claims &&
     isAdminLoginRoute

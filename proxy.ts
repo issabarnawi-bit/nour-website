@@ -9,5 +9,7 @@ export async function proxy(
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|images|fonts).*)",
+  ],
 };
