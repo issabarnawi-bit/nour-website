@@ -29,6 +29,29 @@ import {
   replaceProgramFlights,
 } from "./program-flights.repository";
 
+async function assertPublishPermission(
+  supabase: SupabaseClient,
+): Promise<void> {
+  const { data, error } = await supabase.rpc(
+    "current_user_has_permission",
+    {
+      permission_code: "programs.publish",
+    },
+  );
+
+  if (error) {
+    throw new Error(
+      `تعذر التحقق من صلاحية نشر البرامج: ${error.message}`,
+    );
+  }
+
+  if (!data) {
+    throw new Error(
+      "ليس لديك صلاحية تغيير حالة نشر البرنامج.",
+    );
+  }
+}
+
 /* =========================================================
    CREATE
 ========================================================= */
@@ -37,6 +60,10 @@ export async function createProgram(
   supabase: SupabaseClient,
   values: ProgramFormValues,
 ): Promise<Program> {
+  if (values.status === "published") {
+    await assertPublishPermission(supabase);
+  }
+
   let coverMediaId: string | null = null;
 
   if (values.coverFile) {
@@ -140,6 +167,20 @@ export async function updateProgram(
   values: ProgramFormValues,
   currentCoverMediaId: string | null = null,
 ): Promise<Program> {
+  const currentProgram =
+    await getProgramByIdRecord(
+      supabase,
+      programId,
+    );
+
+  const publicationChanged =
+    currentProgram.status !== values.status ||
+    currentProgram.isActive !== values.isActive;
+
+  if (publicationChanged) {
+    await assertPublishPermission(supabase);
+  }
+
   let coverMediaId =
     currentCoverMediaId;
 
@@ -158,12 +199,6 @@ export async function updateProgram(
       uploadResult.media.id;
   }
 
-  const currentProgram =
-    await getProgramByIdRecord(
-      supabase,
-      programId,
-    );
-
   const program =
     await updateProgramRecord(
       supabase,
@@ -171,10 +206,6 @@ export async function updateProgram(
       values,
       coverMediaId,
     );
-
-  const publicationChanged =
-    currentProgram.status !== values.status ||
-    currentProgram.isActive !== values.isActive;
 
   if (publicationChanged) {
     await setProgramPublicationRecord(
