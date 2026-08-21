@@ -11,24 +11,30 @@ type SiteIntroProps = {
 export default function SiteIntro({ language }: SiteIntroProps) {
   const reduceMotion = useReducedMotion();
   const [visible, setVisible] = useState(true);
+  const [handoff, setHandoff] = useState(false);
 
   useEffect(() => {
-    const duration = reduceMotion ? 260 : 1650;
-    const timer = window.setTimeout(() => setVisible(false), duration);
+    const handoffTimer = window.setTimeout(
+      () => setHandoff(true),
+      reduceMotion ? 120 : 1180,
+    );
+    const closeTimer = window.setTimeout(
+      () => setVisible(false),
+      reduceMotion ? 260 : 1840,
+    );
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
     return () => {
-      window.clearTimeout(timer);
+      window.clearTimeout(handoffTimer);
+      window.clearTimeout(closeTimer);
       document.body.style.overflow = previousOverflow;
     };
   }, [reduceMotion]);
 
   useEffect(() => {
-    if (!visible) {
-      document.body.style.overflow = "";
-    }
+    if (!visible) document.body.style.overflow = "";
   }, [visible]);
 
   return (
@@ -39,36 +45,55 @@ export default function SiteIntro({ language }: SiteIntroProps) {
           role="status"
           aria-label={language === "ar" ? "جاري فتح نور آب" : "Opening NourApp"}
           initial={{ opacity: 1 }}
-          animate={{ opacity: 1 }}
+          animate={
+            handoff
+              ? { opacity: 0, y: -18, scale: 1.015 }
+              : { opacity: 1, y: 0, scale: 1 }
+          }
           exit={{ opacity: 0 }}
-          transition={{ duration: reduceMotion ? 0.12 : 0.42, ease: "easeOut" }}
+          transition={{
+            duration: reduceMotion ? 0.12 : 0.62,
+            ease: [0.22, 1, 0.36, 1],
+          }}
         >
           <motion.div
             className="nr-site-intro-aura nr-site-intro-aura-one"
             aria-hidden="true"
             initial={{ scale: 0.72, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
+            animate={handoff ? { scale: 1.16, opacity: 0 } : { scale: 1, opacity: 1 }}
             transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
           />
           <motion.div
             className="nr-site-intro-aura nr-site-intro-aura-two"
             aria-hidden="true"
             initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1.05, opacity: 1 }}
-            transition={{ duration: 1.05, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+            animate={handoff ? { scale: 1.18, opacity: 0 } : { scale: 1.05, opacity: 1 }}
+            transition={{ duration: 1.05, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
           />
 
           <motion.div
             className="nr-site-intro-content"
             initial={reduceMotion ? false : { opacity: 0, y: 22, scale: 0.94 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
+            animate={
+              handoff
+                ? { opacity: 1, y: -12, scale: 0.985 }
+                : { opacity: 1, y: 0, scale: 1 }
+            }
             transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
           >
             <motion.div
               className="nr-site-intro-logo-shell"
               initial={reduceMotion ? false : { rotate: -5, scale: 0.88 }}
-              animate={{ rotate: 0, scale: 1 }}
-              transition={{ type: "spring", stiffness: 100, damping: 14 }}
+              animate={
+                handoff
+                  ? { y: -66, scale: 0.72, rotate: 0 }
+                  : { y: 0, scale: 1, rotate: 0 }
+              }
+              transition={
+                handoff
+                  ? { duration: 0.58, ease: [0.22, 1, 0.36, 1] }
+                  : { type: "spring", stiffness: 100, damping: 14 }
+              }
             >
               <Image
                 src="/images/site/v-logo.png"
@@ -84,20 +109,32 @@ export default function SiteIntro({ language }: SiteIntroProps) {
               className="nr-site-intro-line"
               aria-hidden="true"
               initial={reduceMotion ? false : { scaleX: 0, opacity: 0 }}
-              animate={{ scaleX: 1, opacity: 1 }}
-              transition={{ duration: 0.72, delay: 0.28, ease: [0.22, 1, 0.36, 1] }}
+              animate={
+                handoff
+                  ? { scaleX: 0.3, opacity: 0 }
+                  : { scaleX: 1, opacity: 1 }
+              }
+              transition={{ duration: 0.55, delay: handoff ? 0 : 0.28, ease: [0.22, 1, 0.36, 1] }}
             >
               <span />
             </motion.div>
 
             <motion.p
               initial={reduceMotion ? false : { opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55, delay: 0.42 }}
+              animate={handoff ? { opacity: 0, y: -12 } : { opacity: 1, y: 0 }}
+              transition={{ duration: 0.42, delay: handoff ? 0 : 0.42 }}
             >
               {language === "ar" ? "رفيقك لرحلة السعادة" : "Your companion for a joyful journey"}
             </motion.p>
           </motion.div>
+
+          <motion.div
+            className="nr-site-intro-curtain"
+            aria-hidden="true"
+            initial={{ scaleY: 0 }}
+            animate={handoff ? { scaleY: 1 } : { scaleY: 0 }}
+            transition={{ duration: 0.62, ease: [0.76, 0, 0.24, 1] }}
+          />
 
           <style jsx global>{`
             .nr-site-intro {
@@ -108,6 +145,7 @@ export default function SiteIntro({ language }: SiteIntroProps) {
               place-items: center;
               overflow: hidden;
               color: #ffffff;
+              transform-origin: 50% 0%;
               background:
                 radial-gradient(circle at 50% 45%, rgba(49, 158, 255, 0.34), transparent 34%),
                 linear-gradient(145deg, #063f97 0%, #0a66d9 48%, #1e9ae9 100%);
@@ -128,7 +166,7 @@ export default function SiteIntro({ language }: SiteIntroProps) {
             .nr-site-intro-aura {
               position: absolute;
               border-radius: 50%;
-              filter: blur(6px);
+              filter: blur(8px);
               pointer-events: none;
             }
 
@@ -165,11 +203,10 @@ export default function SiteIntro({ language }: SiteIntroProps) {
               padding: 22px 28px;
               border: 1px solid rgba(255,255,255,.22);
               border-radius: 28px;
-              background: rgba(255,255,255,.94);
-              box-shadow:
-                0 28px 80px rgba(0, 32, 95, .26),
-                0 0 46px rgba(255,255,255,.12);
+              background: rgba(255,255,255,.96);
+              box-shadow: 0 28px 80px rgba(0,32,95,.26), 0 0 46px rgba(255,255,255,.12);
               backdrop-filter: blur(18px);
+              will-change: transform;
             }
 
             .nr-site-intro-logo-shell::after {
@@ -214,7 +251,15 @@ export default function SiteIntro({ language }: SiteIntroProps) {
               color: rgba(255,255,255,.92);
               font-size: clamp(16px, 2vw, 21px);
               font-weight: 700;
-              letter-spacing: 0;
+            }
+
+            .nr-site-intro-curtain {
+              position: absolute;
+              inset: 0;
+              z-index: 3;
+              transform-origin: top;
+              background: linear-gradient(180deg, rgba(5,77,173,.2), rgba(9,100,216,.02));
+              pointer-events: none;
             }
 
             @media (max-width: 580px) {
@@ -222,14 +267,8 @@ export default function SiteIntro({ language }: SiteIntroProps) {
                 padding: 18px 22px;
                 border-radius: 22px;
               }
-
-              .nr-site-intro-logo {
-                width: 138px;
-              }
-
-              .nr-site-intro-line {
-                margin-top: 24px;
-              }
+              .nr-site-intro-logo { width: 138px; }
+              .nr-site-intro-line { margin-top: 24px; }
             }
 
             @media (prefers-reduced-motion: reduce) {
