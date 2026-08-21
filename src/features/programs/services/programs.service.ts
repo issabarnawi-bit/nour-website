@@ -15,6 +15,7 @@ import {
   getPrograms as getProgramRecords,
   permanentlyDeleteProgram as permanentlyDeleteProgramRecord,
   restoreProgram as restoreProgramRecord,
+  setProgramPublication as setProgramPublicationRecord,
   updateProgram as updateProgramRecord,
 } from "./programs.repository";
 
@@ -157,6 +158,12 @@ export async function updateProgram(
       uploadResult.media.id;
   }
 
+  const currentProgram =
+    await getProgramByIdRecord(
+      supabase,
+      programId,
+    );
+
   const program =
     await updateProgramRecord(
       supabase,
@@ -164,6 +171,19 @@ export async function updateProgram(
       values,
       coverMediaId,
     );
+
+  const publicationChanged =
+    currentProgram.status !== values.status ||
+    currentProgram.isActive !== values.isActive;
+
+  if (publicationChanged) {
+    await setProgramPublicationRecord(
+      supabase,
+      programId,
+      values.status,
+      values.isActive,
+    );
+  }
 
   await replaceProgramHotels(
     supabase,
@@ -177,7 +197,28 @@ export async function updateProgram(
     values.flights ?? [],
   );
 
+  if (publicationChanged) {
+    return getProgramByIdRecord(
+      supabase,
+      programId,
+    );
+  }
+
   return program;
+}
+
+export async function setProgramPublication(
+  supabase: SupabaseClient,
+  programId: string,
+  status: Program["status"],
+  isActive: boolean,
+): Promise<void> {
+  await setProgramPublicationRecord(
+    supabase,
+    programId,
+    status,
+    isActive,
+  );
 }
 
 /* =========================================================
