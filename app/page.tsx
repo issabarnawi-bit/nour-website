@@ -9,6 +9,7 @@ import {
 import { useLanguage } from "../src/core/i18n";
 
 import SiteEnhancements from "./components/SiteEnhancements";
+import SiteIntro from "./components/SiteIntro";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 
@@ -160,6 +161,7 @@ export default function Home() {
 
   return (
     <main className="nour-redesign">
+      <SiteIntro language={language} />
       <SiteEnhancements />
 
       <Header
