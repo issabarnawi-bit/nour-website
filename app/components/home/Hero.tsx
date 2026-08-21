@@ -14,10 +14,11 @@ export default function Hero({ t }: Props) {
       <motion.div
         className="nr-premium-haram-bg"
         aria-hidden="true"
-        initial={{ scale: 1.04, opacity: 0 }}
+        initial={{ scale: 1.035, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 1.05, ease: [0.22, 1, 0.36, 1] }}
       />
+
       <div className="nr-premium-haram-overlay" aria-hidden="true" />
       <div className="nr-premium-hero-orb nr-premium-hero-orb-top" aria-hidden="true" />
       <div className="nr-premium-hero-orb nr-premium-hero-orb-bottom" aria-hidden="true" />
@@ -25,14 +26,14 @@ export default function Hero({ t }: Props) {
       <div className="nr-container nr-premium-hero-inner">
         <motion.div
           className="nr-premium-copy"
-          initial={{ opacity: 0, y: 28 }}
+          initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.68, ease: [0.22, 1, 0.36, 1] }}
         >
           <motion.h1
-            initial={{ opacity: 0, y: 22 }}
+            initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.78, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.72, delay: 0.06, ease: [0.22, 1, 0.36, 1] }}
           >
             {isArabic ? (
               <>
@@ -60,26 +61,26 @@ export default function Hero({ t }: Props) {
             aria-hidden="true"
             initial={{ scaleX: 0, opacity: 0 }}
             animate={{ scaleX: 1, opacity: 1 }}
-            transition={{ duration: 0.72, delay: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.66, delay: 0.22, ease: [0.22, 1, 0.36, 1] }}
           >
             <span />
           </motion.div>
 
           <motion.p
-            initial={{ opacity: 0, y: 18 }}
+            initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, delay: 0.3 }}
+            transition={{ duration: 0.58, delay: 0.26 }}
           >
             {isArabic
-              ? "من اختيار البرنامج إلى متابعة تفاصيل رحلتك، تجمع نور آب خدمات العمرة في تطبيق واحد لتستمتع بتجربة مريحة وآمنة."
-              : "From choosing your program to following every detail of your journey, NourApp brings Umrah services together in one app for a comfortable and secure experience."}
+              ? "من اختيار البرنامج إلى متابعة رحلتك، تجمع نور آب خدمات العمرة في تطبيق واحد لتجربة أسهل وأكثر أمانًا."
+              : "From choosing your program to following your journey, NourApp brings Umrah services together in one app for an easier and safer experience."}
           </motion.p>
 
           <motion.div
             className="nr-premium-actions"
-            initial={{ opacity: 0, y: 18 }}
+            initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, delay: 0.4 }}
+            transition={{ duration: 0.58, delay: 0.34 }}
           >
             <a className="nr-premium-primary" href="#programs">
               <span>{isArabic ? "تصفح البرامج" : "Browse programs"}</span>
@@ -88,7 +89,7 @@ export default function Hero({ t }: Props) {
               </span>
             </a>
 
-            <a className="nr-premium-secondary" href="#download">
+            <a className="nr-premium-secondary" href="#contact">
               <span>{isArabic ? "حمّل التطبيق الآن" : "Download the app"}</span>
               <span className="nr-premium-download-icon" aria-hidden="true">↓</span>
             </a>
@@ -97,14 +98,15 @@ export default function Hero({ t }: Props) {
 
         <motion.div
           className="nr-premium-device-stage"
-          initial={{ opacity: 0, y: 70, scale: 0.94 }}
+          initial={{ opacity: 0, y: 52, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.9, delay: 0.48, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.82, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
         >
           <div className="nr-premium-device-glow" aria-hidden="true" />
+
           <motion.div
-            animate={{ y: [0, -7, 0] }}
-            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+            animate={{ y: [0, -5, 0] }}
+            transition={{ duration: 7.6, repeat: Infinity, ease: "easeInOut" }}
           >
             <Image
               src="/images/site/front-view.png"
@@ -121,7 +123,7 @@ export default function Hero({ t }: Props) {
       <style jsx global>{`
         .nr-premium-hero {
           position: relative;
-          min-height: 780px;
+          min-height: 730px;
           display: flex;
           align-items: flex-start;
           overflow: hidden;
@@ -134,8 +136,8 @@ export default function Hero({ t }: Props) {
           position: absolute;
           inset: 0;
           z-index: -5;
-          background: url("/images/site/hero-haram-bg.jpg") center 58% / cover no-repeat;
-          filter: saturate(.96) contrast(1.03) brightness(.82);
+          background: url("/images/site/haram-statistics-bg.jpg") center 54% / cover no-repeat;
+          filter: saturate(.98) contrast(1.03) brightness(.88);
           transform-origin: center;
           pointer-events: none;
         }
@@ -146,8 +148,17 @@ export default function Hero({ t }: Props) {
           z-index: -4;
           pointer-events: none;
           background:
-            linear-gradient(180deg, rgba(8, 103, 221, .88) 0%, rgba(7, 95, 210, .88) 52%, rgba(4, 75, 176, .94) 100%),
-            radial-gradient(circle at 50% 35%, rgba(30, 150, 255, .28), transparent 42%);
+            linear-gradient(
+              180deg,
+              rgba(8, 103, 221, .72) 0%,
+              rgba(7, 95, 210, .74) 52%,
+              rgba(4, 75, 176, .84) 100%
+            ),
+            radial-gradient(
+              circle at 50% 34%,
+              rgba(35, 164, 255, .22),
+              transparent 42%
+            );
         }
 
         .nr-premium-hero::after {
@@ -156,8 +167,13 @@ export default function Hero({ t }: Props) {
           inset: 0;
           z-index: -3;
           pointer-events: none;
-          background:
-            linear-gradient(90deg, rgba(0, 54, 137, .12), transparent 24%, transparent 76%, rgba(0, 54, 137, .08));
+          background: linear-gradient(
+            90deg,
+            rgba(0, 44, 112, .14),
+            transparent 24%,
+            transparent 76%,
+            rgba(0, 44, 112, .1)
+          );
         }
 
         .nr-premium-hero-orb {
@@ -168,35 +184,35 @@ export default function Hero({ t }: Props) {
         }
 
         .nr-premium-hero-orb-top {
-          width: 300px;
-          height: 300px;
+          width: 280px;
+          height: 280px;
           top: -165px;
-          inset-inline-end: -75px;
-          background: rgba(38, 209, 247, .28);
+          inset-inline-end: -65px;
+          background: rgba(38, 209, 247, .22);
         }
 
         .nr-premium-hero-orb-bottom {
-          width: 440px;
-          height: 440px;
-          bottom: -310px;
+          width: 400px;
+          height: 400px;
+          bottom: -292px;
           inset-inline-start: 12%;
-          border: 1px solid rgba(255, 255, 255, .08);
-          background: rgba(42, 128, 235, .12);
+          border: 1px solid rgba(255, 255, 255, .07);
+          background: rgba(42, 128, 235, .1);
         }
 
         .nr-premium-hero-inner {
           position: relative;
           z-index: 2;
-          width: min(1440px, calc(100% - 36px));
-          min-height: 780px;
+          width: min(1400px, calc(100% - 36px));
+          min-height: 730px;
           display: flex;
           flex-direction: column;
           align-items: center;
-          padding-top: clamp(66px, 7vw, 104px);
+          padding-top: clamp(50px, 5vw, 72px);
         }
 
         .nr-premium-copy {
-          width: min(1180px, 100%);
+          width: min(1120px, 100%);
           margin-inline: auto;
           text-align: center;
         }
@@ -205,11 +221,11 @@ export default function Hero({ t }: Props) {
           width: 100%;
           margin: 0;
           color: #fff;
-          font-size: clamp(48px, 5.45vw, 82px);
+          font-size: clamp(46px, 4.8vw, 74px);
           font-weight: 800;
-          line-height: 1.12;
+          line-height: 1.11;
           letter-spacing: 0;
-          text-shadow: 0 9px 24px rgba(0, 38, 105, .2);
+          text-shadow: 0 8px 22px rgba(0, 38, 105, .2);
         }
 
         .nr-premium-title-line {
@@ -218,44 +234,51 @@ export default function Hero({ t }: Props) {
           text-wrap: balance;
         }
 
-        .nr-premium-title-line-main {
+        .nr-premium-title-line-main,
+        .nr-premium-title-line-second {
           white-space: nowrap;
         }
 
         .nr-premium-title-line-second {
-          margin-top: .12em;
-          white-space: nowrap;
+          margin-top: .1em;
         }
 
         .nr-premium-title-divider {
           position: relative;
-          width: min(920px, 84%);
+          width: min(820px, 78%);
           height: 2px;
-          margin: 30px auto 22px;
+          margin: 24px auto 18px;
           transform-origin: center;
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,.4) 18%, rgba(255,255,255,.4) 82%, transparent);
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.36) 18%,
+            rgba(255,255,255,.36) 82%,
+            transparent
+          );
         }
 
         .nr-premium-title-divider span {
           position: absolute;
           top: 50%;
           left: 50%;
-          width: 9px;
-          height: 9px;
+          width: 8px;
+          height: 8px;
           border-radius: 50%;
           background: #fff;
-          box-shadow: 0 0 14px rgba(255,255,255,.9);
+          box-shadow: 0 0 13px rgba(255,255,255,.82);
           transform: translate(-50%, -50%) rotate(45deg);
         }
 
         .nr-premium-copy > p {
-          width: min(900px, 100%);
+          width: min(780px, 94%);
           margin: 0 auto;
-          color: rgba(255,255,255,.92);
-          font-size: clamp(16px, 1.45vw, 22px);
-          line-height: 1.9;
+          color: rgba(255,255,255,.93);
+          font-size: clamp(15px, 1.18vw, 19px);
+          line-height: 1.82;
           font-weight: 500;
           text-wrap: balance;
+          text-shadow: 0 2px 14px rgba(0, 47, 122, .18);
         }
 
         .nr-premium-actions {
@@ -263,22 +286,26 @@ export default function Hero({ t }: Props) {
           align-items: center;
           justify-content: center;
           flex-wrap: wrap;
-          gap: 18px;
-          margin-top: 30px;
+          gap: 14px;
+          margin-top: 24px;
         }
 
         .nr-premium-actions a {
-          min-width: 285px;
-          min-height: 62px;
+          min-width: 250px;
+          min-height: 56px;
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          gap: 12px;
-          padding-inline: 30px;
-          border-radius: 18px;
-          font-size: 17px;
+          gap: 10px;
+          padding-inline: 26px;
+          border-radius: 16px;
+          font-size: 15px;
           font-weight: 800;
-          transition: transform .22s ease, box-shadow .22s ease, background .22s ease;
+          transition:
+            transform .22s ease,
+            box-shadow .22s ease,
+            background .22s ease,
+            border-color .22s ease;
         }
 
         .nr-premium-actions a:hover {
@@ -288,36 +315,41 @@ export default function Hero({ t }: Props) {
         .nr-premium-primary {
           color: #0966d8;
           background: #fff;
-          box-shadow: 0 16px 35px rgba(1, 45, 115, .18);
+          box-shadow: 0 14px 30px rgba(1, 45, 115, .18);
         }
 
         .nr-premium-primary:hover {
-          box-shadow: 0 20px 44px rgba(1, 45, 115, .24);
+          box-shadow: 0 18px 38px rgba(1, 45, 115, .24);
         }
 
         .nr-premium-secondary {
           color: #fff;
-          border: 1.5px solid rgba(255,255,255,.72);
+          border: 1.5px solid rgba(255,255,255,.7);
           background: rgba(11, 104, 218, .22);
           backdrop-filter: blur(12px);
         }
 
+        .nr-premium-secondary:hover {
+          border-color: rgba(255,255,255,.9);
+          background: rgba(255,255,255,.1);
+        }
+
         .nr-premium-button-arrow {
-          font-size: 30px;
+          font-size: 27px;
           line-height: 0;
           margin-top: -2px;
         }
 
         .nr-premium-download-icon {
-          font-size: 22px;
+          font-size: 20px;
           line-height: 1;
         }
 
         .nr-premium-device-stage {
           position: relative;
-          width: min(420px, 52vw);
-          height: 255px;
-          margin-top: 32px;
+          width: min(390px, 48vw);
+          height: 250px;
+          margin-top: 18px;
           display: flex;
           justify-content: center;
           align-items: flex-start;
@@ -331,14 +363,14 @@ export default function Hero({ t }: Props) {
 
         .nr-premium-device-glow {
           position: absolute;
-          width: 360px;
-          height: 180px;
-          top: 40px;
+          width: 330px;
+          height: 160px;
+          top: 28px;
           left: 50%;
           transform: translateX(-50%);
           border-radius: 50%;
-          background: rgba(255,255,255,.18);
-          filter: blur(45px);
+          background: rgba(255,255,255,.16);
+          filter: blur(42px);
           pointer-events: none;
         }
 
@@ -347,44 +379,59 @@ export default function Hero({ t }: Props) {
           width: 100%;
           height: auto;
           object-fit: contain;
-          filter: drop-shadow(0 24px 40px rgba(0, 24, 76, .3));
+          filter: drop-shadow(0 22px 38px rgba(0, 24, 76, .28));
         }
 
         @media (max-width: 1020px) {
           .nr-premium-hero,
           .nr-premium-hero-inner {
-            min-height: 720px;
+            min-height: 690px;
           }
 
           .nr-premium-copy h1 {
-            font-size: clamp(44px, 6vw, 66px);
+            font-size: clamp(42px, 5.6vw, 64px);
           }
 
           .nr-premium-title-line-main,
           .nr-premium-title-line-second {
             white-space: normal;
+          }
+
+          .nr-premium-device-stage {
+            width: min(360px, 55vw);
+            margin-top: 16px;
           }
         }
 
         @media (max-width: 768px) {
-          .nr-premium-hero {
-            min-height: 690px;
+          .nr-premium-hero,
+          .nr-premium-hero-inner {
+            min-height: 650px;
           }
 
           .nr-premium-haram-bg {
-            background-position: 48% center;
-            filter: saturate(.92) contrast(1.02) brightness(.78);
+            background-position: 50% center;
+            filter: saturate(.95) contrast(1.02) brightness(.84);
+          }
+
+          .nr-premium-haram-overlay {
+            background:
+              linear-gradient(
+                180deg,
+                rgba(8, 103, 221, .76) 0%,
+                rgba(7, 95, 210, .78) 54%,
+                rgba(4, 75, 176, .86) 100%
+              );
           }
 
           .nr-premium-hero-inner {
-            min-height: 690px;
             width: calc(100% - 24px);
-            padding-top: 56px;
+            padding-top: 44px;
           }
 
           .nr-premium-copy h1 {
-            font-size: clamp(34px, 9vw, 48px);
-            line-height: 1.16;
+            font-size: clamp(33px, 8.7vw, 46px);
+            line-height: 1.15;
           }
 
           .nr-premium-title-line-main,
@@ -393,61 +440,61 @@ export default function Hero({ t }: Props) {
           }
 
           .nr-premium-title-line-second {
-            margin-top: .18em;
+            margin-top: .16em;
           }
 
           .nr-premium-title-divider {
-            width: 90%;
-            margin: 24px auto 18px;
+            width: 88%;
+            margin: 20px auto 16px;
           }
 
           .nr-premium-copy > p {
-            width: min(580px, 96%);
+            width: min(560px, 96%);
             font-size: 14px;
-            line-height: 1.8;
+            line-height: 1.72;
           }
 
           .nr-premium-actions {
-            gap: 12px;
-            margin-top: 24px;
+            gap: 10px;
+            margin-top: 20px;
           }
 
           .nr-premium-actions a {
-            min-width: 220px;
-            min-height: 54px;
-            padding-inline: 22px;
-            border-radius: 15px;
+            min-width: 214px;
+            min-height: 52px;
+            padding-inline: 20px;
+            border-radius: 14px;
             font-size: 14px;
           }
 
           .nr-premium-device-stage {
-            width: min(340px, 66vw);
-            height: 210px;
-            margin-top: 26px;
+            width: min(320px, 65vw);
+            height: 198px;
+            margin-top: 16px;
           }
         }
 
         @media (max-width: 520px) {
           .nr-premium-hero,
           .nr-premium-hero-inner {
-            min-height: 660px;
+            min-height: 625px;
           }
 
           .nr-premium-hero-inner {
-            padding-top: 44px;
+            padding-top: 34px;
           }
 
           .nr-premium-copy h1 {
-            font-size: clamp(31px, 10.2vw, 42px);
+            font-size: clamp(30px, 10vw, 40px);
           }
 
           .nr-premium-copy > p {
             font-size: 13px;
-            line-height: 1.75;
+            line-height: 1.68;
           }
 
           .nr-premium-actions {
-            width: min(100%, 360px);
+            width: min(100%, 340px);
             margin-inline: auto;
           }
 
@@ -457,9 +504,9 @@ export default function Hero({ t }: Props) {
           }
 
           .nr-premium-device-stage {
-            width: min(300px, 74vw);
-            height: 190px;
-            margin-top: 22px;
+            width: min(285px, 72vw);
+            height: 176px;
+            margin-top: 14px;
           }
         }
 
