@@ -2,25 +2,55 @@
 
 import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type SiteIntroProps = {
   language: "ar" | "en";
+};
+
+type LogoTarget = {
+  x: number;
+  y: number;
+  scale: number;
 };
 
 export default function SiteIntro({ language }: SiteIntroProps) {
   const reduceMotion = useReducedMotion();
   const [visible, setVisible] = useState(true);
   const [handoff, setHandoff] = useState(false);
+  const [logoTarget, setLogoTarget] = useState<LogoTarget>({ x: 0, y: -66, scale: 0.72 });
+  const logoShellRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const handoffTimer = window.setTimeout(
-      () => setHandoff(true),
-      reduceMotion ? 120 : 1180,
-    );
+    const measureLogoTarget = () => {
+      const source = logoShellRef.current;
+      const target = document.querySelector<HTMLElement>(".nr-v2-logo img");
+
+      if (!source || !target) return;
+
+      const sourceRect = source.getBoundingClientRect();
+      const targetRect = target.getBoundingClientRect();
+
+      const sourceCenterX = sourceRect.left + sourceRect.width / 2;
+      const sourceCenterY = sourceRect.top + sourceRect.height / 2;
+      const targetCenterX = targetRect.left + targetRect.width / 2;
+      const targetCenterY = targetRect.top + targetRect.height / 2;
+
+      setLogoTarget({
+        x: targetCenterX - sourceCenterX,
+        y: targetCenterY - sourceCenterY,
+        scale: Math.max(0.24, Math.min(0.72, targetRect.width / sourceRect.width)),
+      });
+    };
+
+    const handoffTimer = window.setTimeout(() => {
+      measureLogoTarget();
+      window.requestAnimationFrame(() => setHandoff(true));
+    }, reduceMotion ? 120 : 1180);
+
     const closeTimer = window.setTimeout(
       () => setVisible(false),
-      reduceMotion ? 260 : 1840,
+      reduceMotion ? 280 : 1910,
     );
 
     const previousOverflow = document.body.style.overflow;
@@ -45,17 +75,18 @@ export default function SiteIntro({ language }: SiteIntroProps) {
           role="status"
           aria-label={language === "ar" ? "جاري فتح نور آب" : "Opening NourApp"}
           initial={{ opacity: 1 }}
-          animate={
-            handoff
-              ? { opacity: 0, y: -18, scale: 1.015 }
-              : { opacity: 1, y: 0, scale: 1 }
-          }
+          animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{
-            duration: reduceMotion ? 0.12 : 0.62,
-            ease: [0.22, 1, 0.36, 1],
-          }}
+          transition={{ duration: reduceMotion ? 0.1 : 0.16, ease: "easeOut" }}
         >
+          <motion.div
+            className="nr-site-intro-backdrop"
+            aria-hidden="true"
+            initial={{ opacity: 1 }}
+            animate={handoff ? { opacity: 0 } : { opacity: 1 }}
+            transition={{ duration: reduceMotion ? 0.08 : 0.66, ease: [0.22, 1, 0.36, 1] }}
+          />
+
           <motion.div
             className="nr-site-intro-aura nr-site-intro-aura-one"
             aria-hidden="true"
@@ -74,24 +105,28 @@ export default function SiteIntro({ language }: SiteIntroProps) {
           <motion.div
             className="nr-site-intro-content"
             initial={reduceMotion ? false : { opacity: 0, y: 22, scale: 0.94 }}
-            animate={
-              handoff
-                ? { opacity: 1, y: -12, scale: 0.985 }
-                : { opacity: 1, y: 0, scale: 1 }
-            }
+            animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
           >
             <motion.div
+              ref={logoShellRef}
               className="nr-site-intro-logo-shell"
               initial={reduceMotion ? false : { rotate: -5, scale: 0.88 }}
               animate={
                 handoff
-                  ? { y: -66, scale: 0.72, rotate: 0 }
-                  : { y: 0, scale: 1, rotate: 0 }
+                  ? {
+                      x: logoTarget.x,
+                      y: logoTarget.y,
+                      scale: logoTarget.scale,
+                      rotate: 0,
+                      borderRadius: 12,
+                      boxShadow: "0 10px 28px rgba(0, 32, 95, .18)",
+                    }
+                  : { x: 0, y: 0, scale: 1, rotate: 0, borderRadius: 28 }
               }
               transition={
                 handoff
-                  ? { duration: 0.58, ease: [0.22, 1, 0.36, 1] }
+                  ? { duration: 0.68, ease: [0.16, 1, 0.3, 1] }
                   : { type: "spring", stiffness: 100, damping: 14 }
               }
             >
@@ -109,32 +144,20 @@ export default function SiteIntro({ language }: SiteIntroProps) {
               className="nr-site-intro-line"
               aria-hidden="true"
               initial={reduceMotion ? false : { scaleX: 0, opacity: 0 }}
-              animate={
-                handoff
-                  ? { scaleX: 0.3, opacity: 0 }
-                  : { scaleX: 1, opacity: 1 }
-              }
-              transition={{ duration: 0.55, delay: handoff ? 0 : 0.28, ease: [0.22, 1, 0.36, 1] }}
+              animate={handoff ? { scaleX: 0.2, opacity: 0, y: -8 } : { scaleX: 1, opacity: 1, y: 0 }}
+              transition={{ duration: 0.42, delay: handoff ? 0 : 0.28, ease: [0.22, 1, 0.36, 1] }}
             >
               <span />
             </motion.div>
 
             <motion.p
               initial={reduceMotion ? false : { opacity: 0, y: 10 }}
-              animate={handoff ? { opacity: 0, y: -12 } : { opacity: 1, y: 0 }}
-              transition={{ duration: 0.42, delay: handoff ? 0 : 0.42 }}
+              animate={handoff ? { opacity: 0, y: -14, scale: 0.98 } : { opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.36, delay: handoff ? 0 : 0.42 }}
             >
               {language === "ar" ? "رفيقك لرحلة السعادة" : "Your companion for a joyful journey"}
             </motion.p>
           </motion.div>
-
-          <motion.div
-            className="nr-site-intro-curtain"
-            aria-hidden="true"
-            initial={{ scaleY: 0 }}
-            animate={handoff ? { scaleY: 1 } : { scaleY: 0 }}
-            transition={{ duration: 0.62, ease: [0.76, 0, 0.24, 1] }}
-          />
 
           <style jsx global>{`
             .nr-site-intro {
@@ -145,13 +168,19 @@ export default function SiteIntro({ language }: SiteIntroProps) {
               place-items: center;
               overflow: hidden;
               color: #ffffff;
-              transform-origin: 50% 0%;
+              pointer-events: none;
+            }
+
+            .nr-site-intro-backdrop {
+              position: absolute;
+              inset: 0;
+              z-index: 0;
               background:
                 radial-gradient(circle at 50% 45%, rgba(49, 158, 255, 0.34), transparent 34%),
                 linear-gradient(145deg, #063f97 0%, #0a66d9 48%, #1e9ae9 100%);
             }
 
-            .nr-site-intro::before {
+            .nr-site-intro-backdrop::before {
               content: "";
               position: absolute;
               inset: 0;
@@ -165,6 +194,7 @@ export default function SiteIntro({ language }: SiteIntroProps) {
 
             .nr-site-intro-aura {
               position: absolute;
+              z-index: 1;
               border-radius: 50%;
               filter: blur(8px);
               pointer-events: none;
@@ -202,10 +232,10 @@ export default function SiteIntro({ language }: SiteIntroProps) {
               place-items: center;
               padding: 22px 28px;
               border: 1px solid rgba(255,255,255,.22);
-              border-radius: 28px;
-              background: rgba(255,255,255,.96);
+              background: rgba(255,255,255,.98);
               box-shadow: 0 28px 80px rgba(0,32,95,.26), 0 0 46px rgba(255,255,255,.12);
               backdrop-filter: blur(18px);
+              transform-origin: center;
               will-change: transform;
             }
 
@@ -216,6 +246,7 @@ export default function SiteIntro({ language }: SiteIntroProps) {
               z-index: -1;
               border: 1px solid rgba(255,255,255,.12);
               border-radius: 38px;
+              opacity: 0.72;
             }
 
             .nr-site-intro-logo {
@@ -253,19 +284,9 @@ export default function SiteIntro({ language }: SiteIntroProps) {
               font-weight: 700;
             }
 
-            .nr-site-intro-curtain {
-              position: absolute;
-              inset: 0;
-              z-index: 3;
-              transform-origin: top;
-              background: linear-gradient(180deg, rgba(5,77,173,.2), rgba(9,100,216,.02));
-              pointer-events: none;
-            }
-
             @media (max-width: 580px) {
               .nr-site-intro-logo-shell {
                 padding: 18px 22px;
-                border-radius: 22px;
               }
               .nr-site-intro-logo { width: 138px; }
               .nr-site-intro-line { margin-top: 24px; }
