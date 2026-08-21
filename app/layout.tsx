@@ -6,9 +6,11 @@ import QueryProvider from "../src/components/providers/QueryProvider";
 import VisitorAnalyticsTracker from "../src/features/analytics/components/VisitorAnalyticsTracker";
 import { LanguageProvider } from "../src/core/i18n";
 
+import "../src/styles/tokens.css";
 import "./globals.css";
 import "./nour-redesign.css";
 import "./modern-upgrade.css";
+import "./ui-consistency.css";
 
 import {
   getPublicServerSettings,
