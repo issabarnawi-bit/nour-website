@@ -161,6 +161,16 @@ html[dir="ltr"] .nour-redesign textarea {
   line-height: 1.1 !important;
 }
 
+/* Spacing only: keep the previous hero design, but give the eyebrow and title lines more breathing room. */
+.nr-premium-kicker {
+  margin-bottom: 8px;
+}
+
+.nr-premium-copy h1 > span {
+  display: block;
+  margin-top: 0.18em;
+}
+
 .nr-premium-device-stage {
   width: min(430px, 48vw) !important;
   height: 330px !important;
@@ -208,6 +218,10 @@ html[dir="ltr"] .nour-redesign textarea {
     font-size: clamp(34px, 9vw, 48px) !important;
   }
 
+  .nr-premium-copy h1 > span {
+    margin-top: 0.14em;
+  }
+
   .nr-premium-device-stage {
     width: min(340px, 72vw) !important;
     height: 245px !important;
@@ -227,6 +241,14 @@ html[dir="ltr"] .nour-redesign textarea {
   .nr-premium-hero,
   .nr-premium-hero-inner {
     min-height: 700px !important;
+  }
+
+  .nr-premium-kicker {
+    margin-bottom: 5px;
+  }
+
+  .nr-premium-copy h1 > span {
+    margin-top: 0.1em;
   }
 
   .nr-premium-device-stage {
