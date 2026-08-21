@@ -6,6 +6,7 @@ export {
   getPrograms,
   permanentlyDeleteProgram,
   restoreProgram,
+  setProgramPublication,
   updateProgram,
 } from "./programs.service";
 
