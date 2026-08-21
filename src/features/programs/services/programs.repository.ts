@@ -3,6 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
   Program,
   ProgramFormValues,
+  ProgramStatus,
 } from "../types";
 
 type CoverMediaRow = {
@@ -241,9 +242,7 @@ export async function updateProgram(
       flight_notes_en: values.flightNotesEn.trim() || null,
 
       cover_media_id: coverMediaId,
-      status: values.status,
       is_featured: values.isFeatured,
-      is_active: values.isActive,
       sort_order: values.sortOrder,
     })
     .eq("id", programId)
@@ -262,6 +261,40 @@ export async function updateProgram(
   }
 
   return mapProgram(data as ProgramRow);
+}
+
+export async function setProgramPublication(
+  supabase: SupabaseClient,
+  programId: string,
+  status: ProgramStatus,
+  isActive: boolean,
+): Promise<void> {
+  const { data, error } = await supabase.rpc(
+    "set_program_publication",
+    {
+      p_program_id: programId,
+      p_status: status,
+      p_is_active: isActive,
+    },
+  );
+
+  if (error) {
+    if (error.code === "42501") {
+      throw new Error(
+        "ليس لديك صلاحية تغيير حالة نشر هذا البرنامج.",
+      );
+    }
+
+    throw new Error(
+      `تعذر تغيير حالة نشر البرنامج: ${error.message}`,
+    );
+  }
+
+  if (!data) {
+    throw new Error(
+      "لم يتم العثور على البرنامج أو أنه محذوف.",
+    );
+  }
 }
 
 export async function deleteProgram(
