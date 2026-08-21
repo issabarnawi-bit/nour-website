@@ -132,6 +132,89 @@ html[dir="ltr"] .nour-redesign textarea {
   min-height: 110px;
 }
 
+/* Hero refinement: use the existing Haram asset and keep the phone visibly inside the hero. */
+.nr-premium-haram-bg {
+  background-image: url("/images/site/haram-statistics-bg.jpg") !important;
+  background-position: center 48% !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+  filter: saturate(.98) contrast(1.05) brightness(.72) !important;
+}
+
+.nr-premium-haram-overlay {
+  background:
+    linear-gradient(180deg, rgba(3, 63, 153, .72) 0%, rgba(6, 91, 203, .69) 50%, rgba(3, 68, 165, .82) 100%),
+    radial-gradient(circle at 50% 34%, rgba(32, 158, 255, .18), transparent 44%) !important;
+}
+
+.nr-premium-hero,
+.nr-premium-hero-inner {
+  min-height: 860px !important;
+}
+
+.nr-premium-hero-inner {
+  padding-top: clamp(48px, 5vw, 76px) !important;
+}
+
+.nr-premium-copy h1 {
+  font-size: clamp(48px, 5.2vw, 78px) !important;
+  line-height: 1.1 !important;
+}
+
+.nr-premium-device-stage {
+  width: min(430px, 48vw) !important;
+  height: 330px !important;
+  margin-top: 8px !important;
+  transform: translateY(-6px);
+}
+
+.nr-premium-device-stage > div:last-child {
+  width: 100% !important;
+}
+
+.nr-premium-phone-front {
+  width: 100% !important;
+  max-width: 430px !important;
+}
+
+@media (max-width: 1020px) {
+  .nr-premium-hero,
+  .nr-premium-hero-inner {
+    min-height: 800px !important;
+  }
+
+  .nr-premium-device-stage {
+    width: min(390px, 58vw) !important;
+    height: 300px !important;
+    margin-top: 10px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .nr-premium-haram-bg {
+    background-position: center 52% !important;
+  }
+
+  .nr-premium-hero,
+  .nr-premium-hero-inner {
+    min-height: 740px !important;
+  }
+
+  .nr-premium-hero-inner {
+    padding-top: 42px !important;
+  }
+
+  .nr-premium-copy h1 {
+    font-size: clamp(34px, 9vw, 48px) !important;
+  }
+
+  .nr-premium-device-stage {
+    width: min(340px, 72vw) !important;
+    height: 245px !important;
+    margin-top: 8px !important;
+  }
+}
+
 @media (max-width: 580px) {
   .nour-redesign h1 {
     line-height: 1.2;
@@ -139,6 +222,17 @@ html[dir="ltr"] .nour-redesign textarea {
 
   .nour-redesign h2 {
     line-height: 1.28;
+  }
+
+  .nr-premium-hero,
+  .nr-premium-hero-inner {
+    min-height: 700px !important;
+  }
+
+  .nr-premium-device-stage {
+    width: min(300px, 76vw) !important;
+    height: 220px !important;
+    margin-top: 6px !important;
   }
 }
 
