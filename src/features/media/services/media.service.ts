@@ -9,6 +9,20 @@ import {
   uploadMedia as uploadMediaRepository,
 } from "../repositories/media.repository";
 
+export type MediaCleanupFailure = {
+  mediaId: string;
+  bucket: string;
+  path: string;
+  reason: string;
+};
+
+export type MediaCleanupReconciliationResult = {
+  inspected: number;
+  cleaned: number;
+  failed: number;
+  failures: MediaCleanupFailure[];
+};
+
 export async function uploadMedia(
   supabase: SupabaseClient,
   input: UploadMediaInput,
@@ -66,4 +80,76 @@ export async function deleteMedia(
       "تم حذف الملف من التخزين، لكن تعذر تأكيد اكتمال التنظيف في قاعدة البيانات. بقيت الحالة معلّقة ويمكن تسويتها لاحقًا.",
     );
   }
+}
+
+export async function reconcilePendingMediaStorageCleanup(
+  supabase: SupabaseClient,
+): Promise<MediaCleanupReconciliationResult> {
+  const { data, error } = await supabase.rpc(
+    "list_pending_media_storage_cleanup",
+  );
+
+  if (error) {
+    throw new Error(
+      `تعذر تحميل ملفات الوسائط المعلّقة للتنظيف: ${error.message}`,
+    );
+  }
+
+  const pendingRows = Array.isArray(data) ? data : [];
+  const failures: MediaCleanupFailure[] = [];
+  let cleaned = 0;
+
+  for (const row of pendingRows) {
+    const mediaId = String(row.id ?? "");
+    const bucket = String(row.bucket ?? "");
+    const path = String(row.path ?? "");
+
+    if (!mediaId || !bucket || !path) {
+      failures.push({
+        mediaId,
+        bucket,
+        path,
+        reason: "بيانات سجل التنظيف غير مكتملة.",
+      });
+      continue;
+    }
+
+    const { error: storageError } = await supabase.storage
+      .from(bucket)
+      .remove([path]);
+
+    if (storageError) {
+      failures.push({
+        mediaId,
+        bucket,
+        path,
+        reason: storageError.message,
+      });
+      continue;
+    }
+
+    const { error: confirmError } = await supabase.rpc(
+      "confirm_media_storage_cleanup",
+      { p_media_id: mediaId },
+    );
+
+    if (confirmError) {
+      failures.push({
+        mediaId,
+        bucket,
+        path,
+        reason: confirmError.message,
+      });
+      continue;
+    }
+
+    cleaned += 1;
+  }
+
+  return {
+    inspected: pendingRows.length,
+    cleaned,
+    failed: failures.length,
+    failures,
+  };
 }

@@ -1,9 +1,18 @@
 export {
   deleteMedia,
+  reconcilePendingMediaStorageCleanup,
+  uploadMedia,
+} from "./media.service";
+
+export type {
+  MediaCleanupFailure,
+  MediaCleanupReconciliationResult,
+} from "./media.service";
+
+export {
   getMedia,
   getMediaById,
   updateMediaAltText,
-  uploadMedia,
 } from "../repositories/media.repository";
 
 export type {
