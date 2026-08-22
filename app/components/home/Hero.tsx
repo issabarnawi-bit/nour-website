@@ -80,7 +80,6 @@ export default function Hero({ t }: Props) {
           }}
         >
           <motion.span className="nr-premium-kicker" variants={fadeItem}>
-            <SparkleIcon />
             {t.heroEyebrow}
           </motion.span>
 
@@ -423,7 +422,7 @@ export default function Hero({ t }: Props) {
         }
 
         .nr-premium-title-line + .nr-premium-title-line {
-          margin-top: 0.035em;
+          margin-top: 0.25em;
         }
 
         .nr-premium-title-line-main {
@@ -763,7 +762,7 @@ export default function Hero({ t }: Props) {
   }
 
   .nr-premium-title-line + .nr-premium-title-line {
-    margin-top: .035em !important;
+    margin-top: 0.25em !important;
   }
 
   .nr-premium-copy > p {
