@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "../../lib/supabase/client";
 import { getMedia, type MediaItem } from "../media/repositories/media.repository";
+import "./ceo-message-admin.css";
 
 type CeoMessageValue = {
   enabled: boolean;
@@ -170,30 +171,6 @@ export default function CeoMessagePage() {
           </button>
         </div>
       </form>
-
-      <style jsx global>{`
-        .nr-ceo-admin-page { display: grid; gap: 24px; }
-        .nr-ceo-admin-page header p { max-width: 780px; color: var(--admin-text-muted, #64748b); line-height: 1.8; }
-        .nr-ceo-admin-feedback { padding: 16px; }
-        .nr-ceo-admin-form { padding: 22px; display: grid; gap: 18px; max-width: 920px; }
-        .nr-ceo-admin-form label { display: grid; gap: 8px; font-weight: 700; }
-        .nr-ceo-admin-grid-2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
-        .nr-ceo-admin-toggle { display: flex !important; align-items: flex-start; gap: 12px !important; padding: 14px 16px; border-radius: 14px; background: var(--admin-surface-soft, rgba(23,111,232,.06)); }
-        .nr-ceo-admin-toggle input { margin-top: 5px; }
-        .nr-ceo-admin-toggle span { display: grid; gap: 3px; }
-        .nr-ceo-admin-toggle small { color: var(--admin-text-muted, #64748b); font-weight: 500; line-height: 1.6; }
-        .nr-ceo-admin-image-preview { display: flex; align-items: center; gap: 16px; padding: 14px; border: 1px solid var(--admin-border, #e2e8f0); border-radius: 16px; }
-        .nr-ceo-admin-image-preview img { width: 132px; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 14px; }
-        .nr-ceo-admin-image-preview div { display: grid; gap: 5px; }
-        .nr-ceo-admin-image-preview small { color: var(--admin-text-muted, #64748b); line-height: 1.6; }
-        .nr-ceo-admin-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-        @media (max-width: 720px) {
-          .nr-ceo-admin-form { padding: 16px; }
-          .nr-ceo-admin-grid-2 { grid-template-columns: 1fr; }
-          .nr-ceo-admin-image-preview { align-items: flex-start; }
-          .nr-ceo-admin-image-preview img { width: 104px; }
-        }
-      `}</style>
     </section>
   );
 }
