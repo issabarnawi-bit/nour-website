@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { BarChart3, BookOpenText, BriefcaseBusiness, BusFront, CircleGauge, FileCheck2, FolderOpen, Globe2, Handshake, Hotel, Images, Scale, Settings, Users } from "lucide-react";
+import { BarChart3, BookOpenText, BriefcaseBusiness, BusFront, CircleGauge, FileCheck2, FolderOpen, Globe2, Handshake, Hotel, Images, MessageSquareQuote, Scale, Settings, Users } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { getAdminTranslations, useLanguage } from "../../../core/i18n";
 
@@ -15,6 +15,7 @@ export default function Sidebar(){
   {label:t.sidebar.countries,href:"/admin/countries",icon:Globe2},
   {label:t.sidebar.programs,href:"/admin/programs",icon:FolderOpen},
   {label:language==="ar"?"المقالات":"Articles",href:"/admin/articles",icon:BookOpenText},
+  {label:language==="ar"?"كلمة الرئيس التنفيذي":"CEO Message",href:"/admin/ceo-message",icon:MessageSquareQuote},
   {label:language==="ar"?"الفنادق":"Hotels",href:"/admin/hotels",icon:Hotel},
   {label:language==="ar"?"النقل":"Transport",href:"/admin/transports",icon:BusFront},
   {label:language==="ar"?"التأشيرات":"Visas",href:"/admin/visas",icon:FileCheck2},
