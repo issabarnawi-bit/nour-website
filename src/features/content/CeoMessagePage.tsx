@@ -89,48 +89,51 @@ export default function CeoMessagePage() {
   }
 
   return (
-    <section dir="rtl" style={{ display: "grid", gap: 24 }}>
+    <section dir="rtl" className="nr-ceo-admin-page">
       <header>
         <h1>كلمة الرئيس التنفيذي</h1>
         <p>إدارة النص والصورة والمسمى الوظيفي بالعربية والإنجليزية، مع إمكانية إظهار القسم أو إخفائه من الموقع.</p>
       </header>
 
-      {feedback && <div className="admin-card" style={{ padding: 16 }}>{feedback}</div>}
+      {feedback && <div className="admin-card nr-ceo-admin-feedback">{feedback}</div>}
 
-      <form className="admin-card" onSubmit={save} style={{ padding: 22, display: "grid", gap: 16, maxWidth: 920 }}>
-        <label style={{ display: "flex", alignItems: "center", gap: 10 }}>
+      <form className="admin-card nr-ceo-admin-form" onSubmit={save}>
+        <label className="nr-ceo-admin-toggle">
           <input
             type="checkbox"
             checked={value.enabled}
             onChange={(e) => setValue({ ...value, enabled: e.target.checked })}
           />
-          إظهار قسم كلمة الرئيس التنفيذي في الموقع
+          <span>
+            <strong>إظهار قسم كلمة الرئيس التنفيذي في الموقع</strong>
+            <small>{value.enabled ? "القسم مفعّل وسيظهر عند اكتمال المحتوى." : "القسم مخفي ويمكن حفظه كمسودة بدون تعبئة جميع الحقول."}</small>
+          </span>
         </label>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+        <div className="nr-ceo-admin-grid-2">
           <label>الاسم بالعربية
-            <input required value={value.name_ar} onChange={(e) => setValue({ ...value, name_ar: e.target.value })} />
+            <input required={value.enabled} value={value.name_ar} onChange={(e) => setValue({ ...value, name_ar: e.target.value })} />
           </label>
           <label>English name
-            <input required dir="ltr" value={value.name_en} onChange={(e) => setValue({ ...value, name_en: e.target.value })} />
+            <input required={value.enabled} dir="ltr" value={value.name_en} onChange={(e) => setValue({ ...value, name_en: e.target.value })} />
           </label>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+        <div className="nr-ceo-admin-grid-2">
           <label>المسمى الوظيفي
-            <input required value={value.title_ar} onChange={(e) => setValue({ ...value, title_ar: e.target.value })} />
+            <input required={value.enabled} value={value.title_ar} onChange={(e) => setValue({ ...value, title_ar: e.target.value })} />
           </label>
           <label>Job title
-            <input required dir="ltr" value={value.title_en} onChange={(e) => setValue({ ...value, title_en: e.target.value })} />
+            <input required={value.enabled} dir="ltr" value={value.title_en} onChange={(e) => setValue({ ...value, title_en: e.target.value })} />
           </label>
         </div>
 
         <label>الكلمة بالعربية
-          <textarea required rows={8} value={value.message_ar} onChange={(e) => setValue({ ...value, message_ar: e.target.value })} />
+          <textarea required={value.enabled} rows={8} value={value.message_ar} onChange={(e) => setValue({ ...value, message_ar: e.target.value })} />
         </label>
 
         <label>English message
-          <textarea required dir="ltr" rows={8} value={value.message_en} onChange={(e) => setValue({ ...value, message_en: e.target.value })} />
+          <textarea required={value.enabled} dir="ltr" rows={8} value={value.message_en} onChange={(e) => setValue({ ...value, message_en: e.target.value })} />
         </label>
 
         <label>صورة الرئيس التنفيذي
@@ -146,14 +149,19 @@ export default function CeoMessagePage() {
         </label>
 
         {selectedImage && (
-          <img
-            src={selectedImage.publicUrl}
-            alt={selectedImage.altAr || selectedImage.fileName}
-            style={{ width: 220, aspectRatio: "4 / 5", objectFit: "cover", borderRadius: 18 }}
-          />
+          <div className="nr-ceo-admin-image-preview">
+            <img
+              src={selectedImage.publicUrl}
+              alt={selectedImage.altAr || selectedImage.fileName}
+            />
+            <div>
+              <strong>{selectedImage.altAr || selectedImage.fileName}</strong>
+              <small>معاينة الصورة المستخدمة في قسم كلمة الرئيس التنفيذي.</small>
+            </div>
+          </div>
         )}
 
-        <div style={{ display: "flex", gap: 10 }}>
+        <div className="nr-ceo-admin-actions">
           <button className="admin-button" type="submit" disabled={saving}>
             {saving ? "جارٍ الحفظ..." : "حفظ الكلمة"}
           </button>
@@ -162,6 +170,30 @@ export default function CeoMessagePage() {
           </button>
         </div>
       </form>
+
+      <style jsx global>{`
+        .nr-ceo-admin-page { display: grid; gap: 24px; }
+        .nr-ceo-admin-page header p { max-width: 780px; color: var(--admin-text-muted, #64748b); line-height: 1.8; }
+        .nr-ceo-admin-feedback { padding: 16px; }
+        .nr-ceo-admin-form { padding: 22px; display: grid; gap: 18px; max-width: 920px; }
+        .nr-ceo-admin-form label { display: grid; gap: 8px; font-weight: 700; }
+        .nr-ceo-admin-grid-2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+        .nr-ceo-admin-toggle { display: flex !important; align-items: flex-start; gap: 12px !important; padding: 14px 16px; border-radius: 14px; background: var(--admin-surface-soft, rgba(23,111,232,.06)); }
+        .nr-ceo-admin-toggle input { margin-top: 5px; }
+        .nr-ceo-admin-toggle span { display: grid; gap: 3px; }
+        .nr-ceo-admin-toggle small { color: var(--admin-text-muted, #64748b); font-weight: 500; line-height: 1.6; }
+        .nr-ceo-admin-image-preview { display: flex; align-items: center; gap: 16px; padding: 14px; border: 1px solid var(--admin-border, #e2e8f0); border-radius: 16px; }
+        .nr-ceo-admin-image-preview img { width: 132px; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 14px; }
+        .nr-ceo-admin-image-preview div { display: grid; gap: 5px; }
+        .nr-ceo-admin-image-preview small { color: var(--admin-text-muted, #64748b); line-height: 1.6; }
+        .nr-ceo-admin-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        @media (max-width: 720px) {
+          .nr-ceo-admin-form { padding: 16px; }
+          .nr-ceo-admin-grid-2 { grid-template-columns: 1fr; }
+          .nr-ceo-admin-image-preview { align-items: flex-start; }
+          .nr-ceo-admin-image-preview img { width: 104px; }
+        }
+      `}</style>
     </section>
   );
 }
