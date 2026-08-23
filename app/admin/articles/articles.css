@@ -1,0 +1,188 @@
+.nr-articles-admin-page {
+  width: 100%;
+  min-width: 0;
+}
+
+.nr-articles-admin-page > header {
+  margin-bottom: 4px;
+}
+
+.nr-articles-admin-page > header h1 {
+  margin: 0;
+  color: var(--NourApp-text-primary);
+  font-size: clamp(24px, 2vw, 32px);
+}
+
+.nr-articles-admin-page > header p {
+  margin: 8px 0 0;
+  color: var(--NourApp-text-secondary);
+}
+
+.nr-articles-admin-page .admin-card {
+  min-width: 0;
+  border: 1px solid var(--NourApp-border);
+  border-radius: var(--NourApp-radius-lg);
+  background: var(--NourApp-surface);
+  box-shadow: var(--NourApp-shadow-sm);
+}
+
+.nr-articles-admin-page .admin-button,
+.nr-articles-admin-page button {
+  font: inherit;
+}
+
+.nr-articles-admin-page .admin-button {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--NourApp-radius-md);
+  background: var(--NourApp-primary);
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform .18s ease, background .18s ease, opacity .18s ease;
+}
+
+.nr-articles-admin-page .admin-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: var(--NourApp-primary-hover);
+}
+
+.nr-articles-admin-page .admin-button:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+.nr-articles-admin-page input:not([type="checkbox"]),
+.nr-articles-admin-page textarea,
+.nr-articles-admin-page select {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 13px;
+  border: 1px solid var(--NourApp-border);
+  border-radius: var(--NourApp-radius-md);
+  outline: none;
+  background: var(--NourApp-surface-muted);
+  color: var(--NourApp-text-primary);
+  font: inherit;
+  line-height: 1.5;
+  transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+.nr-articles-admin-page textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+.nr-articles-admin-page input:not([type="checkbox"]):focus,
+.nr-articles-admin-page textarea:focus,
+.nr-articles-admin-page select:focus {
+  border-color: var(--NourApp-primary);
+  background: var(--NourApp-surface);
+  box-shadow: 0 0 0 3px var(--NourApp-primary-soft);
+}
+
+.nr-articles-admin-page input::placeholder,
+.nr-articles-admin-page textarea::placeholder {
+  color: var(--NourApp-text-muted);
+}
+
+.nr-articles-admin-page label {
+  color: var(--NourApp-text-primary);
+}
+
+.nr-articles-admin-page input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--NourApp-primary);
+}
+
+.nr-articles-admin-table-wrap {
+  border: 1px solid var(--NourApp-border);
+  border-radius: var(--NourApp-radius-md);
+  overflow-x: auto;
+}
+
+.nr-articles-admin-table th {
+  background: var(--NourApp-surface-muted);
+  color: var(--NourApp-text-secondary);
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.nr-articles-admin-table td {
+  color: var(--NourApp-text-primary);
+  border-top: 1px solid var(--NourApp-border);
+  vertical-align: middle;
+}
+
+.nr-articles-admin-row-actions button,
+.nr-articles-category-list button,
+.nr-articles-editor-head > button {
+  border: 1px solid var(--NourApp-border);
+  border-radius: 10px;
+  background: var(--NourApp-surface-muted);
+  color: var(--NourApp-text-primary);
+  cursor: pointer;
+}
+
+.nr-articles-admin-row-actions button {
+  min-height: 34px;
+  padding: 0 10px;
+}
+
+.nr-articles-admin-row-actions button:hover:not(:disabled),
+.nr-articles-editor-head > button:hover {
+  border-color: var(--NourApp-primary);
+  color: var(--NourApp-primary);
+}
+
+.nr-articles-category-list button {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+}
+
+.nr-articles-editor-head > button {
+  min-height: 36px;
+  padding: 0 12px;
+}
+
+.nr-articles-editor details {
+  border: 1px solid var(--NourApp-border);
+  border-radius: var(--NourApp-radius-md);
+  padding: 12px 14px;
+  background: var(--NourApp-surface-muted);
+}
+
+.nr-articles-editor summary {
+  cursor: pointer;
+  color: var(--NourApp-text-primary);
+  font-weight: 800;
+}
+
+.nr-articles-admin-page h2 {
+  margin-top: 0;
+  color: var(--NourApp-text-primary);
+}
+
+.nr-admin-theme--dark .nr-articles-admin-page .admin-card,
+.nr-admin-theme--dark .nr-articles-admin-page input:not([type="checkbox"]),
+.nr-admin-theme--dark .nr-articles-admin-page textarea,
+.nr-admin-theme--dark .nr-articles-admin-page select,
+.nr-admin-theme--dark .nr-articles-editor details {
+  border-color: var(--nour-border);
+  background: var(--nour-surface);
+  color: var(--nour-text-primary);
+}
+
+@media (max-width: 760px) {
+  .nr-articles-admin-page {
+    gap: 18px;
+  }
+
+  .nr-articles-admin-table {
+    min-width: 560px;
+  }
+}
