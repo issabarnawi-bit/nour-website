@@ -201,6 +201,7 @@ export default function NourWorldMap({ language }: Props) {
   useEffect(() => {
     if (selectedId && !countriesWithPositions.some((country) => country.id === selectedId)) {
       setSelectedId(null);
+      setSelectedProgramId(null);
     }
   }, [countriesWithPositions, selectedId]);
 
@@ -217,9 +218,7 @@ export default function NourWorldMap({ language }: Props) {
   });
 
   const selectedProgram = useMemo(
-    () => selectedProgramId
-      ? (programsQuery.data ?? []).find((program) => program.id === selectedProgramId) ?? null
-      : null,
+    () => programsQuery.data?.find((program) => program.id === selectedProgramId) ?? null,
     [programsQuery.data, selectedProgramId],
   );
 
@@ -256,6 +255,9 @@ export default function NourWorldMap({ language }: Props) {
   const activeProgramsUrl = ctaCountry
     ? `/programs?country=${encodeURIComponent(ctaCountry.id)}`
     : "/programs";
+  const selectedProgramUrl = selectedProgram
+    ? `/programs/${encodeURIComponent(selectedProgram.slug)}`
+    : null;
 
   const routeCountries = useMemo(
     () => countriesWithPositions.filter(
@@ -265,10 +267,12 @@ export default function NourWorldMap({ language }: Props) {
   );
 
   const focusedPosition = selectedCountry?.position;
+  const programFocusActive = Boolean(selectedProgram);
 
-  const chooseCountry = (countryId: string) => {
+  const selectCountry = (countryId: string) => {
     setActiveId(countryId);
     setSelectedId((current) => current === countryId ? null : countryId);
+    setSelectedProgramId(null);
   };
 
   return (
@@ -281,7 +285,9 @@ export default function NourWorldMap({ language }: Props) {
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
-      onBlurCapture={() => setPaused(false)}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setPaused(false);
+      }}
       dir={isArabic ? "rtl" : "ltr"}
     >
       <header className={styles.sectionIntro}>
@@ -339,18 +345,18 @@ export default function NourWorldMap({ language }: Props) {
               {routeCountries.map((country, index) => {
                 const routePath = buildRoutePath(country.position, makkahPosition);
                 const isHighlighted = country.id === highlightedId;
-                const isProgramRoute = Boolean(isHighlighted && selectedProgram);
                 return (
                   <g key={country.id}>
                     <motion.path
                       d={routePath}
-                      className={[
-                        isHighlighted ? styles.routeBaseActive : styles.routeBase,
-                        isProgramRoute ? "nr-map-route-program-selected" : "",
-                      ].filter(Boolean).join(" ")}
+                      className={isHighlighted ? styles.routeBaseActive : styles.routeBase}
                       initial={{ pathLength: 0, opacity: 0 }}
                       whileInView={{ pathLength: 1, opacity: 1 }}
                       viewport={{ once: true }}
+                      animate={isHighlighted && programFocusActive ? { opacity: 1 } : undefined}
+                      style={isHighlighted && programFocusActive
+                        ? { filter: "drop-shadow(0 0 2px rgba(255,195,19,.9))" }
+                        : undefined}
                       transition={{ duration: 1.25, delay: 0.24 + index * 0.11, ease: [0.22, 1, 0.36, 1] }}
                     />
                     <motion.path
@@ -359,15 +365,20 @@ export default function NourWorldMap({ language }: Props) {
                       strokeDasharray="0.6 3.6"
                       animate={{
                         strokeDashoffset: shouldReduceMotion ? 0 : [0, -16],
-                        opacity: isHighlighted ? 1 : 0.32,
+                        opacity: isHighlighted ? 1 : 0.28,
                       }}
                       transition={shouldReduceMotion ? { duration: 0 } : {
-                        strokeDashoffset: { duration: isProgramRoute ? 3.8 : 3.1 + index * 0.18, repeat: Infinity, ease: "linear" },
+                        strokeDashoffset: {
+                          duration: isHighlighted && programFocusActive ? 2.1 : 3.2 + index * 0.22,
+                          repeat: Infinity,
+                          ease: "linear",
+                        },
                       }}
                     />
                     {isHighlighted && !shouldReduceMotion ? (
-                      <circle r={isProgramRoute ? "1.15" : "0.9"} fill="#ffc313" filter="url(#nourRouteGlow)">
-                        <animateMotion dur={isProgramRoute ? "3.8s" : "3.2s"} repeatCount="indefinite" path={routePath} />
+                      <circle r={programFocusActive ? "1.15" : "0.9"} fill="#ffc313" filter="url(#nourRouteGlow)">
+                        <animateMotion dur={programFocusActive ? "3.2s" : "3.8s"} repeatCount="indefinite" path={routePath} />
+                        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.12;0.84;1" dur={programFocusActive ? "3.2s" : "3.8s"} repeatCount="indefinite" />
                       </circle>
                     ) : null}
                   </g>
@@ -379,7 +390,7 @@ export default function NourWorldMap({ language }: Props) {
               className={styles.makkahMarker}
               style={{ left: `${makkahPosition.x}%`, top: `${makkahPosition.y}%` }}
               initial={{ opacity: 0, scale: 0.55 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              whileInView={{ opacity: 1, scale: programFocusActive ? 1.08 : 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
@@ -398,7 +409,6 @@ export default function NourWorldMap({ language }: Props) {
                   type="button"
                   className={[
                     styles.point,
-                    "nr-map-hit-area",
                     country.hasPublishedPrograms ? styles.availablePoint : styles.inactivePoint,
                     isActive ? styles.activePoint : "",
                     isSelected ? "nr-map-selected-point" : "",
@@ -409,7 +419,7 @@ export default function NourWorldMap({ language }: Props) {
                     setPaused(true);
                   }}
                   onMouseLeave={() => setPaused(false)}
-                  onClick={() => chooseCountry(country.id)}
+                  onClick={() => selectCountry(country.id)}
                   aria-label={isArabic ? `عرض برامج ${country.nameAr}` : `Show programs for ${country.nameEn}`}
                   aria-pressed={isSelected}
                 >
@@ -440,7 +450,10 @@ export default function NourWorldMap({ language }: Props) {
                 <button
                   type="button"
                   className={styles.cardClose}
-                  onClick={() => setSelectedId(null)}
+                  onClick={() => {
+                    setSelectedId(null);
+                    setSelectedProgramId(null);
+                  }}
                   aria-label={isArabic ? "إغلاق بطاقة الدولة" : "Close country card"}
                 >×</button>
                 <span className={styles.pin}><LocationIcon /></span>
@@ -452,68 +465,61 @@ export default function NourWorldMap({ language }: Props) {
               </motion.article>
             ) : null}
           </AnimatePresence>
-        </div>
 
-        <AnimatePresence mode="wait">
-          {journeyCountry ? (
-            <motion.div
-              key={`${journeyCountry.id}-${selectedProgram?.id ?? "country"}`}
-              className={[
-                "nr-map-journey-card",
-                selectedProgram ? "nr-map-journey-card-program" : "",
-              ].filter(Boolean).join(" ")}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 8 }}
-              transition={{ duration: 0.24 }}
-            >
-              <div className="nr-map-journey-origin">
-                {journeyCountry.flagUrl ? (
-                  <img src={journeyCountry.flagUrl} alt="" aria-hidden="true" />
-                ) : (
-                  <span><LocationIcon /></span>
-                )}
-                <div>
-                  <small>{isArabic ? "مسار رحلتك" : "Your journey"}</small>
-                  <strong>{isArabic ? journeyCountry.nameAr : journeyCountry.nameEn}</strong>
-                </div>
-              </div>
-
-              <div className="nr-map-focus-route nr-map-journey-route">
-                <strong>{isArabic ? journeyCountry.nameAr : journeyCountry.nameEn}</strong>
-                <span className="nr-map-focus-line">
-                  <span className="nr-map-focus-dot" aria-hidden="true" />
-                </span>
-                <strong>{isArabic ? "مكة" : "Makkah"}</strong>
-              </div>
-
-              {selectedProgram ? (
-                <div className="nr-map-journey-program">
-                  <span>{isArabic ? "البرنامج المختار" : "Selected program"}</span>
-                  <strong>{isArabic ? selectedProgram.titleAr : selectedProgram.titleEn}</strong>
-                  <div>
-                    <small>{formatDuration(selectedProgram.durationDays, selectedProgram.durationNights, isArabic)}</small>
-                    <b>{formatPrice(selectedProgram.basePrice, language)} {selectedProgram.currencyCode}</b>
-                  </div>
-                  <a href={`/programs/${encodeURIComponent(selectedProgram.slug)}`}>
-                    {isArabic ? "عرض تفاصيل البرنامج" : "View program details"}
-                    <ArrowIcon isArabic={isArabic} />
-                  </a>
-                </div>
-              ) : (
-                <div className="nr-map-journey-summary">
-                  <span>{getProgramsLabel(journeyCountry, isArabic)}</span>
-                  {journeyCountry.hasPublishedPrograms ? (
-                    <a href={`/programs?country=${encodeURIComponent(journeyCountry.id)}`}>
-                      {isArabic ? "استعرض البرامج" : "Explore programs"}
-                      <ArrowIcon isArabic={isArabic} />
-                    </a>
+          <AnimatePresence mode="wait">
+            {journeyCountry ? (
+              <motion.div
+                key={`${journeyCountry.id}-${selectedProgram?.id ?? "country"}`}
+                className="nr-map-focus-journey"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 8 }}
+                transition={{ duration: 0.24 }}
+              >
+                <div className="nr-map-focus-topline">
+                  <span className="nr-map-focus-label">{isArabic ? "مسار رحلتك" : "Your journey"}</span>
+                  {journeyCountry.flagUrl ? (
+                    <img src={journeyCountry.flagUrl} alt="" aria-hidden="true" className="nr-map-focus-flag" />
                   ) : null}
                 </div>
-              )}
-            </motion.div>
-          ) : null}
-        </AnimatePresence>
+                <div className="nr-map-focus-route">
+                  <strong>{isArabic ? journeyCountry.nameAr : journeyCountry.nameEn}</strong>
+                  <span className="nr-map-focus-line">
+                    <span className="nr-map-focus-dot" aria-hidden="true" />
+                  </span>
+                  <strong>{isArabic ? "مكة" : "Makkah"}</strong>
+                </div>
+
+                {selectedProgram ? (
+                  <div className="nr-map-focus-program">
+                    <span>{isArabic ? "البرنامج المختار" : "Selected program"}</span>
+                    <strong>{isArabic ? selectedProgram.titleAr : selectedProgram.titleEn}</strong>
+                    <div>
+                      <small>{formatDuration(selectedProgram.durationDays, selectedProgram.durationNights, isArabic)}</small>
+                      <b>{formatPrice(selectedProgram.basePrice, language)} {selectedProgram.currencyCode}</b>
+                    </div>
+                    {selectedProgramUrl ? (
+                      <a href={selectedProgramUrl}>
+                        {isArabic ? "عرض تفاصيل البرنامج" : "View program details"}
+                        <ArrowIcon isArabic={isArabic} />
+                      </a>
+                    ) : null}
+                  </div>
+                ) : (
+                  <div className="nr-map-focus-summary">
+                    <small>{getProgramsLabel(journeyCountry, isArabic)}</small>
+                    {journeyCountry.hasPublishedPrograms ? (
+                      <a href={`/programs?country=${encodeURIComponent(journeyCountry.id)}`}>
+                        {isArabic ? "استعرض الرحلات" : "Explore journeys"}
+                        <ArrowIcon isArabic={isArabic} />
+                      </a>
+                    ) : null}
+                  </div>
+                )}
+              </motion.div>
+            ) : null}
+          </AnimatePresence>
+        </div>
 
         <motion.aside
           className={styles.floatingPanel}
@@ -569,7 +575,7 @@ export default function NourWorldMap({ language }: Props) {
             >
               <div className="nr-map-programs-head">
                 <div>
-                  <span>{isArabic ? "اختر برنامجًا لربطه بمسارك" : "Choose a program for your route"}</span>
+                  <span>{isArabic ? "اختر برنامجًا لتخصيص المسار" : "Select a program to focus the journey"}</span>
                   <strong>
                     {isArabic
                       ? `برامج ${selectedCountry.nameAr}`
@@ -604,49 +610,38 @@ export default function NourWorldMap({ language }: Props) {
                 <div className="nr-map-programs-grid">
                   {programsQuery.data!.map((program) => {
                     const title = isArabic ? program.titleAr : program.titleEn;
-                    const isProgramSelected = selectedProgramId === program.id;
+                    const isProgramSelected = program.id === selectedProgramId;
                     return (
-                      <article
+                      <button
                         key={program.id}
-                        className={[
-                          "nr-map-program-card",
-                          isProgramSelected ? "nr-map-program-card-selected" : "",
-                        ].filter(Boolean).join(" ")}
+                        type="button"
+                        className={`nr-map-program-card ${isProgramSelected ? "nr-map-program-card-selected" : ""}`}
+                        onClick={() => setSelectedProgramId((current) => current === program.id ? null : program.id)}
+                        aria-label={isArabic ? `اختيار ${title}` : `Select ${title}`}
+                        aria-pressed={isProgramSelected}
                       >
-                        <button
-                          type="button"
-                          className="nr-map-program-select"
-                          onClick={() => setSelectedProgramId((current) => current === program.id ? null : program.id)}
-                          aria-pressed={isProgramSelected}
-                          aria-label={isArabic ? `اختيار برنامج ${title}` : `Select ${title}`}
-                        >
-                          <div className="nr-map-program-media">
-                            {program.coverUrl ? (
-                              <img src={program.coverUrl} alt={title} />
-                            ) : (
-                              <div className="nr-map-program-placeholder"><KaabaIcon /></div>
-                            )}
-                            {program.isFeatured ? (
-                              <span>{isArabic ? "مميز" : "Featured"}</span>
-                            ) : null}
-                            {isProgramSelected ? (
-                              <b className="nr-map-program-selected-badge">{isArabic ? "مختار" : "Selected"}</b>
-                            ) : null}
+                        <div className="nr-map-program-media">
+                          {program.coverUrl ? (
+                            <img src={program.coverUrl} alt="" aria-hidden="true" />
+                          ) : (
+                            <div className="nr-map-program-placeholder"><KaabaIcon /></div>
+                          )}
+                          {program.isFeatured ? (
+                            <span>{isArabic ? "مميز" : "Featured"}</span>
+                          ) : null}
+                          {isProgramSelected ? (
+                            <em>{isArabic ? "مختار" : "Selected"}</em>
+                          ) : null}
+                        </div>
+                        <div className="nr-map-program-body">
+                          <strong>{title}</strong>
+                          <small>{formatDuration(program.durationDays, program.durationNights, isArabic)}</small>
+                          <div>
+                            <span>{isArabic ? "ابتداءً من" : "From"}</span>
+                            <b>{formatPrice(program.basePrice, language)} {program.currencyCode}</b>
                           </div>
-                          <div className="nr-map-program-body">
-                            <strong>{title}</strong>
-                            <small>{formatDuration(program.durationDays, program.durationNights, isArabic)}</small>
-                            <div>
-                              <span>{isArabic ? "ابتداءً من" : "From"}</span>
-                              <b>{formatPrice(program.basePrice, language)} {program.currencyCode}</b>
-                            </div>
-                          </div>
-                        </button>
-                        <a className="nr-map-program-link" href={`/programs/${encodeURIComponent(program.slug)}`}>
-                          {isArabic ? "التفاصيل" : "Details"}
-                          <ArrowIcon isArabic={isArabic} />
-                        </a>
-                      </article>
+                        </div>
+                      </button>
                     );
                   })}
                 </div>
@@ -670,7 +665,7 @@ export default function NourWorldMap({ language }: Props) {
                       isHighlighted ? styles.activeTab : "",
                       isSelected ? "nr-map-selected-tab" : "",
                     ].filter(Boolean).join(" ")}
-                    onClick={() => chooseCountry(country.id)}
+                    onClick={() => selectCountry(country.id)}
                     aria-pressed={isSelected}
                   >
                     {isArabic ? country.nameAr : country.nameEn}
@@ -682,23 +677,21 @@ export default function NourWorldMap({ language }: Props) {
         ) : null}
 
         <p className={styles.mapHint}>
-          {selectedCountry
+          {selectedProgram
             ? isArabic
-              ? "تم تثبيت اختيارك. اختر برنامجًا بالأسفل لربطه بمسار الرحلة، أو اضغط الدولة مرة أخرى للعودة إلى العرض العالمي."
-              : "Your starting point is pinned. Choose a program below to connect it to the journey, or select the country again to return to the world view."
-            : isArabic
-              ? "اختر دولة من الخريطة أو من القائمة لعرض مسار الرحلة والبرامج المتاحة."
-              : "Choose a country on the map or from the list to view its journey route and available programs."}
+              ? "تم تخصيص مسار الرحلة حسب البرنامج المختار. اضغط على البطاقة مرة أخرى لإلغاء الاختيار."
+              : "The journey is focused on your selected program. Select the card again to clear it."
+            : selectedCountry
+              ? isArabic
+                ? "اختر أحد البرامج لعرض تفاصيله مباشرة داخل مسار الرحلة."
+                : "Select a program to show its details directly in your journey."
+              : isArabic
+                ? "اختر دولة من الخريطة أو من القائمة لعرض المسار والبرامج المتاحة."
+                : "Choose a country on the map or from the list to view its route and available programs."}
         </p>
       </div>
 
       <style jsx global>{`
-        .nr-map-hit-area::after {
-          content: "";
-          position: absolute;
-          inset: -14px;
-          border-radius: 50%;
-        }
         .nr-map-selected-point {
           z-index: 13 !important;
           transform: translate(-50%, -50%) scale(1.36) !important;
@@ -711,7 +704,9 @@ export default function NourWorldMap({ language }: Props) {
           border-color: rgba(255,195,19,.3) !important;
           color: #ffc313 !important;
         }
-        .nr-map-selected-tab { box-shadow: inset 0 0 0 1px rgba(255,195,19,.55) !important; }
+        .nr-map-selected-tab {
+          box-shadow: inset 0 0 0 1px rgba(255,195,19,.55) !important;
+        }
         .nr-map-cta-disabled {
           cursor: not-allowed !important;
           opacity: .58;
@@ -719,72 +714,50 @@ export default function NourWorldMap({ language }: Props) {
           filter: grayscale(.15);
         }
         .nr-map-cta-disabled:hover { transform: none !important; }
-        .nr-map-route-program-selected {
-          stroke-width: 2.3 !important;
-          opacity: 1 !important;
-          filter: url(#nourRouteGlow);
-        }
 
-        .nr-map-journey-card {
-          display: grid;
-          grid-template-columns: minmax(160px,.8fr) minmax(250px,1.4fr) minmax(180px,.9fr);
-          align-items: center;
-          gap: 14px;
-          padding: 13px 15px;
-          border: 1px solid rgba(255,255,255,.13);
-          border-radius: 18px;
+        .nr-map-focus-journey {
+          position: absolute;
+          z-index: 27;
+          inset-inline-end: 18px;
+          bottom: 18px;
+          width: min(360px, 46%);
+          padding: 13px 14px;
+          border: 1px solid rgba(255,255,255,.15);
+          border-radius: 17px;
           color: #fff;
-          background: linear-gradient(100deg, rgba(5,26,48,.95), rgba(8,43,79,.84));
-          box-shadow: 0 16px 38px rgba(0,0,0,.18);
+          background: rgba(4,20,39,.92);
+          box-shadow: 0 18px 44px rgba(0,0,0,.28);
+          backdrop-filter: blur(14px);
         }
-        .nr-map-journey-card-program {
-          border-color: rgba(255,195,19,.28);
-          box-shadow: 0 16px 38px rgba(0,0,0,.2), inset 0 0 0 1px rgba(255,195,19,.06);
-        }
-        .nr-map-journey-origin {
+        .nr-map-focus-topline {
           display: flex;
           align-items: center;
+          justify-content: space-between;
           gap: 10px;
-          min-width: 0;
+          margin-bottom: 8px;
         }
-        .nr-map-journey-origin > img,
-        .nr-map-journey-origin > span {
-          display: grid;
-          flex: 0 0 38px;
-          width: 38px;
-          height: 38px;
-          place-items: center;
-          overflow: hidden;
-          border: 1px solid rgba(255,255,255,.16);
-          border-radius: 11px;
-          background: rgba(255,255,255,.08);
+        .nr-map-focus-label {
+          color: #8fc8ff;
+          font-size: 9px;
+          font-weight: 900;
         }
-        .nr-map-journey-origin > img { object-fit: cover; }
-        .nr-map-journey-origin svg { width: 18px; height: 18px; color: #ffc313; }
-        .nr-map-journey-origin div { min-width: 0; }
-        .nr-map-journey-origin small,
-        .nr-map-journey-origin strong { display: block; }
-        .nr-map-journey-origin small { color: #8fc8ff; font-size: 8px; font-weight: 900; }
-        .nr-map-journey-origin strong {
-          margin-top: 3px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          font-size: 13px;
-        }
-        .nr-map-journey-route {
-          min-width: 0;
+        .nr-map-focus-flag {
+          width: 23px;
+          height: 16px;
+          object-fit: cover;
+          border-radius: 4px;
+          box-shadow: 0 0 0 1px rgba(255,255,255,.14);
         }
         .nr-map-focus-route {
           display: grid;
-          grid-template-columns: max-content minmax(70px,1fr) max-content;
+          grid-template-columns: max-content minmax(54px, 1fr) max-content;
           align-items: center;
           gap: 9px;
         }
-        .nr-map-focus-route strong { font-size: 10px; }
+        .nr-map-focus-route strong { font-size: 11px; }
         .nr-map-focus-line {
           position: relative;
-          min-width: 70px;
+          min-width: 54px;
           height: 3px;
           overflow: visible;
           border-radius: 999px;
@@ -803,63 +776,56 @@ export default function NourWorldMap({ language }: Props) {
           border-radius: 50%;
           background: #ffc313;
           box-shadow: 0 0 0 4px rgba(255,195,19,.2), 0 0 20px rgba(255,195,19,.98);
-          animation: nrJourneyDotLtrV4 3.8s linear infinite;
+          animation: nrJourneyDotLtrStable 3.8s linear infinite;
           will-change: left, right;
         }
         [dir="rtl"] .nr-map-focus-dot {
           left: auto;
           right: 0;
-          animation-name: nrJourneyDotRtlV4;
+          animation-name: nrJourneyDotRtlStable;
         }
-        .nr-map-journey-summary,
-        .nr-map-journey-program {
-          min-width: 0;
+        .nr-map-focus-summary {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 10px;
+          margin-top: 9px;
         }
-        .nr-map-journey-summary {
+        .nr-map-focus-summary small { color: rgba(255,255,255,.64); font-size: 8px; }
+        .nr-map-focus-summary a,
+        .nr-map-focus-program a {
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          color: #ffc313;
+          font-size: 9px;
+          font-weight: 900;
+          text-decoration: none;
+        }
+        .nr-map-focus-summary a svg,
+        .nr-map-focus-program a svg { width: 12px; height: 12px; }
+        .nr-map-focus-program {
+          display: grid;
+          gap: 5px;
+          margin-top: 10px;
+          padding-top: 9px;
+          border-top: 1px solid rgba(255,255,255,.1);
+        }
+        .nr-map-focus-program > span { color: #8fc8ff; font-size: 8px; font-weight: 800; }
+        .nr-map-focus-program > strong {
+          overflow: hidden;
+          font-size: 11px;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .nr-map-focus-program > div {
           display: flex;
           align-items: center;
           justify-content: space-between;
           gap: 10px;
         }
-        .nr-map-journey-summary > span { color: rgba(255,255,255,.62); font-size: 9px; }
-        .nr-map-journey-summary a,
-        .nr-map-journey-program a {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          gap: 6px;
-          min-height: 34px;
-          padding-inline: 11px;
-          border-radius: 10px;
-          color: #173b61;
-          background: #ffc313;
-          font-size: 8.5px;
-          font-weight: 900;
-          text-decoration: none;
-          white-space: nowrap;
-        }
-        .nr-map-journey-summary a svg,
-        .nr-map-journey-program a svg { width: 13px; height: 13px; }
-        .nr-map-journey-program {
-          display: grid;
-          gap: 4px;
-        }
-        .nr-map-journey-program > span { color: #8fc8ff; font-size: 7.5px; font-weight: 800; }
-        .nr-map-journey-program > strong {
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          font-size: 11px;
-        }
-        .nr-map-journey-program > div {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 8px;
-        }
-        .nr-map-journey-program small { color: rgba(255,255,255,.58); font-size: 7.5px; }
-        .nr-map-journey-program b { color: #ffc313; font-size: 10px; }
-        .nr-map-journey-program a { margin-top: 4px; width: fit-content; }
+        .nr-map-focus-program small { color: rgba(255,255,255,.62); font-size: 8px; }
+        .nr-map-focus-program b { color: #ffc313; font-size: 10px; }
 
         .nr-map-programs {
           display: grid;
@@ -897,35 +863,30 @@ export default function NourWorldMap({ language }: Props) {
           gap: 10px;
         }
         .nr-map-program-card {
-          position: relative;
+          width: 100%;
           min-width: 0;
           overflow: hidden;
+          padding: 0;
           border: 1px solid rgba(255,255,255,.1);
           border-radius: 15px;
           color: #fff;
           background: rgba(255,255,255,.055);
+          text-align: start;
+          cursor: pointer;
+          appearance: none;
           transition: transform .2s ease, border-color .2s ease, background .2s ease, box-shadow .2s ease;
         }
-        .nr-map-program-card:hover {
+        .nr-map-program-card:hover,
+        .nr-map-program-card:focus-visible {
           transform: translateY(-3px);
           border-color: rgba(255,195,19,.35);
           background: rgba(255,255,255,.08);
+          outline: none;
         }
         .nr-map-program-card-selected {
-          border-color: rgba(255,195,19,.62);
-          background: rgba(255,195,19,.07);
-          box-shadow: inset 0 0 0 1px rgba(255,195,19,.12), 0 12px 28px rgba(0,0,0,.16);
-        }
-        .nr-map-program-select {
-          display: block;
-          width: 100%;
-          padding: 0;
-          border: 0;
-          color: inherit;
-          background: transparent;
-          font: inherit;
-          text-align: inherit;
-          cursor: pointer;
+          border-color: rgba(255,195,19,.68) !important;
+          background: rgba(255,195,19,.08) !important;
+          box-shadow: 0 0 0 2px rgba(255,195,19,.13), 0 12px 32px rgba(0,0,0,.18);
         }
         .nr-map-program-media {
           position: relative;
@@ -940,12 +901,13 @@ export default function NourWorldMap({ language }: Props) {
           display: block;
         }
         .nr-map-program-media > span,
-        .nr-map-program-selected-badge {
+        .nr-map-program-media > em {
           position: absolute;
           top: 8px;
           padding: 4px 7px;
           border-radius: 999px;
           font-size: 7px;
+          font-style: normal;
           font-weight: 900;
         }
         .nr-map-program-media > span {
@@ -953,11 +915,11 @@ export default function NourWorldMap({ language }: Props) {
           color: #102f55;
           background: #ffc313;
         }
-        .nr-map-program-selected-badge {
+        .nr-map-program-media > em {
           inset-inline-end: 8px;
           color: #fff;
-          background: rgba(5,31,58,.92);
-          border: 1px solid rgba(255,195,19,.48);
+          background: rgba(23,111,232,.88);
+          box-shadow: 0 4px 14px rgba(0,0,0,.2);
         }
         .nr-map-program-placeholder {
           display: grid;
@@ -992,17 +954,6 @@ export default function NourWorldMap({ language }: Props) {
         }
         .nr-map-program-body > div span { color: rgba(255,255,255,.5); font-size: 7px; }
         .nr-map-program-body > div b { color: #ffc313; font-size: 11px; }
-        .nr-map-program-link {
-          display: inline-flex;
-          align-items: center;
-          gap: 5px;
-          margin: 0 11px 10px;
-          color: #8fc8ff;
-          font-size: 8px;
-          font-weight: 800;
-          text-decoration: none;
-        }
-        .nr-map-program-link svg { width: 12px; height: 12px; }
         .nr-map-programs-state {
           padding: 18px;
           border: 1px dashed rgba(255,255,255,.12);
@@ -1012,66 +963,76 @@ export default function NourWorldMap({ language }: Props) {
           font-size: 10px;
         }
 
-        @keyframes nrJourneyDotLtrV4 {
-          from { left: 0; opacity: .45; }
-          8% { opacity: 1; }
-          92% { opacity: 1; }
-          to { left: calc(100% - 10px); opacity: .35; }
+        @keyframes nrJourneyDotLtrStable {
+          from { left: 0; opacity: .25; }
+          12% { opacity: 1; }
+          84% { opacity: 1; }
+          to { left: calc(100% - 10px); opacity: .2; }
         }
-        @keyframes nrJourneyDotRtlV4 {
-          from { right: 0; opacity: .45; }
-          8% { opacity: 1; }
-          92% { opacity: 1; }
-          to { right: calc(100% - 10px); opacity: .35; }
+        @keyframes nrJourneyDotRtlStable {
+          from { right: 0; opacity: .25; }
+          12% { opacity: 1; }
+          84% { opacity: 1; }
+          to { right: calc(100% - 10px); opacity: .2; }
         }
+
         @media (max-width: 760px) {
-          .nr-map-hit-area::after { inset: -16px; }
-          .nr-map-journey-card {
-            grid-template-columns: 1fr;
-            gap: 10px;
-            padding: 12px;
-            border-color: rgba(255,195,19,.18);
-            border-radius: 15px;
-            background: rgba(3,18,35,.96);
-            box-shadow: 0 14px 34px rgba(0,0,0,.3);
+          .nr-map-focus-journey {
+            position: relative;
+            z-index: 35;
+            inset: auto;
+            width: auto;
+            margin: 10px;
+            padding: 12px 13px;
+            border-color: rgba(255,195,19,.22);
+            background: rgba(3,18,35,.97);
+            box-shadow: 0 14px 34px rgba(0,0,0,.38);
           }
-          .nr-map-journey-origin > img,
-          .nr-map-journey-origin > span {
-            flex-basis: 34px;
-            width: 34px;
-            height: 34px;
+          .nr-map-focus-label { font-size: 9px; }
+          .nr-map-focus-route {
+            grid-template-columns: max-content minmax(76px, 1fr) max-content;
+            gap: 8px;
           }
-          .nr-map-journey-route {
-            grid-template-columns: max-content minmax(82px,1fr) max-content;
-          }
-          .nr-map-focus-line { min-width: 82px; }
+          .nr-map-focus-route strong { font-size: 10px; }
+          .nr-map-focus-line { min-width: 76px; height: 3px; }
           .nr-map-focus-dot {
             width: 12px;
             height: 12px;
             box-shadow: 0 0 0 5px rgba(255,195,19,.24), 0 0 26px rgba(255,195,19,1);
           }
-          .nr-map-journey-summary {
-            align-items: center;
-          }
-          .nr-map-journey-program > strong { font-size: 12px; white-space: normal; }
-          .nr-map-journey-program a,
-          .nr-map-journey-summary a { min-height: 38px; }
+          [dir="ltr"] .nr-map-focus-dot { animation-name: nrJourneyDotLtrMobileStable; }
+          [dir="rtl"] .nr-map-focus-dot { animation-name: nrJourneyDotRtlMobileStable; }
+          .nr-map-focus-program > strong { white-space: normal; }
           .nr-map-programs { padding: 12px; }
-          .nr-map-programs-head { align-items: flex-end; }
+          .nr-map-programs-head { align-items: end; }
           .nr-map-programs-head strong { font-size: 15px; }
           .nr-map-programs-grid {
             display: flex;
             gap: 9px;
             overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            -webkit-overflow-scrolling: touch;
-            padding-bottom: 3px;
+            scroll-snap-type: x proximity;
+            overscroll-behavior-inline: contain;
+            padding-bottom: 4px;
+            scrollbar-width: none;
           }
+          .nr-map-programs-grid::-webkit-scrollbar { display: none; }
           .nr-map-program-card {
             flex: 0 0 min(78vw, 245px);
-            scroll-snap-align: start;
+            scroll-snap-align: center;
           }
           .nr-map-program-media { height: 116px; }
+        }
+        @keyframes nrJourneyDotLtrMobileStable {
+          from { left: 0; opacity: .25; }
+          12% { opacity: 1; }
+          84% { opacity: 1; }
+          to { left: calc(100% - 12px); opacity: .2; }
+        }
+        @keyframes nrJourneyDotRtlMobileStable {
+          from { right: 0; opacity: .25; }
+          12% { opacity: 1; }
+          84% { opacity: 1; }
+          to { right: calc(100% - 12px); opacity: .2; }
         }
         @media (prefers-reduced-motion: reduce) {
           .nr-map-focus-dot { animation: none !important; }
