@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 
@@ -49,6 +49,7 @@ function buildRoutePath(from: MapPosition, to: MapPosition) {
 
 export default function NourWorldMap({ language }: Props) {
   const isArabic = language === "ar";
+  const shouldReduceMotion = useReducedMotion();
   const supabase = useMemo(() => createClient(), []);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -117,7 +118,7 @@ export default function NourWorldMap({ language }: Props) {
   );
 
   useEffect(() => {
-    if (paused || selectedId || countriesWithPositions.length <= 1) return;
+    if (paused || selectedId || shouldReduceMotion || countriesWithPositions.length <= 1) return;
     const availableCountries = countriesWithPositions.filter(
       (country) => country.iso2 !== SAUDI_ISO2 && country.hasPublishedPrograms,
     );
@@ -132,7 +133,7 @@ export default function NourWorldMap({ language }: Props) {
     }, 4300);
 
     return () => window.clearInterval(timer);
-  }, [paused, selectedId, countriesWithPositions]);
+  }, [paused, selectedId, shouldReduceMotion, countriesWithPositions]);
 
   const ctaCountry = selectedCountry ?? activeCountry;
   const highlightedId = selectedId ?? activeId;
@@ -188,11 +189,13 @@ export default function NourWorldMap({ language }: Props) {
           <div
             className={styles.mapStage}
             style={{
-              transform: selectedCountry ? "scale(1.075)" : "scale(1)",
+              transform: selectedCountry && !shouldReduceMotion ? "scale(1.075)" : "scale(1)",
               transformOrigin: focusedPosition
                 ? `${focusedPosition.x}% ${focusedPosition.y}%`
                 : "50% 50%",
-              transition: "transform 700ms cubic-bezier(.22,1,.36,1), transform-origin 700ms cubic-bezier(.22,1,.36,1)",
+              transition: shouldReduceMotion
+                ? "none"
+                : "transform 700ms cubic-bezier(.22,1,.36,1), transform-origin 700ms cubic-bezier(.22,1,.36,1)",
             }}
           >
             <img className={styles.realisticMap} src="/images/site/world-map-white.svg" alt="" aria-hidden="true" />
@@ -228,15 +231,14 @@ export default function NourWorldMap({ language }: Props) {
                       className={isHighlighted ? styles.routeTravelerActive : styles.routeTraveler}
                       strokeDasharray="0.6 3.6"
                       animate={{
-                        strokeDashoffset: [0, -16],
-                        opacity: isHighlighted ? [0.45, 1, 0.45] : [0.18, 0.55, 0.18],
+                        strokeDashoffset: shouldReduceMotion ? 0 : [0, -16],
+                        opacity: isHighlighted ? 1 : 0.4,
                       }}
-                      transition={{
+                      transition={shouldReduceMotion ? { duration: 0 } : {
                         strokeDashoffset: { duration: 2.8 + index * 0.22, repeat: Infinity, ease: "linear" },
-                        opacity: { duration: 2.4, repeat: Infinity, ease: "easeInOut", delay: index * 0.16 },
                       }}
                     />
-                    {isHighlighted ? (
+                    {isHighlighted && !shouldReduceMotion ? (
                       <circle r="0.9" fill="#ffc313" filter="url(#nourRouteGlow)">
                         <animateMotion dur="3s" repeatCount="indefinite" path={routePath} />
                       </circle>
