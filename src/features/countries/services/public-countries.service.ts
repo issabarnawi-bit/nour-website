@@ -48,6 +48,11 @@ type MediaRow = {
   path: string;
 };
 
+type Coordinates = {
+  latitude: number;
+  longitude: number;
+};
+
 const publicCountryColumns = `
   id,
   name_ar,
@@ -59,6 +64,52 @@ const publicCountryColumns = `
   flag_media_id,
   sort_order
 `;
+
+/**
+ * Visual centers used only by the public world-map experience.
+ *
+ * The production countries table keeps its original geographic coordinates.
+ * These overrides compensate for country shape / map projection so markers sit
+ * visually near the center of each country on the equirectangular SVG map.
+ *
+ * Some legacy country rows currently contain non-standard ISO2 values, so the
+ * lookup also supports normalized English/Arabic names until those records are
+ * reconciled separately.
+ */
+const VISUAL_MAP_CENTERS: Record<string, Coordinates> = {
+  "sa": { latitude: 23.8859, longitude: 45.0792 },
+  "saudi arabia": { latitude: 23.8859, longitude: 45.0792 },
+  "السعودية": { latitude: 23.8859, longitude: 45.0792 },
+
+  "sd": { latitude: 15.6, longitude: 30.4 },
+  "su": { latitude: 15.6, longitude: 30.4 },
+  "sudan": { latitude: 15.6, longitude: 30.4 },
+  "sudan n": { latitude: 15.6, longitude: 30.4 },
+  "السودان": { latitude: 15.6, longitude: 30.4 },
+
+  "jo": { latitude: 31.24, longitude: 36.51 },
+  "ju": { latitude: 31.24, longitude: 36.51 },
+  "jordan": { latitude: 31.24, longitude: 36.51 },
+  "jurdan": { latitude: 31.24, longitude: 36.51 },
+  "الاردن": { latitude: 31.24, longitude: 36.51 },
+  "الأردن": { latitude: 31.24, longitude: 36.51 },
+
+  "es": { latitude: 40.25, longitude: -3.72 },
+  "ss": { latitude: 40.25, longitude: -3.72 },
+  "spain": { latitude: 40.25, longitude: -3.72 },
+  "sbain": { latitude: 40.25, longitude: -3.72 },
+  "اسبانيا": { latitude: 40.25, longitude: -3.72 },
+  "إسبانيا": { latitude: 40.25, longitude: -3.72 },
+
+  "ca": { latitude: 56.13, longitude: -106.35 },
+  "canada": { latitude: 56.13, longitude: -106.35 },
+  "كندا": { latitude: 56.13, longitude: -106.35 },
+
+  "ng": { latitude: 9.08, longitude: 8.68 },
+  "nj": { latitude: 9.08, longitude: 8.68 },
+  "nigeria": { latitude: 9.08, longitude: 8.68 },
+  "نيجيريا": { latitude: 9.08, longitude: 8.68 },
+};
 
 function normalizeCoordinate(
   value: number | string | null,
@@ -76,6 +127,33 @@ function normalizeCoordinate(
   return Number.isFinite(parsedValue)
     ? parsedValue
     : null;
+}
+
+function normalizeMapLookup(value: string | null | undefined): string {
+  return (value ?? "")
+    .trim()
+    .toLocaleLowerCase("en-US");
+}
+
+function getVisualMapCoordinates(
+  country: PublicCountryRow,
+  latitude: number,
+  longitude: number,
+): Coordinates {
+  const lookupKeys = [
+    country.iso2,
+    country.name_en,
+    country.name_ar,
+  ]
+    .map(normalizeMapLookup)
+    .filter(Boolean);
+
+  for (const key of lookupKeys) {
+    const override = VISUAL_MAP_CENTERS[key];
+    if (override) return override;
+  }
+
+  return { latitude, longitude };
 }
 
 function getPublicMediaUrl(
@@ -236,15 +314,22 @@ export async function getPublicCountries(
 
   return validCountryRows.map(
     (country) => {
-      const latitude =
+      const sourceLatitude =
         normalizeCoordinate(
           country.latitude,
         ) as number;
 
-      const longitude =
+      const sourceLongitude =
         normalizeCoordinate(
           country.longitude,
         ) as number;
+
+      const { latitude, longitude } =
+        getVisualMapCoordinates(
+          country,
+          sourceLatitude,
+          sourceLongitude,
+        );
 
       const programCount =
         programCounts.get(country.id) ??
