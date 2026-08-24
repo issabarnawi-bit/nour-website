@@ -9,7 +9,6 @@ import { createClient } from "../../../../src/lib/supabase/client";
 import { trackMapEvent } from "../../../../src/lib/analytics/map-events";
 
 type Props = { language: Language };
-
 type CountryButtonSource = "map" | "chip";
 
 function normalize(value: string | null | undefined) {
@@ -44,11 +43,7 @@ function findCountryFromButton(
       return { country, source: "map" };
     }
 
-    if (
-      !ariaLabel &&
-      localizedName &&
-      (text === localizedName || text.startsWith(`${localizedName} `))
-    ) {
+    if (!ariaLabel && localizedName && text.startsWith(localizedName)) {
       return { country, source: "chip" };
     }
   }
@@ -169,22 +164,41 @@ export default function NourWorldMapEnhancements({ language }: Props) {
         }
 
         if (button.classList.contains("nr-map-program-card")) {
-          const programAnchor = button.querySelector<HTMLAnchorElement>("a[href*='/programs/']");
-          const programSlug = programAnchor?.href.split("/programs/")[1]?.split(/[?#]/)[0];
+          window.setTimeout(() => {
+            const programLink = root.querySelector<HTMLAnchorElement>(
+              '.nr-map-focus-program a[href^="/programs/"]',
+            );
+            const href = programLink?.getAttribute("href") ?? "";
+            const programSlug = href.startsWith("/programs/")
+              ? href.slice("/programs/".length).split(/[?#]/)[0]
+              : undefined;
 
-          trackMapEvent("map_program_clicked", {
-            countryId: selectedCountry?.id,
-            countryIso2: selectedCountry?.iso2,
-            programSlug,
-            source: "program_card",
-            hasPrograms: true,
-          });
+            trackMapEvent("map_program_clicked", {
+              countryId: selectedCountry?.id,
+              countryIso2: selectedCountry?.iso2,
+              programSlug,
+              source: "program_card",
+              hasPrograms: true,
+            });
+          }, 0);
         }
       }
 
       if (anchor && root.contains(anchor)) {
         const href = anchor.getAttribute("href") ?? "";
-        if (href.startsWith("/programs")) {
+
+        if (href.startsWith("/programs/")) {
+          trackMapEvent("map_program_clicked", {
+            countryId: selectedCountry?.id,
+            countryIso2: selectedCountry?.iso2,
+            programSlug: href.slice("/programs/".length).split(/[?#]/)[0],
+            source: "journey_card",
+            hasPrograms: true,
+          });
+          return;
+        }
+
+        if (href === "/programs" || href.startsWith("/programs?")) {
           trackMapEvent("map_view_all_clicked", {
             countryId: selectedCountry?.id,
             countryIso2: selectedCountry?.iso2,
@@ -251,17 +265,7 @@ export default function NourWorldMapEnhancements({ language }: Props) {
               : "You can browse journeys available from other countries now. Programs for this country will appear as soon as they are published."}
           </p>
         </div>
-        <a
-          href="/programs"
-          onClick={() => {
-            trackMapEvent("map_view_all_clicked", {
-              countryId: selectedCountry.id,
-              countryIso2: selectedCountry.iso2,
-              source: "journey_card",
-              hasPrograms: false,
-            });
-          }}
-        >
+        <a href="/programs">
           {isArabic ? "استعرض البرامج المتاحة" : "Explore available programs"}
           <span aria-hidden="true">{isArabic ? "←" : "→"}</span>
         </a>
