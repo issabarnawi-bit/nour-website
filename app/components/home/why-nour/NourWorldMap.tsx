@@ -674,7 +674,7 @@ export default function NourWorldMap({ language }: Props) {
         .nr-map-focus-line i {
           position: absolute;
           top: 50%;
-          left: 0;
+          inset-inline-start: 0;
           width: 7px;
           height: 7px;
           transform: translateY(-50%);
@@ -806,8 +806,8 @@ export default function NourWorldMap({ language }: Props) {
         }
 
         @keyframes nrJourneyTraveler {
-          from { left: 0; }
-          to { left: calc(100% - 7px); }
+          from { inset-inline-start: 0; }
+          to { inset-inline-start: calc(100% - 7px); }
         }
         @media (max-width: 760px) {
           .nr-map-focus-journey {
@@ -832,7 +832,7 @@ export default function NourWorldMap({ language }: Props) {
           .nr-map-program-media { height: 116px; }
         }
         @media (prefers-reduced-motion: reduce) {
-          .nr-map-focus-line i { animation: none; left: calc(100% - 7px); }
+          .nr-map-focus-line i { animation: none; inset-inline-start: calc(100% - 7px); }
           .nr-map-program-card { transition: none; }
         }
       `}</style>
