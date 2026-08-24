@@ -1,6 +1,7 @@
 "use client";
 import type { ReactNode } from "react";
 import ProgramDetailsExperience from "./ProgramDetailsExperience";
+import ProgramStructuredContent from "./ProgramStructuredContent";
 
 export default function ProgramsLayout({
   children,
@@ -10,6 +11,7 @@ export default function ProgramsLayout({
   return (
     <>
       {children}
+      <ProgramStructuredContent />
       <ProgramDetailsExperience />
     </>
   );
