@@ -111,6 +111,36 @@ const VISUAL_MAP_CENTERS: Record<string, Coordinates> = {
   "نيجيريا": { latitude: 9.08, longitude: 8.68 },
 };
 
+const STANDARD_FLAG_CODES: Record<string, string> = {
+  "sa": "SA",
+  "saudi arabia": "SA",
+  "السعودية": "SA",
+  "sd": "SD",
+  "su": "SD",
+  "sudan": "SD",
+  "sudan n": "SD",
+  "السودان": "SD",
+  "jo": "JO",
+  "ju": "JO",
+  "jordan": "JO",
+  "jurdan": "JO",
+  "الاردن": "JO",
+  "الأردن": "JO",
+  "es": "ES",
+  "ss": "ES",
+  "spain": "ES",
+  "sbain": "ES",
+  "اسبانيا": "ES",
+  "إسبانيا": "ES",
+  "ca": "CA",
+  "canada": "CA",
+  "كندا": "CA",
+  "ng": "NG",
+  "nj": "NG",
+  "nigeria": "NG",
+  "نيجيريا": "NG",
+};
+
 function normalizeCoordinate(
   value: number | string | null,
 ): number | null {
@@ -154,6 +184,35 @@ function getVisualMapCoordinates(
   }
 
   return { latitude, longitude };
+}
+
+function getCountryFlagCode(country: PublicCountryRow): string | undefined {
+  const lookupKeys = [country.iso2, country.name_en, country.name_ar]
+    .map(normalizeMapLookup)
+    .filter(Boolean);
+
+  for (const key of lookupKeys) {
+    const code = STANDARD_FLAG_CODES[key];
+    if (code) return code;
+  }
+
+  const rawIso2 = (country.iso2 ?? "").trim().toUpperCase();
+  return /^[A-Z]{2}$/.test(rawIso2) ? rawIso2 : undefined;
+}
+
+function countryCodeToEmoji(code: string): string {
+  return [...code.toUpperCase()]
+    .map((character) => String.fromCodePoint(127397 + character.charCodeAt(0)))
+    .join("");
+}
+
+function getFallbackFlagDataUrl(country: PublicCountryRow): string | undefined {
+  const code = getCountryFlagCode(country);
+  if (!code) return undefined;
+
+  const emoji = countryCodeToEmoji(code);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="44" viewBox="0 0 64 44"><rect width="64" height="44" rx="6" fill="#ffffff"/><text x="32" y="31" text-anchor="middle" font-size="30">${emoji}</text></svg>`;
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 }
 
 function getPublicMediaUrl(
@@ -342,6 +401,11 @@ export async function getPublicCountries(
             )
           : undefined;
 
+      const storedFlagUrl = getPublicMediaUrl(
+        supabase,
+        media,
+      );
+
       return {
         id: country.id,
 
@@ -357,10 +421,7 @@ export async function getPublicCountries(
         flagMediaId:
           country.flag_media_id,
 
-        flagUrl: getPublicMediaUrl(
-          supabase,
-          media,
-        ),
+        flagUrl: storedFlagUrl ?? getFallbackFlagDataUrl(country),
 
         publishedProgramsCount:
           programCount,
