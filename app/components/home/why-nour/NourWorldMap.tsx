@@ -199,6 +199,7 @@ export default function NourWorldMap({
   useEffect(() => {
     if (
       paused ||
+      selectedId ||
       countriesWithPositions.length <= 1
     ) {
       return;
@@ -231,10 +232,12 @@ export default function NourWorldMap({
     }, 4300);
 
     return () => window.clearInterval(timer);
-  }, [paused, countriesWithPositions]);
+  }, [paused, selectedId, countriesWithPositions]);
 
   const ctaCountry =
     selectedCountry ?? activeCountry;
+
+  const highlightedId = selectedId ?? activeId;
 
   const activeProgramsUrl = ctaCountry
     ? `/programs?country=${encodeURIComponent(
@@ -378,15 +381,15 @@ export default function NourWorldMap({
                     makkahPosition,
                   );
 
-                  const isActive =
-                    country.id === activeId;
+                  const isHighlighted =
+                    country.id === highlightedId;
 
                   return (
                     <g key={country.id}>
                       <motion.path
                         d={routePath}
                         className={
-                          isActive
+                          isHighlighted
                             ? styles.routeBaseActive
                             : styles.routeBase
                         }
@@ -409,14 +412,14 @@ export default function NourWorldMap({
                       <motion.path
                         d={routePath}
                         className={
-                          isActive
+                          isHighlighted
                             ? styles.routeTravelerActive
                             : styles.routeTraveler
                         }
                         strokeDasharray="0.6 3.6"
                         animate={{
                           strokeDashoffset: [0, -16],
-                          opacity: isActive
+                          opacity: isHighlighted
                             ? [0.45, 1, 0.45]
                             : [0.18, 0.55, 0.18],
                         }}
@@ -474,6 +477,8 @@ export default function NourWorldMap({
               (country) => {
                 const isActive =
                   country.id === activeId;
+                const isSelected =
+                  country.id === selectedId;
                 const isSaudi =
                   country.iso2 === SAUDI_ISO2;
 
@@ -491,6 +496,9 @@ export default function NourWorldMap({
                       isActive
                         ? styles.activePoint
                         : "",
+                      isSelected
+                        ? "nr-map-selected-point"
+                        : "",
                     ]
                       .filter(Boolean)
                       .join(" ")}
@@ -499,7 +507,9 @@ export default function NourWorldMap({
                       top: `${country.position.y}%`,
                     }}
                     onMouseEnter={() => {
-                      setActiveId(country.id);
+                      if (!selectedId) {
+                        setActiveId(country.id);
+                      }
                       setPaused(true);
                     }}
                     onMouseLeave={() =>
@@ -518,7 +528,7 @@ export default function NourWorldMap({
                         ? `عرض برامج ${country.nameAr}`
                         : `Show programs for ${country.nameEn}`
                     }
-                    aria-pressed={isActive}
+                    aria-pressed={isSelected}
                   >
                     <span />
                     <small>
@@ -550,7 +560,6 @@ export default function NourWorldMap({
               </div>
             ) : null}
           </div>
-
 
           <AnimatePresence mode="wait">
             {selectedCountry ? (
@@ -596,118 +605,134 @@ export default function NourWorldMap({
                 <div>
                   <small>
                     {isArabic
-                      ? selectedCountry.nameAr
-                      : selectedCountry.nameEn}
+                      ? "الدولة المختارة"
+                      : "Selected country"}
                   </small>
                   <strong>
+                    {isArabic
+                      ? selectedCountry.nameAr
+                      : selectedCountry.nameEn}
+                  </strong>
+                  <small>
                     {getProgramsLabel(
                       selectedCountry,
                       isArabic,
                     )}
-                  </strong>
+                  </small>
                 </div>
               </motion.article>
             ) : null}
           </AnimatePresence>
-
         </div>
 
-          <motion.aside
-            className={styles.floatingPanel}
-            initial={{
-              opacity: 0,
-              x: isArabic ? 34 : -34,
-            }}
-            whileInView={{
-              opacity: 1,
-              x: 0,
-            }}
-            viewport={{ once: true }}
-            transition={{
-              duration: 0.72,
-              delay: 0.35,
-              ease: [0.22, 1, 0.36, 1],
-            }}
-          >
-            <span className={styles.panelKicker}>
-              {isArabic
+        <motion.aside
+          className={styles.floatingPanel}
+          initial={{
+            opacity: 0,
+            x: isArabic ? 34 : -34,
+          }}
+          whileInView={{
+            opacity: 1,
+            x: 0,
+          }}
+          viewport={{ once: true }}
+          transition={{
+            duration: 0.72,
+            delay: 0.35,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+        >
+          <span className={styles.panelKicker}>
+            {selectedCountry
+              ? isArabic
+                ? "الدولة المختارة"
+                : "Selected country"
+              : isArabic
                 ? "اختر نقطة الانطلاق"
                 : "Choose your starting point"}
-            </span>
+          </span>
 
-            <h4>
-              {ctaCountry
-                ? isArabic
-                  ? `اكتشف برامج ${ctaCountry.nameAr}`
-                  : `Explore programs from ${ctaCountry.nameEn}`
-                : isArabic
-                  ? "اختر دولتك"
-                  : "Choose your country"}
-            </h4>
+          <h4>
+            {ctaCountry
+              ? isArabic
+                ? `اكتشف برامج ${ctaCountry.nameAr}`
+                : `Explore programs from ${ctaCountry.nameEn}`
+              : isArabic
+                ? "اختر دولتك"
+                : "Choose your country"}
+          </h4>
 
-            <p>
-              {ctaCountry
-                ? getProgramsLabel(
-                    ctaCountry,
-                    isArabic,
-                  )
-                : isArabic
-                  ? "اختر نقطة على الخريطة لعرض البرامج."
-                  : "Select a point on the map to view programs."}
-            </p>
+          <p>
+            {ctaCountry
+              ? getProgramsLabel(
+                  ctaCountry,
+                  isArabic,
+                )
+              : isArabic
+                ? "اختر نقطة على الخريطة لعرض البرامج."
+                : "Select a point on the map to view programs."}
+          </p>
 
-            <div className={styles.metrics}>
-              <div>
-                <strong>{countries.length}</strong>
-                <span>
-                  {isArabic
-                    ? "دولة مفعّلة"
-                    : "Active countries"}
-                </span>
-              </div>
-
-              <div>
-                <strong>
-                  {countriesWithProgramsCount}
-                </strong>
-                <span>
-                  {isArabic
-                    ? "دول لديها برامج"
-                    : "With programs"}
-                </span>
-              </div>
-
-              <div>
-                <strong>
-                  {publishedProgramsCount}
-                </strong>
-                <span>
-                  {isArabic
-                    ? "برنامج منشور"
-                    : "Programs"}
-                </span>
-              </div>
+          <div className={styles.metrics}>
+            <div>
+              <strong>{countries.length}</strong>
+              <span>
+                {isArabic
+                  ? "دولة مفعّلة"
+                  : "Active countries"}
+              </span>
             </div>
 
+            <div>
+              <strong>
+                {countriesWithProgramsCount}
+              </strong>
+              <span>
+                {isArabic
+                  ? "دول لديها برامج"
+                  : "With programs"}
+              </span>
+            </div>
+
+            <div>
+              <strong>
+                {publishedProgramsCount}
+              </strong>
+              <span>
+                {isArabic
+                  ? "برنامج منشور"
+                  : "Programs"}
+              </span>
+            </div>
+          </div>
+
+          {ctaCountry?.hasPublishedPrograms ? (
             <a
               className={styles.cta}
               href={activeProgramsUrl}
             >
               <span>
-                {ctaCountry
-                  ? isArabic
-                    ? `استعرض برامج ${ctaCountry.nameAr}`
-                    : `Explore ${ctaCountry.nameEn} programs`
-                  : isArabic
-                    ? "استعرض البرامج"
-                    : "Explore programs"}
+                {isArabic
+                  ? `استعرض برامج ${ctaCountry.nameAr}`
+                  : `Explore ${ctaCountry.nameEn} programs`}
               </span>
               <ArrowIcon
                 isArabic={isArabic}
               />
             </a>
-          </motion.aside>
-
+          ) : (
+            <span
+              className={`${styles.cta} nr-map-cta-disabled`}
+              aria-disabled="true"
+            >
+              <span>
+                {isArabic
+                  ? "لا توجد برامج متاحة حاليًا"
+                  : "No programs available yet"}
+              </span>
+            </span>
+          )}
+        </motion.aside>
 
         {countriesWithPositions.length > 0 ? (
           <div className={styles.locationTabs}>
@@ -716,42 +741,99 @@ export default function NourWorldMap({
                 (country) =>
                   country.iso2 !== SAUDI_ISO2,
               )
-              .map((country) => (
-                <button
-                  key={country.id}
-                  type="button"
-                  className={
-                    country.id === activeId
-                      ? styles.activeTab
-                      : ""
-                  }
-                  onClick={() => {
-                    setActiveId(country.id);
-                    setSelectedId(country.id);
-                  }}
-                >
-                  {isArabic
-                    ? country.nameAr
-                    : country.nameEn}
+              .map((country) => {
+                const isSelected =
+                  country.id === selectedId;
+                const isHighlighted =
+                  country.id === highlightedId;
 
-                  {country.hasPublishedPrograms ? (
-                    <span>
-                      {
-                        country.publishedProgramsCount
-                      }
-                    </span>
-                  ) : null}
-                </button>
-              ))}
+                return (
+                  <button
+                    key={country.id}
+                    type="button"
+                    className={[
+                      isHighlighted
+                        ? styles.activeTab
+                        : "",
+                      isSelected
+                        ? "nr-map-selected-tab"
+                        : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                    onClick={() => {
+                      setActiveId(country.id);
+                      setSelectedId((current) =>
+                        current === country.id
+                          ? null
+                          : country.id,
+                      );
+                    }}
+                    aria-pressed={isSelected}
+                  >
+                    {isArabic
+                      ? country.nameAr
+                      : country.nameEn}
+
+                    {country.hasPublishedPrograms ? (
+                      <span>
+                        {
+                          country.publishedProgramsCount
+                        }
+                      </span>
+                    ) : null}
+                  </button>
+                );
+              })}
           </div>
         ) : null}
 
         <p className={styles.mapHint}>
-          {isArabic
-            ? "اختر دولة من الخريطة أو من القائمة لعرض البرامج المتاحة."
-            : "Choose a country on the map or from the list to view available programs."}
+          {selectedCountry
+            ? isArabic
+              ? "تم تثبيت اختيارك. اضغط على الدولة مرة أخرى لإلغاء الاختيار."
+              : "Your selection is pinned. Select the country again to clear it."
+            : isArabic
+              ? "اختر دولة من الخريطة أو من القائمة لعرض البرامج المتاحة."
+              : "Choose a country on the map or from the list to view available programs."}
         </p>
       </div>
+
+      <style jsx global>{`
+        .nr-map-selected-point {
+          z-index: 13 !important;
+          transform: translate(-50%, -50%) scale(1.36) !important;
+          background: #ffc313 !important;
+          box-shadow:
+            0 0 0 10px rgba(255,195,19,.18),
+            0 0 38px rgba(255,195,19,.78) !important;
+        }
+
+        .nr-map-selected-point::before {
+          border-color: rgba(255,195,19,.72) !important;
+        }
+
+        .nr-map-selected-point > small {
+          opacity: 1 !important;
+          border-color: rgba(255,195,19,.3) !important;
+          color: #ffc313 !important;
+        }
+
+        .nr-map-selected-tab {
+          box-shadow: inset 0 0 0 1px rgba(255,195,19,.55) !important;
+        }
+
+        .nr-map-cta-disabled {
+          cursor: not-allowed !important;
+          opacity: .58;
+          box-shadow: none !important;
+          filter: grayscale(.15);
+        }
+
+        .nr-map-cta-disabled:hover {
+          transform: none !important;
+        }
+      `}</style>
     </motion.section>
   );
 }
