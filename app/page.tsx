@@ -8,7 +8,7 @@ import Footer from "./components/layout/Footer";
 import Hero from "./components/home/Hero";
 import ProgramsPreview from "./components/home/ProgramsPreview";
 import Services from "./components/home/Services";
-import NourWorldMap from "./components/home/why-nour/NourWorldMapV5";
+import NourWorldMap from "./components/home/why-nour/NourWorldMap";
 import Journey from "./components/home/Journey";
 import Showcase from "./components/home/Showcase";
 import WhyNour from "./components/home/WhyNour";
