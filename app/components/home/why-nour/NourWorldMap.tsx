@@ -244,7 +244,7 @@ export default function NourWorldMap({ language }: Props) {
         const nextIndex = currentIndex < 0 ? 0 : (currentIndex + 1) % availableCountries.length;
         return availableCountries[nextIndex].id;
       });
-    }, 4300);
+    }, 6000);
 
     return () => window.clearInterval(timer);
   }, [paused, selectedId, shouldReduceMotion, countriesWithPositions]);
