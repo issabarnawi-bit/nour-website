@@ -239,6 +239,7 @@ export default function NourWorldMap({ language }: Props) {
   }, [paused, selectedId, shouldReduceMotion, countriesWithPositions]);
 
   const ctaCountry = selectedCountry ?? activeCountry;
+  const journeyCountry = selectedCountry ?? activeCountry;
   const highlightedId = selectedId ?? activeId;
   const activeProgramsUrl = ctaCountry
     ? `/programs?country=${encodeURIComponent(ctaCountry.id)}`
@@ -431,21 +432,25 @@ export default function NourWorldMap({ language }: Props) {
             ) : null}
           </AnimatePresence>
 
-          <AnimatePresence>
-            {selectedCountry ? (
+          <AnimatePresence mode="wait">
+            {journeyCountry ? (
               <motion.div
+                key={journeyCountry.id}
                 className="nr-map-focus-journey"
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 8 }}
+                transition={{ duration: 0.24 }}
               >
                 <span className="nr-map-focus-label">{isArabic ? "مسار رحلتك" : "Your journey"}</span>
                 <div className="nr-map-focus-route">
-                  <strong>{isArabic ? selectedCountry.nameAr : selectedCountry.nameEn}</strong>
-                  <span className="nr-map-focus-line"><i /></span>
+                  <strong>{isArabic ? journeyCountry.nameAr : journeyCountry.nameEn}</strong>
+                  <span className="nr-map-focus-line">
+                    <span className="nr-map-focus-dot" aria-hidden="true" />
+                  </span>
                   <strong>{isArabic ? "مكة" : "Makkah"}</strong>
                 </div>
-                <small>{getProgramsLabel(selectedCountry, isArabic)}</small>
+                <small>{getProgramsLabel(journeyCountry, isArabic)}</small>
               </motion.div>
             ) : null}
           </AnimatePresence>
@@ -638,7 +643,7 @@ export default function NourWorldMap({ language }: Props) {
 
         .nr-map-focus-journey {
           position: absolute;
-          z-index: 17;
+          z-index: 27;
           inset-inline-end: 18px;
           bottom: 18px;
           width: min(330px, 42%);
@@ -646,8 +651,8 @@ export default function NourWorldMap({ language }: Props) {
           border: 1px solid rgba(255,255,255,.15);
           border-radius: 16px;
           color: #fff;
-          background: rgba(4,20,39,.82);
-          box-shadow: 0 18px 44px rgba(0,0,0,.2);
+          background: rgba(4,20,39,.9);
+          box-shadow: 0 18px 44px rgba(0,0,0,.28);
           backdrop-filter: blur(14px);
         }
         .nr-map-focus-label {
@@ -659,34 +664,51 @@ export default function NourWorldMap({ language }: Props) {
         }
         .nr-map-focus-route {
           display: grid;
-          grid-template-columns: max-content 1fr max-content;
+          grid-template-columns: max-content minmax(54px, 1fr) max-content;
           align-items: center;
           gap: 9px;
         }
         .nr-map-focus-route strong { font-size: 11px; }
         .nr-map-focus-line {
           position: relative;
-          height: 2px;
+          min-width: 54px;
+          height: 3px;
           overflow: visible;
           border-radius: 999px;
           background: linear-gradient(90deg, #176fe8, #2aa9e9, #ffc313);
         }
-        .nr-map-focus-line i {
+        .nr-map-focus-line::after {
+          display: none !important;
+          content: none !important;
+        }
+        .nr-map-focus-line > i {
+          display: none !important;
+        }
+        .nr-map-focus-dot {
           position: absolute;
+          z-index: 8;
           top: 50%;
-          inset-inline-start: 0;
-          width: 7px;
-          height: 7px;
+          left: 0;
+          right: auto;
+          width: 10px;
+          height: 10px;
           transform: translateY(-50%);
+          border: 2px solid rgba(255,255,255,.94);
           border-radius: 50%;
           background: #ffc313;
-          box-shadow: 0 0 14px rgba(255,195,19,.85);
-          animation: nrJourneyTraveler 2.6s linear infinite;
+          box-shadow: 0 0 0 4px rgba(255,195,19,.2), 0 0 20px rgba(255,195,19,.98);
+          animation: nrJourneyDotLtrStable 2.35s linear infinite;
+          will-change: left, right;
+        }
+        [dir="rtl"] .nr-map-focus-dot {
+          left: auto;
+          right: 0;
+          animation-name: nrJourneyDotRtlStable;
         }
         .nr-map-focus-journey > small {
           display: block;
           margin-top: 7px;
-          color: rgba(255,255,255,.58);
+          color: rgba(255,255,255,.64);
           font-size: 8px;
         }
 
@@ -805,18 +827,49 @@ export default function NourWorldMap({ language }: Props) {
           font-size: 10px;
         }
 
-        @keyframes nrJourneyTraveler {
-          from { inset-inline-start: 0; }
-          to { inset-inline-start: calc(100% - 7px); }
+        @keyframes nrJourneyDotLtrStable {
+          from { left: 0; }
+          to { left: calc(100% - 10px); }
+        }
+        @keyframes nrJourneyDotRtlStable {
+          from { right: 0; }
+          to { right: calc(100% - 10px); }
         }
         @media (max-width: 760px) {
           .nr-map-focus-journey {
-            inset-inline: 12px;
-            bottom: 12px;
+            z-index: 35;
+            inset-inline: 10px;
+            bottom: 10px;
             width: auto;
-            padding: 10px 12px;
+            padding: 11px 12px;
+            border-color: rgba(255,195,19,.22);
+            background: rgba(3,18,35,.96);
+            box-shadow: 0 14px 34px rgba(0,0,0,.38);
+          }
+          .nr-map-focus-label {
+            margin-bottom: 7px;
+            font-size: 8px;
+          }
+          .nr-map-focus-route {
+            grid-template-columns: max-content minmax(72px, 1fr) max-content;
+            gap: 8px;
           }
           .nr-map-focus-route strong { font-size: 9px; }
+          .nr-map-focus-line {
+            min-width: 72px;
+            height: 3px;
+          }
+          .nr-map-focus-dot {
+            width: 12px;
+            height: 12px;
+            box-shadow: 0 0 0 5px rgba(255,195,19,.24), 0 0 26px rgba(255,195,19,1);
+          }
+          [dir="ltr"] .nr-map-focus-dot {
+            animation-name: nrJourneyDotLtrMobileStable;
+          }
+          [dir="rtl"] .nr-map-focus-dot {
+            animation-name: nrJourneyDotRtlMobileStable;
+          }
           .nr-map-programs { padding: 12px; }
           .nr-map-programs-grid {
             display: flex;
@@ -831,8 +884,26 @@ export default function NourWorldMap({ language }: Props) {
           }
           .nr-map-program-media { height: 116px; }
         }
+        @keyframes nrJourneyDotLtrMobileStable {
+          from { left: 0; }
+          to { left: calc(100% - 12px); }
+        }
+        @keyframes nrJourneyDotRtlMobileStable {
+          from { right: 0; }
+          to { right: calc(100% - 12px); }
+        }
         @media (prefers-reduced-motion: reduce) {
-          .nr-map-focus-line i { animation: none; inset-inline-start: calc(100% - 7px); }
+          .nr-map-focus-dot {
+            animation: none !important;
+          }
+          [dir="ltr"] .nr-map-focus-dot {
+            left: calc(100% - 10px);
+            right: auto;
+          }
+          [dir="rtl"] .nr-map-focus-dot {
+            right: calc(100% - 10px);
+            left: auto;
+          }
           .nr-map-program-card { transition: none; }
         }
       `}</style>
