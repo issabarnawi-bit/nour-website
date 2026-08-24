@@ -2,11 +2,13 @@
 
 import type { Language } from "../../../data/home";
 import NourWorldMap from "./NourWorldMap";
+import NourWorldMapEnhancements from "./NourWorldMapEnhancements";
 
 export default function NourWorldMapMobileLayout({ language }: { language: Language }) {
   return (
     <div className="nr-map-mobile-layout-fix">
       <NourWorldMap language={language} />
+      <NourWorldMapEnhancements language={language} />
       <style jsx global>{`
         @media (max-width: 760px) {
           .nr-map-mobile-layout-fix div:has(> .nr-map-focus-journey) {
