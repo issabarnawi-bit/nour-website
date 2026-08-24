@@ -14,6 +14,33 @@ import styles from "./NourWorldMap.module.css";
 
 type Props = { language: Language };
 type MapPosition = { x: number; y: number };
+type MapProgramRow = {
+  id: string;
+  title_ar: string;
+  title_en: string;
+  slug: string;
+  duration_days: number;
+  duration_nights: number;
+  base_price: number | string;
+  currency_code: string;
+  is_featured: boolean;
+  cover_media:
+    | { bucket: string; path: string }
+    | { bucket: string; path: string }[]
+    | null;
+};
+type MapProgram = {
+  id: string;
+  titleAr: string;
+  titleEn: string;
+  slug: string;
+  durationDays: number;
+  durationNights: number;
+  basePrice: number;
+  currencyCode: string;
+  isFeatured: boolean;
+  coverUrl: string | null;
+};
 
 const SAUDI_ISO2 = "SA";
 const MAKKAH_COORDINATES = { latitude: 21.4225, longitude: 39.8262 };
@@ -45,6 +72,74 @@ function buildRoutePath(from: MapPosition, to: MapPosition) {
   const midX = (from.x + to.x) / 2;
   const lift = Math.max(6, Math.min(15, Math.abs(from.x - to.x) * 0.08));
   return `M${from.x} ${from.y} C${midX} ${from.y - lift}, ${midX} ${to.y - lift * 0.72}, ${to.x} ${to.y}`;
+}
+
+function getCoverMedia(media: MapProgramRow["cover_media"]) {
+  if (!media) return null;
+  return Array.isArray(media) ? media[0] ?? null : media;
+}
+
+function formatPrice(value: number, language: Language) {
+  return new Intl.NumberFormat(language === "ar" ? "ar-SA" : "en-US", {
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+function formatDuration(days: number, nights: number, isArabic: boolean) {
+  if (isArabic) return `${days} أيام · ${nights} ليالٍ`;
+  return `${days} days · ${nights} nights`;
+}
+
+async function loadCountryPrograms(
+  supabase: ReturnType<typeof createClient>,
+  countryId: string,
+): Promise<MapProgram[]> {
+  const { data, error } = await supabase
+    .from("programs")
+    .select(`
+      id,
+      title_ar,
+      title_en,
+      slug,
+      duration_days,
+      duration_nights,
+      base_price,
+      currency_code,
+      is_featured,
+      cover_media:media!programs_cover_media_id_fkey (
+        bucket,
+        path
+      )
+    `)
+    .eq("country_id", countryId)
+    .eq("status", "published")
+    .eq("is_active", true)
+    .is("deleted_at", null)
+    .order("is_featured", { ascending: false })
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: false })
+    .limit(3);
+
+  if (error) throw new Error(`Failed to load map programs: ${error.message}`);
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+  return ((data ?? []) as MapProgramRow[]).map((program) => {
+    const cover = getCoverMedia(program.cover_media);
+    return {
+      id: program.id,
+      titleAr: program.title_ar,
+      titleEn: program.title_en,
+      slug: program.slug,
+      durationDays: program.duration_days,
+      durationNights: program.duration_nights,
+      basePrice: Number(program.base_price) || 0,
+      currencyCode: program.currency_code,
+      isFeatured: program.is_featured,
+      coverUrl: cover && supabaseUrl
+        ? `${supabaseUrl}/storage/v1/object/public/${cover.bucket}/${cover.path}`
+        : null,
+    };
+  });
 }
 
 export default function NourWorldMap({ language }: Props) {
@@ -107,6 +202,14 @@ export default function NourWorldMap({ language }: Props) {
       setSelectedId(null);
     }
   }, [countriesWithPositions, selectedId]);
+
+  const programsQuery = useQuery({
+    queryKey: ["public", "map-country-programs", selectedCountry?.id],
+    queryFn: () => loadCountryPrograms(supabase, selectedCountry!.id),
+    enabled: Boolean(selectedCountry?.hasPublishedPrograms),
+    staleTime: 2 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
 
   const publishedProgramsCount = useMemo(
     () => countries.reduce((total, country) => total + country.publishedProgramsCount, 0),
@@ -389,6 +492,88 @@ export default function NourWorldMap({ language }: Props) {
           )}
         </motion.aside>
 
+        <AnimatePresence mode="wait">
+          {selectedCountry?.hasPublishedPrograms ? (
+            <motion.section
+              key={selectedCountry.id}
+              className="nr-map-programs"
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.3 }}
+              aria-label={isArabic ? "برامج الدولة المختارة" : "Programs from selected country"}
+            >
+              <div className="nr-map-programs-head">
+                <div>
+                  <span>{isArabic ? "برامج من نقطة انطلاقك" : "Programs from your starting point"}</span>
+                  <strong>
+                    {isArabic
+                      ? `برامج ${selectedCountry.nameAr}`
+                      : `${selectedCountry.nameEn} programs`}
+                  </strong>
+                </div>
+                <a href={activeProgramsUrl}>
+                  {isArabic ? "عرض الكل" : "View all"}
+                  <ArrowIcon isArabic={isArabic} />
+                </a>
+              </div>
+
+              {programsQuery.isLoading ? (
+                <div className="nr-map-programs-state">
+                  {isArabic ? "جارٍ تحميل البرامج..." : "Loading programs..."}
+                </div>
+              ) : null}
+
+              {programsQuery.isError ? (
+                <div className="nr-map-programs-state" role="alert">
+                  {isArabic ? "تعذر تحميل البرامج حاليًا." : "Unable to load programs right now."}
+                </div>
+              ) : null}
+
+              {!programsQuery.isLoading && !programsQuery.isError && (programsQuery.data?.length ?? 0) === 0 ? (
+                <div className="nr-map-programs-state">
+                  {isArabic ? "لا توجد برامج منشورة حاليًا." : "No published programs right now."}
+                </div>
+              ) : null}
+
+              {(programsQuery.data?.length ?? 0) > 0 ? (
+                <div className="nr-map-programs-grid">
+                  {programsQuery.data!.map((program) => {
+                    const title = isArabic ? program.titleAr : program.titleEn;
+                    return (
+                      <a
+                        key={program.id}
+                        className="nr-map-program-card"
+                        href={`/programs/${encodeURIComponent(program.slug)}`}
+                        aria-label={isArabic ? `عرض تفاصيل ${title}` : `View details for ${title}`}
+                      >
+                        <div className="nr-map-program-media">
+                          {program.coverUrl ? (
+                            <img src={program.coverUrl} alt={title} />
+                          ) : (
+                            <div className="nr-map-program-placeholder"><KaabaIcon /></div>
+                          )}
+                          {program.isFeatured ? (
+                            <span>{isArabic ? "مميز" : "Featured"}</span>
+                          ) : null}
+                        </div>
+                        <div className="nr-map-program-body">
+                          <strong>{title}</strong>
+                          <small>{formatDuration(program.durationDays, program.durationNights, isArabic)}</small>
+                          <div>
+                            <span>{isArabic ? "ابتداءً من" : "From"}</span>
+                            <b>{formatPrice(program.basePrice, language)} {program.currencyCode}</b>
+                          </div>
+                        </div>
+                      </a>
+                    );
+                  })}
+                </div>
+              ) : null}
+            </motion.section>
+          ) : null}
+        </AnimatePresence>
+
         {countriesWithPositions.length > 0 ? (
           <div className={styles.locationTabs}>
             {countriesWithPositions
@@ -504,6 +689,122 @@ export default function NourWorldMap({ language }: Props) {
           color: rgba(255,255,255,.58);
           font-size: 8px;
         }
+
+        .nr-map-programs {
+          display: grid;
+          gap: 12px;
+          padding: 14px 16px 16px;
+          border: 1px solid rgba(255,255,255,.11);
+          border-radius: 20px;
+          color: #fff;
+          background: rgba(5,25,47,.72);
+          box-shadow: 0 16px 42px rgba(0,0,0,.14);
+          backdrop-filter: blur(14px);
+        }
+        .nr-map-programs-head {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 14px;
+        }
+        .nr-map-programs-head div { display: grid; gap: 3px; }
+        .nr-map-programs-head span { color: #91c6ff; font-size: 9px; font-weight: 800; }
+        .nr-map-programs-head strong { color: #fff; font-size: 17px; }
+        .nr-map-programs-head > a {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          color: #ffc313;
+          font-size: 10px;
+          font-weight: 900;
+          text-decoration: none;
+        }
+        .nr-map-programs-head > a svg { width: 14px; height: 14px; }
+        .nr-map-programs-grid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 10px;
+        }
+        .nr-map-program-card {
+          min-width: 0;
+          overflow: hidden;
+          border: 1px solid rgba(255,255,255,.1);
+          border-radius: 15px;
+          color: #fff;
+          background: rgba(255,255,255,.055);
+          text-decoration: none;
+          transition: transform .2s ease, border-color .2s ease, background .2s ease;
+        }
+        .nr-map-program-card:hover {
+          transform: translateY(-3px);
+          border-color: rgba(255,195,19,.35);
+          background: rgba(255,255,255,.08);
+        }
+        .nr-map-program-media {
+          position: relative;
+          height: 108px;
+          overflow: hidden;
+          background: rgba(255,255,255,.04);
+        }
+        .nr-map-program-media img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+        }
+        .nr-map-program-media > span {
+          position: absolute;
+          top: 8px;
+          inset-inline-start: 8px;
+          padding: 4px 7px;
+          border-radius: 999px;
+          color: #102f55;
+          background: #ffc313;
+          font-size: 7px;
+          font-weight: 900;
+        }
+        .nr-map-program-placeholder {
+          display: grid;
+          width: 100%;
+          height: 100%;
+          place-items: center;
+          color: #ffc313;
+          background: linear-gradient(145deg, rgba(23,111,232,.16), rgba(255,195,19,.08));
+        }
+        .nr-map-program-placeholder svg { width: 30px; height: 30px; }
+        .nr-map-program-body {
+          display: grid;
+          gap: 6px;
+          padding: 10px 11px 11px;
+        }
+        .nr-map-program-body > strong {
+          overflow: hidden;
+          color: #fff;
+          font-size: 12px;
+          line-height: 1.35;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .nr-map-program-body > small { color: rgba(255,255,255,.55); font-size: 8px; }
+        .nr-map-program-body > div {
+          display: flex;
+          align-items: end;
+          justify-content: space-between;
+          gap: 8px;
+          padding-top: 5px;
+          border-top: 1px solid rgba(255,255,255,.07);
+        }
+        .nr-map-program-body > div span { color: rgba(255,255,255,.5); font-size: 7px; }
+        .nr-map-program-body > div b { color: #ffc313; font-size: 11px; }
+        .nr-map-programs-state {
+          padding: 18px;
+          border: 1px dashed rgba(255,255,255,.12);
+          border-radius: 14px;
+          color: rgba(255,255,255,.62);
+          text-align: center;
+          font-size: 10px;
+        }
+
         @keyframes nrJourneyTraveler {
           from { left: 0; }
           to { left: calc(100% - 7px); }
@@ -516,9 +817,23 @@ export default function NourWorldMap({ language }: Props) {
             padding: 10px 12px;
           }
           .nr-map-focus-route strong { font-size: 9px; }
+          .nr-map-programs { padding: 12px; }
+          .nr-map-programs-grid {
+            display: flex;
+            gap: 9px;
+            overflow-x: auto;
+            scroll-snap-type: x proximity;
+            padding-bottom: 2px;
+          }
+          .nr-map-program-card {
+            flex: 0 0 min(78vw, 245px);
+            scroll-snap-align: start;
+          }
+          .nr-map-program-media { height: 116px; }
         }
         @media (prefers-reduced-motion: reduce) {
           .nr-map-focus-line i { animation: none; left: calc(100% - 7px); }
+          .nr-map-program-card { transition: none; }
         }
       `}</style>
     </motion.section>
