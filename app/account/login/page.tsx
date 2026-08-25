@@ -64,14 +64,14 @@ export default function PilgrimLoginPage() {
         <Link className="pa-brand" href="/"><span>ن</span><div><strong>NourApp</strong><small>رفيقك لرحلة السعادة</small></div></Link>
 
         <div className="pa-coming-soon">
-          <strong>الحجز عبر نور آب متاح قريبًا</strong>
-          <span>ترقّبونا قريبًا لتجربة حجز متكاملة وآمنة لرحلتكم إلى العمرة.</span>
+          <strong>الحجز متاح عبر تطبيق نور آب</strong>
+          <span>لإتمام حجز برنامج العمرة، استخدم تطبيق نور آب واستمتع بتجربة حجز متكاملة وآمنة.</span>
         </div>
 
         <div className="pa-copy">
           <span><UserRound /> حساب المعتمر</span>
           <h1>{mode === "login" ? "تسجيل الدخول" : "إنشاء حساب جديد"}</h1>
-          <p>{mode === "login" ? "سجل الدخول إلى حسابك لتجهيز بياناتك والاستعداد لخدمات الحجز القادمة قريبًا." : "أنشئ حسابك وجهّز بياناتك من الآن، وسيتم تفعيل الحجز عبر المنصة قريبًا."}</p>
+          <p>{mode === "login" ? "سجل الدخول لإدارة حسابك وبياناتك، ولإتمام الحجز انتقل إلى تطبيق نور آب." : "أنشئ حسابك وجهّز بياناتك، ثم استخدم تطبيق نور آب لإتمام الحجز."}</p>
         </div>
 
         <form onSubmit={submit}>
@@ -83,7 +83,7 @@ export default function PilgrimLoginPage() {
         </form>
 
         <button className="pa-switch" type="button" onClick={() => { setMode((v) => v === "login" ? "register" : "login"); setError(""); setMessage(""); }}>{mode === "login" ? "ليس لديك حساب؟ إنشاء حساب" : "لديك حساب؟ تسجيل الدخول"}</button>
-        <p className="pa-note">يمكنك إنشاء حسابك وتجهيز بياناتك الآن، وسيتم تفعيل خدمة الحجز عبر نور آب قريبًا.</p>
+        <p className="pa-note">الحجز متاح حاليًا عبر تطبيق نور آب. يمكنك استخدام الموقع لإدارة حسابك وتجهيز بياناتك.</p>
       </section>
 
       <style jsx global>{`
