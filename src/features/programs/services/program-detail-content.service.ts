@@ -103,7 +103,7 @@ export async function getProgramDetailContent(
     supabase.from("program_inclusion_items").select("*").eq("program_id", programId).is("deleted_at", null).order("inclusion_type").order("sort_order"),
     supabase.from("program_cancellation_rules").select("*").eq("program_id", programId).is("deleted_at", null).order("sort_order"),
     supabase.from("program_meeting_points").select("*").eq("program_id", programId).is("deleted_at", null).order("sort_order"),
-    supabase.from("program_price_tiers").select("*").eq("program_id", programId).is("deleted_at", null).order("sort_order"),
+    supabase.from("program_price_tiers").select("*").eq("program_id", programId).is("departure_id", null).is("deleted_at", null).order("sort_order"),
     supabase.from("program_faqs").select("*").eq("program_id", programId).is("deleted_at", null).order("sort_order"),
   ]);
 
