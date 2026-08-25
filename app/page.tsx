@@ -17,38 +17,18 @@ import CeoMessage from "./components/home/CeoMessage";
 import ArticlesPreview from "./components/home/ArticlesPreview";
 import Payments from "./components/home/Payments";
 import CTA from "./components/home/CTA";
-import { appScreens, copy, type Theme } from "./data/home";
-
-const coreSectionIds = ["home", "programs", "services", "journey", "about", "articles"] as const;
-type CoreSectionId = (typeof coreSectionIds)[number];
+import { appScreens, copy, sectionIds, type SectionId, type Theme } from "./data/home";
 
 export default function Home() {
   const { language, toggleLanguage } = useLanguage();
   const [theme, setTheme] = useState<Theme>("light");
   const [menuOpen, setMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState<CoreSectionId>("home");
+  const [activeSection, setActiveSection] = useState<SectionId>("home");
   const [activeScreen, setActiveScreen] = useState(0);
   const t = copy[language];
-
   const navItems = useMemo(
-    () => language === "ar"
-      ? [
-          { id: "home", label: "الرئيسية" },
-          { id: "programs", label: "برامج العمرة" },
-          { id: "services", label: "الخدمات" },
-          { id: "journey", label: "كيف يعمل نور آب" },
-          { id: "about", label: "عن نور آب" },
-          { id: "articles", label: "دليل العمرة" },
-        ]
-      : [
-          { id: "home", label: "Home" },
-          { id: "programs", label: "Umrah Programs" },
-          { id: "services", label: "Services" },
-          { id: "journey", label: "How NourApp Works" },
-          { id: "about", label: "About NourApp" },
-          { id: "articles", label: "Umrah Guide" },
-        ],
-    [language],
+    () => sectionIds.map((id, index) => ({ id, label: t.nav[index] })),
+    [t],
   );
 
   useEffect(() => {
@@ -70,7 +50,7 @@ export default function Home() {
   }, [theme]);
 
   useEffect(() => {
-    const sections = coreSectionIds
+    const sections = sectionIds
       .map((id) => document.getElementById(id))
       .filter((section): section is HTMLElement => Boolean(section));
     if (!sections.length) return;
@@ -80,10 +60,13 @@ export default function Home() {
         const current = entries
           .filter((entry) => entry.isIntersecting)
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
-          ?.target.id as CoreSectionId | undefined;
+          ?.target.id as SectionId | undefined;
         if (current) setActiveSection(current);
       },
-      { rootMargin: "-25% 0px -60% 0px", threshold: [0.05, 0.2, 0.45, 0.7] },
+      {
+        rootMargin: "-25% 0px -60% 0px",
+        threshold: [0.05, 0.2, 0.45, 0.7],
+      },
     );
 
     sections.forEach((section) => observer.observe(section));
@@ -94,6 +77,7 @@ export default function Home() {
     <main className="nour-redesign">
       <SiteEnhancements />
       <PublicHeader
+        t={t}
         language={language}
         theme={theme}
         menuOpen={menuOpen}
@@ -106,34 +90,93 @@ export default function Home() {
       />
       <Hero t={t} />
       <ProgramsPreview language={language} />
-      <div id="services"><Services language={language} /></div>
-      <div id="world-map"><NourWorldMap language={language} /></div>
+      <Services language={language} />
+      <div id="world-map">
+        <NourWorldMap language={language} />
+      </div>
       <Journey t={t} language={language} />
-      <Showcase t={t} language={language} activeScreen={activeScreen} onScreenChange={setActiveScreen} />
-      <div id="about"><WhyNour language={language} /></div>
+      <Showcase
+        t={t}
+        language={language}
+        activeScreen={activeScreen}
+        onScreenChange={setActiveScreen}
+      />
+      <div id="about">
+        <WhyNour language={language} />
+      </div>
       <Statistics language={language} />
       <CeoMessage language={language} />
-      <div id="articles"><ArticlesPreview language={language} /></div>
+      <ArticlesPreview language={language} />
       <Payments language={language} />
       <CTA t={t} language={language} />
       <Footer t={t} language={language} />
 
       <style jsx global>{`
-        .nr-map-focus-line { --nr-journey-dot-size: 9px; }
-        .nr-map-focus-line > i { display: none !important; }
-        .nr-map-focus-line::after {
-          content: ""; position: absolute; z-index: 6; top: 50%; left: 0; right: auto;
-          width: var(--nr-journey-dot-size); height: var(--nr-journey-dot-size); transform: translateY(-50%);
-          border: 2px solid rgba(255,255,255,.92); border-radius: 50%; background: #ffc313;
-          box-shadow: 0 0 0 4px rgba(255,195,19,.2), 0 0 20px rgba(255,195,19,.95);
-          animation: nrJourneyDotLtr 2.35s linear infinite; will-change: left,right;
+        .nr-map-focus-line {
+          --nr-journey-dot-size: 9px;
         }
-        [dir="rtl"] .nr-map-focus-line::after { left: auto; right: 0; animation-name: nrJourneyDotRtl; }
-        @keyframes nrJourneyDotLtr { from { left: 0; } to { left: calc(100% - var(--nr-journey-dot-size)); } }
-        @keyframes nrJourneyDotRtl { from { right: 0; } to { right: calc(100% - var(--nr-journey-dot-size)); } }
-        @media (max-width:760px) {
-          .nr-map-focus-line { --nr-journey-dot-size: 11px; min-width: 54px; height: 3px !important; }
-          .nr-map-focus-line::after { border-width: 2px; box-shadow: 0 0 0 5px rgba(255,195,19,.22), 0 0 24px rgba(255,195,19,1); }
+
+        .nr-map-focus-line > i {
+          display: none !important;
+        }
+
+        .nr-map-focus-line::after {
+          content: "";
+          position: absolute;
+          z-index: 6;
+          top: 50%;
+          left: 0;
+          right: auto;
+          width: var(--nr-journey-dot-size);
+          height: var(--nr-journey-dot-size);
+          transform: translateY(-50%);
+          border: 2px solid rgba(255, 255, 255, 0.92);
+          border-radius: 50%;
+          background: #ffc313;
+          box-shadow:
+            0 0 0 4px rgba(255, 195, 19, 0.2),
+            0 0 20px rgba(255, 195, 19, 0.95);
+          animation: nrJourneyDotLtr 2.35s linear infinite;
+          will-change: left, right;
+        }
+
+        [dir="rtl"] .nr-map-focus-line::after {
+          left: auto;
+          right: 0;
+          animation-name: nrJourneyDotRtl;
+        }
+
+        @keyframes nrJourneyDotLtr {
+          from {
+            left: 0;
+          }
+          to {
+            left: calc(100% - var(--nr-journey-dot-size));
+          }
+        }
+
+        @keyframes nrJourneyDotRtl {
+          from {
+            right: 0;
+          }
+          to {
+            right: calc(100% - var(--nr-journey-dot-size));
+          }
+        }
+
+        @media (max-width: 760px) {
+          .nr-map-focus-line {
+            --nr-journey-dot-size: 11px;
+            min-width: 54px;
+            height: 3px !important;
+          }
+
+          .nr-map-focus-line::after {
+            border-width: 2px;
+            box-shadow:
+              0 0 0 5px rgba(255, 195, 19, 0.22),
+              0 0 24px rgba(255, 195, 19, 1);
+          }
         }
       `}</style>
     </main>
