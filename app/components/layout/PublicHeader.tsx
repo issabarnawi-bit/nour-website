@@ -1,0 +1,67 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+
+import Header from "./Header";
+import type { HomeCopy, Language, SectionId, Theme } from "../../data/home";
+import { createClient } from "../../../src/lib/supabase/client";
+
+type Props = {
+  t: HomeCopy;
+  language: Language;
+  theme: Theme;
+  menuOpen: boolean;
+  activeSection: SectionId;
+  navItems: { id: SectionId; label: string }[];
+  onLanguageChange: () => void;
+  onThemeChange: () => void;
+  onMenuToggle: () => void;
+  onMenuClose: () => void;
+};
+
+export default function PublicHeader(props: Props) {
+  const supabase = useMemo(() => createClient(), []);
+  const [signedIn, setSignedIn] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (mounted) setSignedIn(Boolean(data.session));
+    });
+
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSignedIn(Boolean(session));
+    });
+
+    return () => {
+      mounted = false;
+      data.subscription.unsubscribe();
+    };
+  }, [supabase]);
+
+  useEffect(() => {
+    const accountHref = signedIn ? "/account/profile" : "/account/login";
+    const accountLabel = signedIn
+      ? props.language === "ar" ? "حسابي" : "My account"
+      : props.language === "ar" ? "تسجيل الدخول" : "Sign in";
+
+    const syncAccountAction = () => {
+      document
+        .querySelectorAll<HTMLAnchorElement>(
+          ".nr-v2-primary-action, .nr-v2-mobile-cta",
+        )
+        .forEach((link) => {
+          link.href = accountHref;
+          const label = link.querySelector("span");
+          if (label) label.textContent = accountLabel;
+        });
+    };
+
+    syncAccountAction();
+    const timer = window.setTimeout(syncAccountAction, 0);
+    return () => window.clearTimeout(timer);
+  }, [signedIn, props.language, props.menuOpen]);
+
+  return <Header {...props} />;
+}

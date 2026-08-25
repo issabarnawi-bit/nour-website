@@ -1,0 +1,12 @@
+-- Booking function source notes.
+-- Executable definitions live in supabase/migrations/20260826015500_booking_core.sql.
+--
+-- create_program_booking(...)
+--   SECURITY DEFINER public entry point for website/app booking creation.
+--   Revalidates program/departure/price tier, serializes on the departure row,
+--   expires stale holds, validates traveler limits, decrements seats atomically,
+--   inserts traveler rows, and writes booking_status_history.
+--
+-- admin_set_booking_status(...)
+--   SECURITY DEFINER admin transition helper guarded by bookings.manage.
+--   Releases seats when an active booking is cancelled/expired and records history.

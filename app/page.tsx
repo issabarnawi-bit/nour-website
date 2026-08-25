@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLanguage } from "../src/core/i18n";
 import SiteEnhancements from "./components/SiteEnhancements";
-import Header from "./components/layout/Header";
+import PublicHeader from "./components/layout/PublicHeader";
 import Footer from "./components/layout/Footer";
 import Hero from "./components/home/Hero";
 import ProgramsPreview from "./components/home/ProgramsPreview";
@@ -76,7 +76,7 @@ export default function Home() {
   return (
     <main className="nour-redesign">
       <SiteEnhancements />
-      <Header
+      <PublicHeader
         t={t}
         language={language}
         theme={theme}

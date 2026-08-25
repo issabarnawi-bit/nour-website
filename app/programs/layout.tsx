@@ -4,6 +4,7 @@ import ProgramDetailsExperience from "./ProgramDetailsExperience";
 import ProgramStructuredContent from "./ProgramStructuredContent";
 import ProgramDepartures from "./ProgramDepartures";
 import ProgramBookingSelector from "./ProgramBookingSelector";
+import ProgramBookingCheckout from "./ProgramBookingCheckout";
 
 export default function ProgramsLayout({
   children,
@@ -15,6 +16,7 @@ export default function ProgramsLayout({
       {children}
       <ProgramDepartures />
       <ProgramBookingSelector />
+      <ProgramBookingCheckout />
       <ProgramStructuredContent />
       <ProgramDetailsExperience />
     </>

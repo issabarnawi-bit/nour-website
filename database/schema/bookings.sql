@@ -1,0 +1,12 @@
+-- Booking core source schema.
+-- Executable migration: supabase/migrations/20260826015500_booking_core.sql
+
+-- Main entities:
+-- public.bookings
+-- public.booking_travelers
+-- public.booking_status_history
+--
+-- Bookings snapshot the selected program/departure/price tier, traveler count,
+-- unit/total price, currency, contact channel, reservation hold, payment state,
+-- and lifecycle timestamps. Seat availability is changed only through booking
+-- functions so concurrent booking attempts are serialized on program_departures.
