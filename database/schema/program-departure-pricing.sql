@@ -1,0 +1,7 @@
+-- Program departure pricing source note.
+-- Canonical executable DDL: supabase/migrations/20260826005000_link_price_tiers_to_departures.sql
+--
+-- program_price_tiers.departure_id -> program_departures.id (nullable)
+-- NULL departure_id means the price tier is generic for the whole program.
+-- Non-NULL departure_id means the price tier applies only to that departure.
+-- A validation trigger prevents linking a price tier to a departure from another program.
