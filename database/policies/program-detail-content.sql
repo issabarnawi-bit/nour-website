@@ -1,0 +1,21 @@
+-- RLS source notes for structured program detail content.
+-- Applies to itinerary, inclusions, cancellation, meeting points, price tiers, FAQs.
+--
+-- Public SELECT:
+--   row is_active = true
+--   row deleted_at is null
+--   parent program status = published
+--   parent program is_active = true
+--   parent program deleted_at is null
+--
+-- Admin SELECT:
+--   programs.create OR programs.update OR programs.publish OR programs.delete
+-- Admin INSERT:
+--   programs.create OR programs.update
+-- Admin UPDATE:
+--   programs.update
+-- Admin DELETE:
+--   programs.update OR programs.delete
+--
+-- Canonical executable policies are in:
+-- supabase/migrations/20260825011600_program_detail_content.sql

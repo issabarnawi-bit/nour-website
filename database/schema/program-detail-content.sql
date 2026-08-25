@@ -1,0 +1,17 @@
+-- Source-of-truth schema for structured program detail content.
+-- Executable deployment lives in supabase/migrations/20260825011600_program_detail_content.sql.
+
+-- Tables:
+-- public.program_itinerary_days
+-- public.program_inclusion_items
+-- public.program_cancellation_rules
+-- public.program_meeting_points
+-- public.program_price_tiers
+-- public.program_faqs
+--
+-- All tables use UUID primary keys, program_id FK -> programs(id) ON DELETE CASCADE,
+-- created_at/updated_at/deleted_at audit timestamps, is_active, sort_order,
+-- bilingual AR/EN content, set_updated_at() triggers, supporting indexes, and RLS.
+--
+-- Detailed canonical DDL is kept in the official migration so schema and deployment
+-- remain byte-for-byte aligned for this release.
