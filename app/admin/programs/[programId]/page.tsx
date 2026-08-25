@@ -18,10 +18,33 @@ export default async function Page({
         style={{
           display: "flex",
           justifyContent: "flex-end",
+          flexWrap: "wrap",
+          gap: 12,
           padding: "20px 24px 16px",
           marginBottom: 8,
         }}
       >
+        <Link
+          href={`/admin/programs/${programId}/departures`}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight: 42,
+            padding: "0 16px",
+            borderRadius: 11,
+            color: "#176fe8",
+            background: "#eef5ff",
+            border: "1px solid #d7e6fb",
+            textDecoration: "none",
+            fontSize: 13,
+            fontWeight: 800,
+            lineHeight: 1.2,
+          }}
+        >
+          مواعيد الانطلاق والتوفر
+        </Link>
+
         <Link
           href={`/admin/programs/${programId}/content`}
           style={{
