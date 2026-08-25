@@ -1,0 +1,4 @@
+-- RLS source notes for public.program_departures.
+-- Public SELECT: anon/authenticated may read only active, non-deleted departures whose parent program is published, active, and non-deleted.
+-- Admin SELECT/INSERT/UPDATE/DELETE: authenticated only, guarded by existing programs.* RBAC permissions via current_user_has_permission().
+-- Table grants: anon SELECT; authenticated SELECT/INSERT/UPDATE/DELETE; service_role ALL.
