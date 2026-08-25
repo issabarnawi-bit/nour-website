@@ -1,0 +1,10 @@
+-- Booking RLS source notes.
+-- Executable policies live in supabase/migrations/20260826015500_booking_core.sql.
+--
+-- authenticated admins:
+--   bookings.view or bookings.manage => read bookings/travelers/history
+--   bookings.manage => update bookings/travelers
+-- authenticated customers:
+--   may read only bookings tied to auth.uid() and their related travelers/history
+-- anon/authenticated public booking creation:
+--   no direct INSERT grants; creation is only through create_program_booking(...)
