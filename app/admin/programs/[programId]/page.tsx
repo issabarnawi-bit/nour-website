@@ -46,6 +46,27 @@ export default async function Page({
         </Link>
 
         <Link
+          href={`/admin/programs/${programId}/departure-pricing`}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight: 42,
+            padding: "0 16px",
+            borderRadius: 11,
+            color: "#7a5600",
+            background: "#fff8e1",
+            border: "1px solid #f1df9b",
+            textDecoration: "none",
+            fontSize: 13,
+            fontWeight: 800,
+            lineHeight: 1.2,
+          }}
+        >
+          أسعار مواعيد الانطلاق
+        </Link>
+
+        <Link
           href={`/admin/programs/${programId}/content`}
           style={{
             display: "inline-flex",
