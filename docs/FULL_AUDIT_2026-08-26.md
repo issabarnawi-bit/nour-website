@@ -8,7 +8,7 @@ This audit covers the current `master` codebase, the connected Supabase Producti
 
 - Repository: `issabarnawi-bit/nour-website`
 - Baseline commit: `21472351dfd622c306016b1885ab4aab2af49e71`
-- Production database: Supabase project `nour-platform`
+- Production database: Supabase project `nour-platform` (`fsgxtdhmmbkadjozqgck`)
 - Production database status at audit time: healthy
 - Framework: Next.js 16.2.10 / React 19.2.4 / TypeScript 5 / Supabase
 
@@ -20,24 +20,36 @@ The apex `nourappglobal.com` currently exposes a web-server directory index inst
 
 ### P0 — Migration history is not reconciled with Git source
 
-Production migration history contains recent migration versions that do not match the filenames currently present under `supabase/migrations/` for the same logical changes. Examples include program detail content, departures, departure-linked price tiers, booking core, pilgrim accounts and document grants.
+Production migration history contains recent migration versions that do not match the filenames currently present under `supabase/migrations/` for the same logical changes. No new Production DDL should be applied until this is reconciled.
 
-Do not create or apply additional Production migrations until the migration ledger and repository are reconciled and a deterministic forward path is documented.
+#### Confirmed Production ↔ repository version map
+
+The logical migration names match, but the recorded Production versions differ from the repository filenames for these migrations:
+
+| Logical migration | Production version | Repository filename version |
+|---|---:|---:|
+| articles_and_ceo_content | 20260822004339 | 20260822033000 |
+| reconcile_ceo_message_setting | 20260822005752 | 20260822043000 |
+| program_detail_content | 20260824222011 | 20260825011600 |
+| program_detail_content_table_grants | 20260825025239 | 20260825055100 |
+| scope_program_detail_content_policies | 20260825030530 | 20260825060500 |
+| program_departures_availability | 20260825032353 | 20260825033000 |
+| link_price_tiers_to_departures | 20260825214705 | 20260826005000 |
+| booking_core | 20260825223827 | 20260826015500 |
+| pilgrim_accounts_and_booking_auth | 20260825225858 | 20260826020500 |
+| pilgrim_document_column_grants | 20260825230042 | 20260826020700 |
+
+All earlier recorded migration versions through `20260821220000_add_media_cleanup_reconciliation` match the repository migration filenames by version/name, except intentionally short historical versions such as `20260729` and `20260819` which also exist in Git with those names.
+
+#### Reconciliation decision
+
+Do **not** edit the Production migration ledger ad hoc and do **not** replay the ten logical migrations. Before the next Production migration, establish a canonical migration-history repair procedure that preserves the already-applied schema and makes CLI/deployment history deterministic. The repair must be reviewed as an operational action, not hidden inside an application migration.
 
 ### P1 — SECURITY DEFINER surface needs explicit privilege review
 
 Supabase security advisors report multiple `SECURITY DEFINER` functions callable by `anon` and/or `authenticated`. Some are intentionally public and contain internal validation, while others should not expose unnecessary direct RPC execution.
 
-Specific review targets include:
-
-- `create_program_booking`
-- `has_permission`
-- `is_super_admin`
-- `current_user_has_permission`
-- `admin_set_booking_status`
-- program deletion / restoration / publication functions
-- platform settings and legal publication functions
-- media cleanup functions
+Specific review targets include `create_program_booking`, `has_permission`, `is_super_admin`, `current_user_has_permission`, `admin_set_booking_status`, program deletion/restoration/publication functions, platform settings/legal publication functions, and media cleanup functions.
 
 The public analytics, subscription, unsubscribe, maintenance-mode and public-settings/legal readers require separate treatment because anonymous execution may be intentional.
 
@@ -55,14 +67,7 @@ Several tables have RLS enabled without policies. This can be intentional deny-b
 
 ### P2 — Database performance cleanup
 
-The database advisor reports:
-
-- multiple unindexed foreign keys, including booking and pilgrim-document relations;
-- duplicate indexes on `permissions.key` and `roles.key`;
-- multiple permissive SELECT policies;
-- RLS initialization-plan inefficiencies.
-
-Unused-index warnings are not an immediate deletion target because the production workload is still young.
+The database advisor reports multiple unindexed foreign keys, including booking and pilgrim-document relations; duplicate indexes on `permissions.key` and `roles.key`; multiple permissive SELECT policies; and RLS initialization-plan inefficiencies. Unused-index warnings are not an immediate deletion target because the production workload is still young.
 
 ### P1 — No repository quality gate existed
 
@@ -80,11 +85,11 @@ The project already sets global CSP/HSTS/referrer/permissions/frame/content-type
 
 ### Phase 0 — Stabilization & reconciliation
 
-1. Establish PR quality gate.
-2. Fix domain/origin routing and disable directory listing.
-3. Reconcile Production migration ledger with repository migration files.
-4. Record a Production schema/RLS/function/grant snapshot.
-5. Freeze new Production DDL until reconciliation is complete.
+1. Establish PR quality gate. **In progress on audit branch.**
+2. Fix domain/origin routing and disable directory listing. **External hosting/DNS action required; no Vercel connector is available in this workspace.**
+3. Reconcile Production migration ledger with repository migration files. **Version map captured; repair/replay remains frozen.**
+4. Record a Production schema/RLS/function/grant snapshot. **Next audit action.**
+5. Freeze new Production DDL until reconciliation is complete. **Active.**
 
 Exit criteria: domain serves intended app, migration histories are deterministic, quality gate passes, Production baseline is documented.
 
