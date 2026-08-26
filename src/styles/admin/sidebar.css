@@ -231,59 +231,160 @@ body.dark .nr-admin-sidebar-status,
 }
 
 /* =========================================================
-   COMPACT MODERN SIDEBAR
+   COMPACT MODERN SIDEBAR — HOVER EXPAND
 ========================================================= */
 
 @media (min-width: 901px) {
   .nr-admin-sidebar {
     position: sticky;
     top: 0;
+    z-index: 70;
+    justify-self: end;
     width: 92px;
     min-height: 100vh;
     height: 100vh;
     padding: 14px 10px;
+    overflow: visible;
     border-left: 1px solid var(--NourApp-border);
     background: var(--NourApp-surface);
     box-shadow: none;
+    transition:
+      width 0.24s ease,
+      box-shadow 0.24s ease;
+  }
+
+  .nr-admin-sidebar:hover,
+  .nr-admin-sidebar:focus-within {
+    width: 268px;
+    box-shadow: -18px 0 40px rgba(15, 23, 42, 0.1);
   }
 
   .nr-admin-sidebar-brand {
-    justify-content: center;
-    padding: 4px 0 16px;
+    justify-content: flex-start;
+    min-height: 62px;
+    gap: 12px;
+    padding: 4px 5px 14px;
   }
 
+  .nr-admin-sidebar-brand-logo,
   .nr-admin-sidebar-logo {
     width: 46px;
     height: 46px;
+    display: grid;
+    place-items: center;
+    flex: 0 0 46px;
+    overflow: hidden;
     border-radius: 14px;
-    font-size: 20px;
+    background: #ffffff;
+  }
+
+  .nr-admin-sidebar-brand-logo img,
+  .nr-admin-sidebar-logo img {
+    display: block;
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    border-radius: 10px;
   }
 
   .nr-admin-sidebar-brand-text {
-    display: none;
+    display: flex;
+    min-width: 0;
+    max-width: 0;
+    overflow: hidden;
+    opacity: 0;
+    white-space: nowrap;
+    transform: translateX(8px);
+    transition:
+      max-width 0.24s ease,
+      opacity 0.16s ease,
+      transform 0.24s ease;
+  }
+
+  .nr-admin-sidebar:hover .nr-admin-sidebar-brand-text,
+  .nr-admin-sidebar:focus-within .nr-admin-sidebar-brand-text {
+    max-width: 170px;
+    opacity: 1;
+    transform: translateX(0);
   }
 
   .nr-admin-sidebar-nav {
-    align-items: center;
-    gap: 8px;
-    padding-top: 16px;
+    align-items: stretch;
+    gap: 5px;
+    min-height: 0;
+    flex: 1 1 auto;
+    padding-top: 10px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+  }
+
+  .nr-admin-sidebar-nav::-webkit-scrollbar {
+    width: 0;
+    height: 0;
   }
 
   .nr-admin-sidebar-link {
     width: 52px;
-    height: 48px;
-    justify-content: center;
-    padding: 0;
-    border-radius: 14px;
+    min-height: 43px;
+    height: 43px;
+    flex: 0 0 43px;
+    justify-content: flex-start;
+    gap: 10px;
+    padding: 0 5px;
+    overflow: hidden;
+    border-radius: 13px;
+    white-space: nowrap;
+    transition:
+      width 0.24s ease,
+      background var(--NourApp-transition-fast),
+      color var(--NourApp-transition-fast);
   }
 
-  .nr-admin-sidebar-link > span:not(.nr-admin-sidebar-link-icon) {
-    display: none;
+  .nr-admin-sidebar:hover .nr-admin-sidebar-link,
+  .nr-admin-sidebar:focus-within .nr-admin-sidebar-link {
+    width: 100%;
+  }
+
+  .nr-admin-sidebar-link-label {
+    display: block !important;
+    min-width: 0;
+    max-width: 0;
+    overflow: hidden;
+    opacity: 0;
+    color: inherit;
+    font-size: 13px;
+    font-weight: 750;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transform: translateX(8px);
+    transition:
+      max-width 0.24s ease,
+      opacity 0.14s ease,
+      transform 0.24s ease;
+  }
+
+  .nr-admin-sidebar:hover .nr-admin-sidebar-link-label,
+  .nr-admin-sidebar:focus-within .nr-admin-sidebar-link-label {
+    max-width: 178px;
+    opacity: 1;
+    transform: translateX(0);
   }
 
   .nr-admin-sidebar-link-icon {
-    width: auto;
-    font-size: 20px;
+    width: 42px;
+    height: 38px;
+    flex: 0 0 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+  }
+
+  .nr-admin-sidebar-link-icon svg {
+    width: 20px;
+    height: 20px;
   }
 
   .nr-admin-sidebar-link:hover {
@@ -294,28 +395,51 @@ body.dark .nr-admin-sidebar-status,
   .nr-admin-sidebar-link[aria-current="page"] {
     background: var(--NourApp-primary);
     color: #ffffff;
-    box-shadow: 0 10px 24px rgb(23 111 232 / 24%);
+    box-shadow: 0 8px 20px rgb(23 111 232 / 20%);
   }
 
   .nr-admin-sidebar-footer {
     display: flex;
-    justify-content: center;
-    margin-top: auto;
-    padding-top: 18px;
+    justify-content: flex-start;
+    flex: 0 0 auto;
+    margin-top: 0;
+    padding-top: 10px;
   }
 
   .nr-admin-sidebar-status {
-    width: 46px;
-    height: 46px;
-    justify-content: center;
-    padding: 0;
+    width: 52px;
+    height: 44px;
+    justify-content: flex-start;
+    gap: 10px;
+    padding: 0 16px;
+    overflow: hidden;
     border: 1px solid var(--NourApp-border);
-    border-radius: 14px;
+    border-radius: 13px;
     background: var(--NourApp-surface-muted);
+    transition: width 0.24s ease;
+  }
+
+  .nr-admin-sidebar:hover .nr-admin-sidebar-status,
+  .nr-admin-sidebar:focus-within .nr-admin-sidebar-status {
+    width: 100%;
   }
 
   .nr-admin-sidebar-status div {
-    display: none;
+    display: flex;
+    min-width: 0;
+    max-width: 0;
+    overflow: hidden;
+    opacity: 0;
+    white-space: nowrap;
+    transition:
+      max-width 0.24s ease,
+      opacity 0.15s ease;
+  }
+
+  .nr-admin-sidebar:hover .nr-admin-sidebar-status div,
+  .nr-admin-sidebar:focus-within .nr-admin-sidebar-status div {
+    max-width: 170px;
+    opacity: 1;
   }
 
   .nr-admin-sidebar-status-dot {
@@ -369,7 +493,11 @@ body.dark .nr-admin-sidebar-status,
 .nr-admin-theme--dark .nr-admin-sidebar-logo,
 html.dark .nr-admin-sidebar-logo,
 body.dark .nr-admin-sidebar-logo,
-[data-theme="dark"] .nr-admin-sidebar-logo {
+[data-theme="dark"] .nr-admin-sidebar-logo,
+.nr-admin-theme--dark .nr-admin-sidebar-brand-logo,
+html.dark .nr-admin-sidebar-brand-logo,
+body.dark .nr-admin-sidebar-brand-logo,
+[data-theme="dark"] .nr-admin-sidebar-brand-logo {
   background: var(--nour-surface-muted);
 }
 
@@ -425,10 +553,6 @@ body.dark .nr-admin-sidebar-logo,
 }
 
 @media (min-width: 1024px) {
-  .nr-admin-sidebar-link {
-    justify-content: center;
-  }
-
   .nr-admin-sidebar-link-icon {
     width: 42px;
     height: 42px;

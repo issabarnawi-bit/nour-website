@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { BarChart3, BookOpenText, BriefcaseBusiness, BusFront, CircleGauge, FileCheck2, FolderOpen, Globe2, Handshake, Hotel, Images, MessageSquareQuote, Scale, Settings, Users } from "lucide-react";
+import { BarChart3, BookOpenText, BriefcaseBusiness, BusFront, CalendarCheck2, CircleGauge, FileCheck2, FolderOpen, Globe2, Handshake, Hotel, Images, MessageSquareQuote, Scale, Settings, Users } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { getAdminTranslations, useLanguage } from "../../../core/i18n";
 
@@ -12,6 +12,7 @@ export default function Sidebar(){
  const {language}=useLanguage(); const t=getAdminTranslations(language);
  const navigationItems:SidebarNavigationItem[]=[
   {label:t.sidebar.dashboard,href:"/admin/dashboard",icon:CircleGauge},
+  {label:language==="ar"?"الحجوزات":"Bookings",href:"/admin/bookings",icon:CalendarCheck2},
   {label:t.sidebar.countries,href:"/admin/countries",icon:Globe2},
   {label:t.sidebar.programs,href:"/admin/programs",icon:FolderOpen},
   {label:language==="ar"?"المقالات":"Articles",href:"/admin/articles",icon:BookOpenText},
