@@ -80,8 +80,7 @@ export default function AdminDashboardPage() {
         supabase.from("bookings").select("id", { count: "exact", head: true }).eq("status", "pending_payment").is("deleted_at", null),
         supabase.from("bookings").select("id", { count: "exact", head: true }).eq("status", "confirmed").is("deleted_at", null),
         supabase.from("bookings").select("id", { count: "exact", head: true }).is("deleted_at", null),
-        supabase
-          .from("bookings")
+        supabase.from("bookings")
           .select("id,reference,contact_name,travelers_count,total_amount,currency_code,status,payment_status,created_at,programs(title_ar,title_en)")
           .is("deleted_at", null)
           .order("created_at", { ascending: false })
@@ -116,22 +115,22 @@ export default function AdminDashboardPage() {
     return new Intl.NumberFormat(isArabic ? "ar-SA" : "en-US").format(value ?? 0);
   };
 
-  const overviewCards: OverviewCard[] = [
+  const primaryCards: OverviewCard[] = [
     {
-      title: isArabic ? "زيارات اليوم" : "Today's visits",
-      value: number(analyticsQuery.data?.visitsToday, analyticsQuery.isLoading, analyticsQuery.isError),
-      description: isArabic ? "إجمالي زيارات صفحات الموقع اليوم" : "Total website page visits today",
-      icon: Activity,
-      href: "/admin/analytics",
+      title: isArabic ? "إجمالي الحجوزات" : "Total bookings",
+      value: number(bookingsQuery.data?.total, bookingsQuery.isLoading, bookingsQuery.isError),
+      description: isArabic ? "إجمالي الحجوزات المسجلة على المنصة" : "All bookings recorded on the platform",
+      icon: CalendarCheck2,
+      href: "/admin/bookings",
       tone: "blue",
     },
     {
-      title: isArabic ? "الزوار الفريدون" : "Unique visitors",
-      value: number(analyticsQuery.data?.uniqueVisitorsToday, analyticsQuery.isLoading, analyticsQuery.isError),
-      description: isArabic ? "الجلسات المميزة المسجلة اليوم" : "Distinct visitor sessions today",
-      icon: Users,
-      href: "/admin/analytics",
-      tone: "violet",
+      title: isArabic ? "الحجوزات المؤكدة" : "Confirmed bookings",
+      value: number(bookingsQuery.data?.confirmed, bookingsQuery.isLoading, bookingsQuery.isError),
+      description: isArabic ? "الحجوزات التي تم تأكيدها بنجاح" : "Bookings successfully confirmed",
+      icon: CheckCircle2,
+      href: "/admin/bookings?status=confirmed",
+      tone: "green",
     },
     {
       title: isArabic ? "بانتظار الدفع" : "Pending payment",
@@ -142,15 +141,26 @@ export default function AdminDashboardPage() {
       tone: "gold",
     },
     {
-      title: isArabic ? "الحجوزات المؤكدة" : "Confirmed bookings",
-      value: number(bookingsQuery.data?.confirmed, bookingsQuery.isLoading, bookingsQuery.isError),
-      description: isArabic ? `من أصل ${number(bookingsQuery.data?.total, bookingsQuery.isLoading, bookingsQuery.isError)} حجز` : `Out of ${number(bookingsQuery.data?.total, bookingsQuery.isLoading, bookingsQuery.isError)} bookings`,
-      icon: CheckCircle2,
-      href: "/admin/bookings?status=confirmed",
-      tone: "green",
+      title: isArabic ? "زيارات اليوم" : "Today's visits",
+      value: number(analyticsQuery.data?.visitsToday, analyticsQuery.isLoading, analyticsQuery.isError),
+      description: isArabic ? "إجمالي زيارات صفحات الموقع اليوم" : "Total website page visits today",
+      icon: Activity,
+      href: "/admin/analytics",
+      tone: "violet",
+    },
+  ];
+
+  const secondaryCards: OverviewCard[] = [
+    {
+      title: isArabic ? "الزوار الفريدون" : "Unique visitors",
+      value: number(analyticsQuery.data?.uniqueVisitorsToday, analyticsQuery.isLoading, analyticsQuery.isError),
+      description: isArabic ? "الجلسات المميزة المسجلة اليوم" : "Distinct visitor sessions today",
+      icon: Users,
+      href: "/admin/analytics",
+      tone: "violet",
     },
     {
-      title: isArabic ? "طلبات انضمام" : "Join applications",
+      title: isArabic ? "طلبات الانضمام" : "Join applications",
       value: number(applicationsQuery.data?.jobs, applicationsQuery.isLoading, applicationsQuery.isError),
       description: isArabic ? "طلبات جديدة بانتظار المراجعة" : "New applications awaiting review",
       icon: BriefcaseBusiness,
@@ -158,12 +168,12 @@ export default function AdminDashboardPage() {
       tone: "blue",
     },
     {
-      title: isArabic ? "طلبات شراكة" : "Partner applications",
+      title: isArabic ? "طلبات الشراكة" : "Partner applications",
       value: number(applicationsQuery.data?.partners, applicationsQuery.isLoading, applicationsQuery.isError),
       description: isArabic ? "طلبات شراكة بانتظار المراجعة" : "Partnership requests awaiting review",
       icon: Handshake,
       href: "/admin/partners",
-      tone: "violet",
+      tone: "gold",
     },
   ];
 
@@ -184,6 +194,21 @@ export default function AdminDashboardPage() {
     return program ? (isArabic ? program.title_ar : program.title_en) : (isArabic ? "برنامج عمرة" : "Umrah program");
   };
 
+  const renderCard = (card: OverviewCard, compact = false) => {
+    const Icon = card.icon;
+    return (
+      <Link key={card.title} href={card.href} className={`nr-ops-stat ${compact ? "is-compact" : ""} is-${card.tone ?? "blue"}`}>
+        <div className="nr-ops-stat-top">
+          <span className="nr-ops-icon"><Icon size={21} /></span>
+          <ArrowUpRight size={17} />
+        </div>
+        <strong>{card.value}</strong>
+        <span className="nr-ops-stat-title">{card.title}</span>
+        <small>{card.description}</small>
+      </Link>
+    );
+  };
+
   return (
     <section className="nr-dashboard nr-ops-dashboard" dir={isArabic ? "rtl" : "ltr"}>
       <header className="nr-ops-head">
@@ -195,19 +220,23 @@ export default function AdminDashboardPage() {
         <div className="nr-ops-date"><CalendarDays size={17} /><span>{today}</span></div>
       </header>
 
-      <div className="nr-ops-stats">
-        {overviewCards.map((card) => {
-          const Icon = card.icon;
-          return (
-            <Link key={card.title} href={card.href} className={`nr-ops-stat is-${card.tone ?? "blue"}`}>
-              <div className="nr-ops-stat-top"><span className="nr-ops-icon"><Icon size={21} /></span><ArrowUpRight size={17} /></div>
-              <strong>{card.value}</strong>
-              <span className="nr-ops-stat-title">{card.title}</span>
-              <small>{card.description}</small>
-            </Link>
-          );
-        })}
-      </div>
+      <section className="nr-kpi-section">
+        <div className="nr-kpi-heading">
+          <div>
+            <span className="nr-dashboard-kicker">{isArabic ? "مؤشرات الأداء" : "Performance indicators"}</span>
+            <h2>{isArabic ? "الأداء التشغيلي اليوم" : "Today's operational performance"}</h2>
+          </div>
+          <small>{isArabic ? "الأهم أولًا" : "Priority metrics first"}</small>
+        </div>
+
+        <div className="nr-ops-stats nr-ops-stats--primary">
+          {primaryCards.map((card) => renderCard(card))}
+        </div>
+
+        <div className="nr-ops-stats nr-ops-stats--secondary">
+          {secondaryCards.map((card) => renderCard(card, true))}
+        </div>
+      </section>
 
       <section className="nr-ops-panel nr-ops-bookings-panel">
         <div className="nr-ops-panel-head">
@@ -243,326 +272,74 @@ export default function AdminDashboardPage() {
           <div><strong>{isArabic ? "المشتركون النشطون" : "Active subscribers"}</strong><p>{number(analyticsQuery.data?.activeSubscribers, analyticsQuery.isLoading, analyticsQuery.isError)} {isArabic ? "مشترك نشط" : "active subscribers"}</p></div>
           <ArrowUpRight size={17} />
         </Link>
-        <Link href="/admin/bookings" className="nr-ops-health-card">
-          <span className="nr-ops-health-icon"><CalendarCheck2 size={20} /></span>
-          <div><strong>{isArabic ? "إجمالي الحجوزات" : "Total bookings"}</strong><p>{number(bookingsQuery.data?.total, bookingsQuery.isLoading, bookingsQuery.isError)} {isArabic ? "حجز مسجل" : "recorded bookings"}</p></div>
+        <Link href="/admin/analytics" className="nr-ops-health-card">
+          <span className="nr-ops-health-icon"><Activity size={20} /></span>
+          <div><strong>{isArabic ? "زيارات آخر 30 يومًا" : "Visits in 30 days"}</strong><p>{number(analyticsQuery.data?.visitsLast30Days, analyticsQuery.isLoading, analyticsQuery.isError)} {isArabic ? "زيارة" : "visits"}</p></div>
           <ArrowUpRight size={17} />
         </Link>
       </section>
 
       <style jsx>{`
-        .nr-ops-dashboard {
-          display: grid;
-          gap: 22px;
-          color: var(--nour-text-primary);
-        }
+        .nr-ops-dashboard{display:grid;gap:22px;color:var(--nour-text-primary)}
+        .nr-ops-head{display:flex;align-items:flex-end;justify-content:space-between;gap:28px;padding:4px 2px}
+        .nr-ops-head h1{margin:7px 0 8px;color:var(--nour-text-primary);font-size:clamp(28px,3vw,40px);line-height:1.2}
+        .nr-ops-head p{max-width:760px;margin:0;color:var(--nour-text-secondary);line-height:1.75}
+        .nr-ops-date{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--nour-border);border-radius:14px;background:var(--nour-surface);color:var(--nour-text-secondary);box-shadow:var(--nour-shadow-sm);font-size:12px;font-weight:800;white-space:nowrap}
+        .nr-dashboard-kicker{color:var(--nour-primary);font-size:10px;font-weight:900;letter-spacing:.02em}
 
-        .nr-ops-head {
-          display: flex;
-          align-items: flex-end;
-          justify-content: space-between;
-          gap: 28px;
-          padding: 4px 2px;
-        }
+        .nr-kpi-section{display:grid;gap:12px;padding:18px;border:1px solid var(--nour-border);border-radius:22px;background:color-mix(in srgb,var(--nour-surface) 96%,var(--nour-primary));box-shadow:var(--nour-shadow-sm)}
+        .nr-kpi-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;padding:0 2px 4px}
+        .nr-kpi-heading h2{margin:4px 0 0;color:var(--nour-text-primary);font-size:20px}
+        .nr-kpi-heading>small{color:var(--nour-text-muted);font-size:10px;font-weight:800}
 
-        .nr-ops-head h1 {
-          margin: 7px 0 8px;
-          color: var(--nour-text-primary);
-          font-size: clamp(28px, 3vw, 40px);
-          line-height: 1.2;
-        }
+        .nr-ops-stats{display:grid;gap:12px}
+        .nr-ops-stats--primary{grid-template-columns:repeat(4,minmax(0,1fr))}
+        .nr-ops-stats--secondary{grid-template-columns:repeat(3,minmax(0,1fr))}
+        .nr-ops-stat{position:relative;display:grid;gap:7px;min-height:166px;padding:17px;overflow:hidden;border:1px solid var(--nour-border);border-radius:18px;background:var(--nour-surface);color:var(--nour-text-primary);box-shadow:var(--nour-shadow-sm);text-decoration:none;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
+        .nr-ops-stat.is-compact{grid-template-columns:48px minmax(0,1fr) auto;grid-template-rows:auto auto;align-items:center;min-height:112px;gap:4px 12px;padding:14px 16px}
+        .nr-ops-stat.is-compact .nr-ops-stat-top{grid-row:1/3;grid-column:1;align-self:center}
+        .nr-ops-stat.is-compact .nr-ops-stat-top>svg{display:none}
+        .nr-ops-stat.is-compact>strong{grid-column:3;grid-row:1/3;align-self:center;font-size:28px}
+        .nr-ops-stat.is-compact .nr-ops-stat-title{grid-column:2;grid-row:1;align-self:end}
+        .nr-ops-stat.is-compact small{grid-column:2;grid-row:2;align-self:start}
+        .nr-ops-stat:hover{transform:translateY(-3px);border-color:var(--nour-border-strong);box-shadow:var(--nour-shadow-md)}
+        .nr-ops-stat::before{content:"";position:absolute;inset-inline-start:0;top:0;width:4px;height:100%;background:var(--nour-primary)}
+        .nr-ops-stat.is-green::before{background:var(--nour-success)}
+        .nr-ops-stat.is-gold::before{background:var(--nour-warning)}
+        .nr-ops-stat.is-violet::before{background:#8b6cf0}
+        .nr-ops-stat-top{display:flex;align-items:center;justify-content:space-between;color:var(--nour-text-muted)}
+        .nr-ops-icon,.nr-ops-health-icon{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:color-mix(in srgb,var(--nour-primary) 12%,var(--nour-surface));color:var(--nour-primary)}
+        .nr-ops-stat.is-green .nr-ops-icon{background:color-mix(in srgb,var(--nour-success) 12%,var(--nour-surface));color:var(--nour-success)}
+        .nr-ops-stat.is-gold .nr-ops-icon{background:color-mix(in srgb,var(--nour-warning) 13%,var(--nour-surface));color:var(--nour-warning)}
+        .nr-ops-stat.is-violet .nr-ops-icon{background:color-mix(in srgb,#8b6cf0 13%,var(--nour-surface));color:#8b6cf0}
+        .nr-ops-stat>strong{font-size:30px;line-height:1}
+        .nr-ops-stat-title{font-size:12px;font-weight:900}
+        .nr-ops-stat small{color:var(--nour-text-secondary);font-size:10px;line-height:1.5}
 
-        .nr-ops-head p {
-          max-width: 760px;
-          margin: 0;
-          color: var(--nour-text-secondary);
-          line-height: 1.75;
-        }
+        .nr-ops-panel{padding:20px;border:1px solid var(--nour-border);border-radius:20px;background:var(--nour-surface);box-shadow:var(--nour-shadow-sm)}
+        .nr-ops-panel-head{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:15px}
+        .nr-ops-panel-head span{color:var(--nour-primary);font-size:10px;font-weight:900}
+        .nr-ops-panel-head h2{margin:4px 0 0;color:var(--nour-text-primary);font-size:20px}
+        .nr-ops-panel-head>a{display:flex;align-items:center;gap:5px;color:var(--nour-primary);font-size:11px;font-weight:900;text-decoration:none}
+        .nr-ops-bookings{display:grid}
+        .nr-ops-booking-row{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(130px,.7fr) minmax(140px,.7fr);align-items:center;gap:16px;padding:15px 8px;border-top:1px solid var(--nour-border);border-radius:10px;color:var(--nour-text-primary);text-decoration:none;transition:background .18s ease}
+        .nr-ops-booking-row:first-child{border-top:0}.nr-ops-booking-row:hover{background:var(--nour-surface-muted)}
+        .nr-ops-booking-main,.nr-ops-booking-meta,.nr-ops-booking-end{display:grid;gap:4px}.nr-ops-booking-main strong{font-size:13px}.nr-ops-booking-meta strong{font-size:12px}
+        .nr-ops-booking-main span,.nr-ops-booking-main small,.nr-ops-booking-meta span,.nr-ops-booking-end small{color:var(--nour-text-secondary);font-size:10px}.nr-ops-booking-end{justify-items:end}
+        .nr-ops-status{display:inline-flex;align-items:center;justify-content:center;min-height:25px;padding:0 8px;border-radius:999px;background:color-mix(in srgb,var(--nour-warning) 12%,var(--nour-surface));color:var(--nour-warning);font-size:9px;font-weight:900}
+        .nr-ops-status.is-confirmed{background:color-mix(in srgb,var(--nour-success) 12%,var(--nour-surface));color:var(--nour-success)}
+        .nr-ops-status.is-cancelled,.nr-ops-status.is-expired{background:color-mix(in srgb,var(--nour-danger) 12%,var(--nour-surface));color:var(--nour-danger)}
+        .nr-ops-status.is-refunded{background:color-mix(in srgb,#8b6cf0 13%,var(--nour-surface));color:#8b6cf0}
+        .nr-ops-empty{display:grid;place-items:center;min-height:190px;color:var(--nour-text-secondary);font-size:12px}.nr-ops-empty.is-error{color:var(--nour-danger)}
 
-        .nr-ops-date {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          min-height: 44px;
-          padding: 0 14px;
-          border: 1px solid var(--nour-border);
-          border-radius: 14px;
-          background: var(--nour-surface);
-          color: var(--nour-text-secondary);
-          box-shadow: var(--nour-shadow-sm);
-          font-size: 12px;
-          font-weight: 800;
-          white-space: nowrap;
-        }
+        .nr-ops-health{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+        .nr-ops-health-card{display:grid;grid-template-columns:42px minmax(0,1fr) auto;align-items:center;gap:11px;padding:16px;border:1px solid var(--nour-border);border-radius:17px;background:var(--nour-surface);color:var(--nour-text-primary);box-shadow:var(--nour-shadow-sm);text-decoration:none;transition:transform .18s ease,background .18s ease}
+        .nr-ops-health-card:hover{transform:translateY(-2px);background:var(--nour-surface-muted)}.nr-ops-health-card strong{font-size:12px}.nr-ops-health-card p{margin:3px 0 0;color:var(--nour-text-secondary);font-size:10px;line-height:1.5}.nr-ops-health-card>svg{color:var(--nour-text-muted)}
 
-        .nr-ops-stats {
-          display: grid;
-          grid-template-columns: repeat(6, minmax(0, 1fr));
-          gap: 12px;
-        }
-
-        .nr-ops-stat {
-          position: relative;
-          display: grid;
-          gap: 6px;
-          min-height: 168px;
-          padding: 17px;
-          overflow: hidden;
-          border: 1px solid var(--nour-border);
-          border-radius: 18px;
-          background: var(--nour-surface);
-          color: var(--nour-text-primary);
-          box-shadow: var(--nour-shadow-sm);
-          text-decoration: none;
-          transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
-        }
-
-        .nr-ops-stat:hover {
-          transform: translateY(-3px);
-          border-color: var(--nour-border-strong);
-          box-shadow: var(--nour-shadow-md);
-        }
-
-        .nr-ops-stat::before {
-          content: "";
-          position: absolute;
-          inset-inline-start: 0;
-          top: 0;
-          width: 4px;
-          height: 100%;
-          background: var(--nour-primary);
-        }
-
-        .nr-ops-stat.is-green::before { background: var(--nour-success); }
-        .nr-ops-stat.is-gold::before { background: var(--nour-warning); }
-        .nr-ops-stat.is-violet::before { background: #8b6cf0; }
-
-        .nr-ops-stat-top {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          color: var(--nour-text-muted);
-        }
-
-        .nr-ops-icon,
-        .nr-ops-health-icon {
-          display: grid;
-          place-items: center;
-          width: 40px;
-          height: 40px;
-          border-radius: 12px;
-          background: color-mix(in srgb, var(--nour-primary) 12%, var(--nour-surface));
-          color: var(--nour-primary);
-        }
-
-        .nr-ops-stat.is-green .nr-ops-icon {
-          background: color-mix(in srgb, var(--nour-success) 12%, var(--nour-surface));
-          color: var(--nour-success);
-        }
-
-        .nr-ops-stat.is-gold .nr-ops-icon {
-          background: color-mix(in srgb, var(--nour-warning) 13%, var(--nour-surface));
-          color: var(--nour-warning);
-        }
-
-        .nr-ops-stat.is-violet .nr-ops-icon {
-          background: color-mix(in srgb, #8b6cf0 13%, var(--nour-surface));
-          color: #8b6cf0;
-        }
-
-        .nr-ops-stat > strong {
-          font-size: 30px;
-          line-height: 1;
-        }
-
-        .nr-ops-stat-title {
-          font-size: 12px;
-          font-weight: 900;
-        }
-
-        .nr-ops-stat small {
-          color: var(--nour-text-secondary);
-          font-size: 10px;
-          line-height: 1.5;
-        }
-
-        .nr-ops-panel {
-          padding: 20px;
-          border: 1px solid var(--nour-border);
-          border-radius: 20px;
-          background: var(--nour-surface);
-          box-shadow: var(--nour-shadow-sm);
-        }
-
-        .nr-ops-panel-head {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 18px;
-          margin-bottom: 15px;
-        }
-
-        .nr-ops-panel-head span,
-        .nr-dashboard-kicker {
-          color: var(--nour-primary);
-          font-size: 10px;
-          font-weight: 900;
-          letter-spacing: .02em;
-        }
-
-        .nr-ops-panel-head h2 {
-          margin: 4px 0 0;
-          color: var(--nour-text-primary);
-          font-size: 20px;
-        }
-
-        .nr-ops-panel-head > a {
-          display: flex;
-          align-items: center;
-          gap: 5px;
-          color: var(--nour-primary);
-          font-size: 11px;
-          font-weight: 900;
-          text-decoration: none;
-        }
-
-        .nr-ops-bookings { display: grid; }
-
-        .nr-ops-booking-row {
-          display: grid;
-          grid-template-columns: minmax(0, 1.5fr) minmax(130px, .7fr) minmax(140px, .7fr);
-          align-items: center;
-          gap: 16px;
-          padding: 15px 8px;
-          border-top: 1px solid var(--nour-border);
-          border-radius: 10px;
-          color: var(--nour-text-primary);
-          text-decoration: none;
-          transition: background .18s ease;
-        }
-
-        .nr-ops-booking-row:first-child { border-top: 0; }
-        .nr-ops-booking-row:hover { background: var(--nour-surface-muted); }
-
-        .nr-ops-booking-main,
-        .nr-ops-booking-meta,
-        .nr-ops-booking-end {
-          display: grid;
-          gap: 4px;
-        }
-
-        .nr-ops-booking-main strong { font-size: 13px; }
-        .nr-ops-booking-meta strong { font-size: 12px; }
-
-        .nr-ops-booking-main span,
-        .nr-ops-booking-main small,
-        .nr-ops-booking-meta span,
-        .nr-ops-booking-end small {
-          color: var(--nour-text-secondary);
-          font-size: 10px;
-        }
-
-        .nr-ops-booking-end { justify-items: end; }
-
-        .nr-ops-status {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          min-height: 25px;
-          padding: 0 8px;
-          border-radius: 999px;
-          background: color-mix(in srgb, var(--nour-warning) 12%, var(--nour-surface));
-          color: var(--nour-warning);
-          font-size: 9px;
-          font-weight: 900;
-        }
-
-        .nr-ops-status.is-confirmed {
-          background: color-mix(in srgb, var(--nour-success) 12%, var(--nour-surface));
-          color: var(--nour-success);
-        }
-
-        .nr-ops-status.is-cancelled,
-        .nr-ops-status.is-expired {
-          background: color-mix(in srgb, var(--nour-danger) 12%, var(--nour-surface));
-          color: var(--nour-danger);
-        }
-
-        .nr-ops-status.is-refunded {
-          background: color-mix(in srgb, #8b6cf0 13%, var(--nour-surface));
-          color: #8b6cf0;
-        }
-
-        .nr-ops-empty {
-          display: grid;
-          place-items: center;
-          min-height: 190px;
-          color: var(--nour-text-secondary);
-          font-size: 12px;
-        }
-
-        .nr-ops-empty.is-error { color: var(--nour-danger); }
-
-        .nr-ops-health {
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 12px;
-        }
-
-        .nr-ops-health-card {
-          display: grid;
-          grid-template-columns: 42px minmax(0, 1fr) auto;
-          align-items: center;
-          gap: 11px;
-          padding: 16px;
-          border: 1px solid var(--nour-border);
-          border-radius: 17px;
-          background: var(--nour-surface);
-          color: var(--nour-text-primary);
-          box-shadow: var(--nour-shadow-sm);
-          text-decoration: none;
-          transition: transform .18s ease, background .18s ease;
-        }
-
-        .nr-ops-health-card:hover {
-          transform: translateY(-2px);
-          background: var(--nour-surface-muted);
-        }
-
-        .nr-ops-health-card strong { font-size: 12px; }
-
-        .nr-ops-health-card p {
-          margin: 3px 0 0;
-          color: var(--nour-text-secondary);
-          font-size: 10px;
-          line-height: 1.5;
-        }
-
-        .nr-ops-health-card > svg { color: var(--nour-text-muted); }
-
-        @media (max-width: 1500px) {
-          .nr-ops-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-        }
-
-        @media (max-width: 1050px) {
-          .nr-ops-health { grid-template-columns: 1fr; }
-        }
-
-        @media (max-width: 760px) {
-          .nr-ops-head {
-            align-items: flex-start;
-            flex-direction: column;
-          }
-
-          .nr-ops-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-          .nr-ops-booking-row { grid-template-columns: 1fr; }
-          .nr-ops-booking-end { justify-items: start; }
-          .nr-ops-panel-head { align-items: flex-start; flex-direction: column; }
-        }
-
-        @media (max-width: 520px) {
-          .nr-ops-stats { grid-template-columns: 1fr; }
-        }
+        @media(max-width:1300px){.nr-ops-stats--primary{grid-template-columns:repeat(2,minmax(0,1fr))}}
+        @media(max-width:1050px){.nr-ops-stats--secondary,.nr-ops-health{grid-template-columns:1fr}}
+        @media(max-width:760px){.nr-ops-head,.nr-kpi-heading{align-items:flex-start;flex-direction:column}.nr-ops-stats--primary{grid-template-columns:1fr}.nr-ops-booking-row{grid-template-columns:1fr}.nr-ops-booking-end{justify-items:start}.nr-ops-panel-head{align-items:flex-start;flex-direction:column}.nr-ops-stat.is-compact{grid-template-columns:44px minmax(0,1fr) auto}}
+        @media(max-width:520px){.nr-kpi-section{padding:14px}.nr-ops-stat.is-compact>strong{font-size:24px}}
       `}</style>
     </section>
   );
