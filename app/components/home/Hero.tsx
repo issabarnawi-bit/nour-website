@@ -283,13 +283,10 @@ export default function Hero({ t }: Props) {
           inset: 0;
           z-index: -5;
           background:
-            url("/images/site/hero-haram-bg.jpg")
-            center 54% / cover no-repeat;
+            url("/images/site/nour-hero-brand-background.svg")
+            left center / cover no-repeat;
           transform-origin: center;
-          filter:
-            saturate(.94)
-            contrast(1.04)
-            brightness(.86);
+          filter: none;
           pointer-events: none;
         }
 
@@ -301,20 +298,10 @@ export default function Hero({ t }: Props) {
           background:
             linear-gradient(
               90deg,
-              rgba(4, 73, 164, .92) 0%,
-              rgba(9, 101, 210, .84) 38%,
-              rgba(21, 126, 230, .78) 66%,
-              rgba(52, 169, 235, .72) 100%
-            ),
-            radial-gradient(
-              circle at 24% 48%,
-              rgba(1, 31, 74, .20),
-              transparent 34%
-            ),
-            radial-gradient(
-              circle at 86% 82%,
-              rgba(255, 195, 19, .12),
-              transparent 28%
+              rgba(4, 55, 120, .22) 0%,
+              rgba(7, 69, 145, .10) 42%,
+              rgba(10, 83, 166, .04) 68%,
+              transparent 100%
             );
         }
 
@@ -708,20 +695,17 @@ export default function Hero({ t }: Props) {
 
         @media (max-width: 768px) {
           .nr-premium-haram-bg {
-            background-position: 42% center;
-            filter:
-              saturate(.9)
-              contrast(1.02)
-              brightness(.80);
+            background-position: 24% center;
+            filter: none;
           }
 
           .nr-premium-haram-overlay {
             background:
               linear-gradient(
                 180deg,
-                rgba(7, 86, 190, .90) 0%,
-                rgba(15, 112, 224, .82) 50%,
-                rgba(40, 151, 234, .80) 100%
+                rgba(5, 58, 126, .18) 0%,
+                rgba(7, 72, 150, .10) 52%,
+                rgba(8, 82, 164, .06) 100%
               );
           }
 
