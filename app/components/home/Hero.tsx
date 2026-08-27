@@ -284,7 +284,7 @@ export default function Hero({ t }: Props) {
           z-index: -5;
           background:
             url("/images/site/nour-hero-brand-background-1920x900.webp")
-            left center / cover no-repeat;
+            right center / cover no-repeat;
           transform-origin: center;
           filter: none;
           pointer-events: none;
@@ -325,19 +325,21 @@ export default function Hero({ t }: Props) {
         }
 
         .nr-premium-glow-blue {
-          width: 320px;
-          height: 360px;
-          top: -160px;
-          inset-inline-start: -120px;
-          background: rgba(32, 235, 213, 0.36);
+          width: 300px;
+          height: 330px;
+          top: -170px;
+          inset-inline-start: -145px;
+          background: rgba(32, 235, 213, 0.16);
+          filter: blur(18px);
         }
 
         .nr-premium-glow-gold {
-          width: 380px;
-          height: 380px;
-          right: -150px;
-          bottom: -220px;
-          background: rgba(255, 210, 27, 0.42);
+          width: 320px;
+          height: 320px;
+          right: -180px;
+          bottom: -245px;
+          background: rgba(255, 195, 19, 0.10);
+          filter: blur(28px);
         }
 
         .nr-premium-hero-grid {
@@ -531,6 +533,7 @@ export default function Hero({ t }: Props) {
           position: relative;
           min-height: 610px;
           isolation: isolate;
+          inset-inline-end: 22px;
         }
 
         .nr-premium-device-glow {
@@ -689,6 +692,7 @@ export default function Hero({ t }: Props) {
             width: min(100%, 620px);
             min-height: 580px;
             margin-inline: auto;
+            inset-inline-end: 0;
           }
         }
 
