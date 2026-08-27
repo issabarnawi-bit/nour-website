@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 900" preserveAspectRatio="xMidYMid slice">
+  <rect width="1920" height="900" fill="#205C9D"/>
+  <g transform="translate(-35 450)">
+    <polygon points="-165,-85 -75,-170 15,-85 15,85 -75,170 -165,85" fill="none" stroke="#F2B705" stroke-width="72" stroke-linejoin="miter"/>
+    <g fill="none" stroke="#FFFFFF" stroke-width="3" opacity="0.9">
+      <polygon points="55,-292 135,-260 122,-160 52,-178" />
+      <polygon points="145,-250 218,-205 187,-112 125,-147" transform="rotate(18 0 0)"/>
+      <polygon points="214,-178 278,-116 224,-36 170,-87" transform="rotate(34 0 0)"/>
+      <polygon points="254,-79 303,-3 228,58 191,-9" transform="rotate(48 0 0)"/>
+      <polygon points="267,30 301,114 213,156 187,84" transform="rotate(63 0 0)"/>
+      <polygon points="241,139 256,230 160,248 151,171" transform="rotate(78 0 0)"/>
+      <polygon points="177,231 167,323 69,313 78,235" transform="rotate(94 0 0)"/>
+      <polygon points="82,288 48,374 -44,340 -16,266" transform="rotate(109 0 0)"/>
+      <polygon points="-26,311 -80,389 -163,334 -119,270" transform="rotate(124 0 0)"/>
+    </g>
+  </g>
+</svg>
